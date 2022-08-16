@@ -1,1 +1,1 @@
-# rslang
+# rslang project for RS-school
