@@ -2,13 +2,6 @@ import { IUser, IAppState } from "../../typings/typings";
 
 export const ENDPOINT = 'http://localhost:3000';
 
-export const currentUser: IUser = {
-  userId: 'unknown',
-  name: 'unknown',
-  token: 'unknown',
-  refreshToken: 'unknown'
-}
-
 export const appState: IAppState = {
   isSignedIn: false,
   user: { userId: 'unknown',
