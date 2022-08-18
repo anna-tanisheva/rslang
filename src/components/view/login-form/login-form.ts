@@ -13,13 +13,16 @@ export class Form {
       <input type="text" class="registration-name">
       <input type="email" class="registration-email">
       <input type="password" class="registration-password">
-      <button type="submit">Submit</button>
+      <button class="registration-submit">Submit</button>
     </form>
     <form action="#" class="sign-in hidden">
       <input type="email" class="login-email">
       <input type="password" class="login-password">
-      <button>Submit</button>
+      <button class="login-submit">Submit</button>
     </form>
+    <div class="log-out-wrapper">
+      <button class="logout-submit">Log Out</button>
+    </div>
   `
   }
 }
