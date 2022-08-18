@@ -1,0 +1,4 @@
+.active-form {
+  border: 2px solid $main-color;
+  background-color: lighten($main-color, 10%);
+}
