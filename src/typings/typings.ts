@@ -42,7 +42,7 @@ export interface ISignInResponse {
 
 export interface IAppState {
   isSignedIn: boolean;
-  user: ISignInResponse | null;
+  user: IUser;
   group: number;
   page: number;
 }

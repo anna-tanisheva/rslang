@@ -1,20 +1,20 @@
 import { isHTMLButtonElement, isHTMLElement, isHTMLInputElement } from "../../typings/utils/utils";
 import { postUser, logIn } from "./api";
-import { currentUser } from "./state";
+import { appState } from "./state";
 import { ISignInResponse } from "../../typings/typings"
 
 function setCurrentUser(data: ISignInResponse) {
-  currentUser.name = data.name;
-  currentUser.userId = data.userId;
-  currentUser.refreshToken = data.refreshToken;
-  currentUser.token = data.token;
+  appState.user.name = data.name;
+  appState.user.userId = data.userId;
+  appState.user.refreshToken = data.refreshToken;
+  appState.user.token = data.token;
 }
 
 export function setCurrentUserOnLoad() {
-  if(!localStorage.currentUser) return;
-  const user = JSON.parse(localStorage.currentUser);
+  if(!localStorage.appState) return;
+  const {user} = JSON.parse(localStorage.appState);
   setCurrentUser(user);
-  console.log(currentUser)
+  console.log(user)
 }
 
 export function showForms(e: Event): void {
@@ -57,7 +57,11 @@ export async function addNewUserHandler(): Promise<void> {
     password: userData.password
   });
   setCurrentUser(signedIn);
-  localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  appState.isSignedIn = true;
+  localStorage.setItem('appState', JSON.stringify(appState));
+  passwordInput.value = '';
+  emailInput.value = '';
+  nameInput.value = '';
 }
 
 export async function signInHandler(): Promise<void> {
@@ -74,12 +78,16 @@ export async function signInHandler(): Promise<void> {
     password: userData.password
   });
   setCurrentUser(signedIn);
-  localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  appState.isSignedIn = true;
+  localStorage.setItem('appState', JSON.stringify(appState));
+  passwordInput.value = '';
+  emailInput.value = '';
 }
 
 export function logOutHandler(): void {
-  Object.keys(currentUser).forEach(key => {
-    currentUser[(key as keyof typeof currentUser)] = 'unknown'
+  Object.keys(appState.user).forEach(key => {
+    appState.user[(key as keyof typeof appState.user)] = 'unknown'
   })
-  localStorage.removeItem('currentUser');
+  appState.isSignedIn = false;
+  localStorage.setItem('appState', JSON.stringify(appState));
 }
