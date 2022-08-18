@@ -8,13 +8,16 @@ function setCurrentUser(data: ISignInResponse) {
   appState.user.userId = data.userId;
   appState.user.refreshToken = data.refreshToken;
   appState.user.token = data.token;
+  const welcomeContainer = document.querySelector('.welcome-text');
+  if(!isHTMLElement(welcomeContainer)) return;
+  if (data.name === 'unknown') return;
+  welcomeContainer.innerText = `Welcome ${data.name} `;
 }
 
 export function setCurrentUserOnLoad() {
   if(!localStorage.appState) return;
   const {user} = JSON.parse(localStorage.appState);
   setCurrentUser(user);
-  console.log(user)
 }
 
 export function showForms(e: Event): void {
@@ -90,4 +93,11 @@ export function logOutHandler(): void {
   })
   appState.isSignedIn = false;
   localStorage.setItem('appState', JSON.stringify(appState));
+  const welcomeContainer = document.querySelector('.welcome-text');
+  if(!isHTMLElement(welcomeContainer)) return;
+  welcomeContainer.innerText = `Welcome stranger`
+}
+
+export function showFormHandler() {
+  document.querySelector('.form-container')?.classList.toggle('hidden')
 }

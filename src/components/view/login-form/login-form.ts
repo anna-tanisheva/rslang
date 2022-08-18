@@ -10,19 +10,16 @@ export class Form {
       <button class="show-sign-up active-form">Sign-up</button>
     </div>
     <form action="#" class="sign-up">
-      <input type="text" class="registration-name">
-      <input type="email" class="registration-email">
-      <input type="password" class="registration-password">
+      <input type="text" class="registration-name" placeholder="name">
+      <input type="email" class="registration-email" placeholder="email">
+      <input type="password" class="registration-password" placeholder="password">
       <button class="registration-submit">Submit</button>
     </form>
     <form action="#" class="sign-in hidden">
-      <input type="email" class="login-email">
-      <input type="password" class="login-password">
+      <input type="email" class="login-email" placeholder="email">
+      <input type="password" class="login-password" placeholder="password">
       <button class="login-submit">Submit</button>
     </form>
-    <div class="log-out-wrapper">
-      <button class="logout-submit">Log Out</button>
-    </div>
   `
   }
 }

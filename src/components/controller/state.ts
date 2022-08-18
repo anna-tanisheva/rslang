@@ -1,4 +1,4 @@
-import { IUser, IAppState } from "../../typings/typings";
+import { IAppState } from "../../typings/typings";
 
 export const ENDPOINT = 'http://localhost:3000';
 
