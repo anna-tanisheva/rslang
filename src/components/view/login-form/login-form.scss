@@ -2,6 +2,14 @@
   position: absolute;
   top: 0;
   left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  width: 300px;
+  padding: 10px;
+  border: 2px solid $main-color;
+  border-radius: 5px;
 }
 
 .show-form {
@@ -14,7 +22,25 @@
   outline: none;
 }
 
+.show-tab {
+  border: none;
+  outline: none;
+  background-color: transparent;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  background-color: lighten($main-color, 10%);
+  padding: 30px;
+
+  label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+}
+
 .active-form {
-  border: 2px solid $main-color;
   background-color: lighten($main-color, 10%);
 }

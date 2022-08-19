@@ -10,9 +10,29 @@ function setCurrentUser(data: ISignInResponse) {
   appState.user.token = data.token;
   const welcomeContainer = document.querySelector('.welcome-text');
   if(!isHTMLElement(welcomeContainer)) return;
+  if (data.name === 'unknown') {
+    welcomeContainer.innerText = `Welcome stranger`
+  } else {
+    welcomeContainer.innerText = `Welcome ${data.name} `;
+  };
   if (data.name === 'unknown') return;
-  welcomeContainer.innerText = `Welcome ${data.name} `;
+  const logOutBtn = document.querySelector('.logout-submit');
+  if(!isHTMLButtonElement(logOutBtn)) return;
+  logOutBtn.removeAttribute('disabled');
 }
+
+// function validateForm() {
+//   const nameInput = document.querySelector('.registration-name');
+//   if(!isHTMLInputElement(nameInput)) return;
+//   const emailInput = document.querySelector('.registration-email');
+//   if(!isHTMLInputElement(emailInput)) return;
+//   const passwordInput = document.querySelector('.registration-password');
+//   if(!isHTMLInputElement(passwordInput)) return;
+//   // if(!nameInput.value || emailInput.value.indexOf('@') === -1 || emailInput.value.indexOf('.') === -1 || )
+//   if(!nameInput.value) {
+
+//   }
+// }
 
 export function setCurrentUserOnLoad() {
   if(!localStorage.appState) return;
@@ -95,7 +115,10 @@ export function logOutHandler(): void {
   localStorage.setItem('appState', JSON.stringify(appState));
   const welcomeContainer = document.querySelector('.welcome-text');
   if(!isHTMLElement(welcomeContainer)) return;
-  welcomeContainer.innerText = `Welcome stranger`
+  welcomeContainer.innerText = `Welcome stranger`;
+  const logOutBtn = document.querySelector('.logout-submit');
+  if(!isHTMLButtonElement(logOutBtn)) return;
+  logOutBtn.setAttribute('disabled', 'true');
 }
 
 export function showFormHandler() {
