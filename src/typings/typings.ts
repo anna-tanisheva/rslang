@@ -71,4 +71,4 @@ export interface ITextbookState {
     activeWord: number;
     wordsArray: WordsData;
     maxPage: number;
-
+}

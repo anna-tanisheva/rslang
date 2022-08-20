@@ -1,11 +1,9 @@
 
 import {WordDetails} from "../view/textbook";
 import {IResWordsPage, IWord} from "../../typings";
-import {fetchWords} from "./api";
-import {textbookState} from "./state";
+import {fetchWords, postUser, logIn} from "./api";
+import { textbookState, appState } from "./state";
 import { isHTMLButtonElement, isHTMLElement, isHTMLInputElement } from "../../typings/utils/utils";
-import { postUser, logIn } from "./api";
-import { appState } from "./state";
 import { ISignInResponse } from "../../typings/typings"
 
 export function drawWordDetails(element: IWord) {
