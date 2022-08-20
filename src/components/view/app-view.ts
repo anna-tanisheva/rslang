@@ -4,19 +4,24 @@ import {createElementWithAttributes} from "./utils";
 import { isHTMLElement } from "../../typings/utils/utils";
 import { Form } from "./login-form/login-form";
 import { ShowFormPanel } from "./login-form/show-button";
+import { Header } from "./page-view/header-view";
+import { MainPage } from "./page-view/main-view";
+import { Footer } from "./page-view/footer-view";
 // import { appState } from "../controller/state";
 
 
 export class AppView {
-    private textbook = new TextbookView(textbookState);
-    private form = new Form();
-    private showForm = new ShowFormPanel();
+  private header = new Header().create();
 
-    private drawTestView(): void {
-        const root = createElementWithAttributes("div", {id: "root"});
-        root.append(this.textbook.template);
-        document.body.append(root);
-    }
+  private footer = new Footer().create();
+  
+  private main = new MainPage().create();
+
+    private textbook = new TextbookView(textbookState);
+
+    private form = new Form();
+
+    private showForm = new ShowFormPanel();
 
   private drawForm(): void {
     const body = document.querySelector('body');
@@ -34,8 +39,11 @@ export class AppView {
   }
 
     public drawView(): void {
-      this.drawTestView();
+      const root = createElementWithAttributes("div", {id: "root"});
+      root.append(this.textbook.template, this.header, this.main, this.footer);
+      document.body.append(root);
       this.drawForm();
   }
+
 }
 
