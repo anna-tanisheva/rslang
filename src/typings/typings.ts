@@ -1,4 +1,4 @@
-interface IWord {
+export interface IWord {
   id: string;
   audioExample: string;
   audioMeaning: string;
@@ -14,39 +14,40 @@ interface IWord {
   wordTranslate: string
 }
 
-interface IUser {
-  id: string;
+export interface IUser {
+  userId: string;
   name: string;
-  email: string;
+  token?: string;
+  refreshToken?: string;
 }
 
-interface IUserSignUp {
+export interface IUserSignUp {
   name: string;
   email: string;
   password: string;
 }
 
-interface IUserSignIn {
+export interface IUserSignIn {
   email: string;
   password: string;
 }
 
-interface ISignInResponse {
+export interface ISignInResponse {
   message: string;
   token: string;
   refreshToken: string;
   userId: string;
-  name: string
+  name: string;
 }
 
-interface IAppState {
+export interface IAppState {
   isSignedIn: boolean;
-  user: ISignInResponse | null;
+  user: IUser;
   group: number;
   page: number;
 }
 
-interface IWordProgress {
+export interface IWordProgress {
   isSignedIn: boolean;
   user: ISignInResponse | null;
   group: number;
