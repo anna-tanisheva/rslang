@@ -1,0 +1,168 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik+Mono+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,700;0,900;1,400;1,700;1,900&display=swap');
+$sides-padding: 1rem;
+$colorActiveBg:lighten(lightgrey,
+15%);
+$colorActive:lighten(black,
+40%);
+$colorAccent:gold;
+$colorGroup1:darken( aquamarine,
+35%);
+$colorGroup2:lighten(orange,
+5%);
+$colorGroup3:darken(pink,
+10%);
+$colorGroup4:lighten(red,
+20%);
+$colorGroup5:lightskyblue;
+$colorGroup6:lighten(blue,
+25%);
+.textbook-container {
+    padding: 1rem 0;
+    width: min(1200px, calc(100% - $sides-padding));
+    margin: 0 auto;
+    .group-heading,
+    .group-container {
+        font-family: 'Rubik', sans-serif;
+        font-weight: 300;
+        padding: calc($sides-padding/2);
+        background-color: $colorActiveBg;
+    }
+    .group-heading {
+        border-radius: 0 1rem 0 0;
+    }
+    .group-container {
+        padding-bottom: calc($sides-padding/2);
+        border-radius: 0 0 1rem 1rem;
+    }
+}
+
+.textbook-controls {
+    display: flex;
+    width: min-content;
+    gap: 0.5em;
+}
+
+.group-label,
+.textbook-mode,
+.textbook-settings {
+    padding: calc($sides-padding/2);
+    font-size: 1rem;
+    letter-spacing: -0.1em;
+    cursor: pointer;
+    border: unset;
+    background: unset;
+    transition: 0.2s;
+}
+
+.textbook-control {
+    display: grid;
+}
+
+.group-label,
+.textbook-mode {
+    font-family: 'Rubik Mono One', sans-serif;
+    color: lightgrey;
+    border-radius: 1rem 1rem 0 0;
+    display: grid;
+    place-items: center;
+    padding-bottom: 0;
+    transition: 0.2s;
+}
+
+input[name="textbook-mode"],
+input[name="group-radio"] {
+    width: 0;
+    height: 0;
+    opacity: 0;
+    display: none;
+}
+
+input[name="textbook-mode"]:checked+.textbook-mode,
+input[name="group-radio"]:checked+.group-label {
+    color: $colorActive;
+}
+
+input[name="textbook-mode"]:checked+.textbook-mode {
+    background-color: $colorActiveBg;
+}
+
+.textbook-mode:hover {
+    color: $colorAccent;
+}
+
+.textbook-settings {
+    font-size: 1.5rem;
+    color: $colorActive;
+    display: grid;
+    place-items: center;
+}
+
+.textbook-settings .settings-icon {
+    fill: currentColor;
+    width: 1em;
+    height: 1em;
+    transition: 0.3s;
+}
+
+.textbook-settings:hover .settings-icon {
+    transform: rotate(120deg);
+}
+
+.group-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1em;
+}
+
+.group-item {
+    color: lightgrey;
+    flex: 1;
+}
+
+.group-item h2 {
+    min-width: 160px;
+}
+
+.group-item p {
+    text-align: right;
+}
+
+.group-item:nth-child(1) input[name="group-radio"]:checked+.group-label {
+    color: $colorGroup1;
+    box-shadow: 2px 2px 0px 0px currentColor;
+}
+
+.group-item:nth-child(2) input[name="group-radio"]:checked+.group-label {
+    color: $colorGroup2;
+    box-shadow: 2px 2px 0px 0px currentColor;
+}
+
+.group-item:nth-child(3) input[name="group-radio"]:checked+.group-label {
+    color: $colorGroup3;
+    box-shadow: 2px 2px 0px 0px currentColor;
+}
+
+.group-item:nth-child(4) input[name="group-radio"]:checked+.group-label {
+    color: $colorGroup4;
+    box-shadow: 2px 2px 0px 0px currentColor;
+}
+
+.group-item:nth-child(5) input[name="group-radio"]:checked+.group-label {
+    color: $colorGroup5;
+    box-shadow: 2px 2px 0px 0px currentColor;
+}
+
+.group-item:nth-child(6) input[name="group-radio"]:checked+.group-label {
+    color: $colorGroup6;
+    box-shadow: 2px 2px 0px 0px currentColor;
+}
+
+.group-label {
+    background-color: lighten(lightgrey, 11%);
+    font-family: 'Rubik Mono One', sans-serif;
+    color: currentColor;
+    border-radius: 1rem;
+    place-items: unset;
+}

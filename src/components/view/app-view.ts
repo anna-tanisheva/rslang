@@ -1,21 +1,22 @@
+import {textbookState} from "../controller/state";
+import {TextbookView} from "./textbook/textbook-view";
+import {createElementWithAttributes} from "./utils";
 import { isHTMLElement } from "../../typings/utils/utils";
 import { Form } from "./login-form/login-form";
 import { ShowFormPanel } from "./login-form/show-button";
 // import { appState } from "../controller/state";
 
+
 export class AppView {
+    private textbook = new TextbookView(textbookState);
+    private form = new Form();
+    private showForm = new ShowFormPanel();
 
-  private form = new Form();
-
-  private showForm = new ShowFormPanel();
-
-  private drawTestView(): void {
-    const body = document.querySelector('body');
-    const hello = document.createElement('h1');
-    hello.innerText = 'Hello World!';
-    if (!isHTMLElement(body)) return;
-    body.append(hello);
-  }
+    private drawTestView(): void {
+        const root = createElementWithAttributes("div", {id: "root"});
+        root.append(this.textbook.template);
+        document.body.append(root);
+    }
 
   private drawForm(): void {
     const body = document.querySelector('body');
@@ -37,3 +38,4 @@ export class AppView {
       this.drawForm();
   }
 }
+

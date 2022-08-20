@@ -1,7 +1,31 @@
+
+import {WordDetails} from "../view/textbook";
+import {IResWordsPage, IWord} from "../../typings";
+import {fetchWords} from "./api";
+import {textbookState} from "./state";
 import { isHTMLButtonElement, isHTMLElement, isHTMLInputElement } from "../../typings/utils/utils";
 import { postUser, logIn } from "./api";
 import { appState } from "./state";
 import { ISignInResponse } from "../../typings/typings"
+
+export function drawWordDetails(element: IWord) {
+    const card = new WordDetails(element);
+    return card.template;
+}
+
+async function getWords(): Promise<IResWordsPage> {
+    const pageData = await fetchWords({
+        group: textbookState.group,
+        page: textbookState.page,
+    });
+    return pageData;
+}
+
+export async function drawTextbook(): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const pageData = await getWords();
+}
+
 
 function setCurrentUser(data: ISignInResponse) {
   appState.user.name = data.name;
@@ -124,3 +148,4 @@ export function logOutHandler(): void {
 export function showFormHandler() {
   document.querySelector('.form-container')?.classList.toggle('hidden')
 }
+
