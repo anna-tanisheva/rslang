@@ -1,4 +1,5 @@
 export interface IWord {
+
     id: string;
     audio: string;
     audioExample: string;
@@ -16,9 +17,10 @@ export interface IWord {
 }
 
 export interface IUser {
-    id: string;
+    userId: string;
     name: string;
-    email: string;
+    token?: string;
+    refreshToken?: string;
 }
 
 export interface IUserSignUp {
@@ -41,10 +43,10 @@ export interface ISignInResponse {
 }
 
 export interface IAppState {
-    isSignedIn: boolean;
-    user: ISignInResponse | null;
-    group: number;
-    page: number;
+  isSignedIn: boolean;
+  user: IUser;
+  group: number;
+  page: number;
 }
 
 export interface IWordProgress {
@@ -69,4 +71,4 @@ export interface ITextbookState {
     activeWord: number;
     wordsArray: WordsData;
     maxPage: number;
-}
+
