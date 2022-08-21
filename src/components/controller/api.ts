@@ -26,6 +26,11 @@ export async function postUser(body: IUserSignUp): Promise<IUser> {
       'Content-Type': 'application/json'
     }
   })
+  if (res.status === 417) {
+    throw new Error('417');
+  } else if (res.status === 422) {
+    throw new Error('422');
+  }
   return res.json();
 }
 
@@ -38,6 +43,11 @@ export async function logIn(body: IUserSignIn): Promise<ISignInResponse> {
       'Content-Type': 'application/json'
     }
   })
+  if (res.status === 403) {
+    throw new Error('403');
+  } else if (res.status === 404) {
+    throw new Error('404');
+  }
   return res.json();
 }
 
