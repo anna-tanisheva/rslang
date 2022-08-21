@@ -1,12 +1,13 @@
 .form-container {
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
-  width: 300px;
+  width: 20%;
+  min-height: 250px;
   padding: 10px;
   border: 2px solid $main-color;
   border-radius: 5px;
@@ -22,10 +23,26 @@
   outline: none;
 }
 
+.show-form-wrapper {
+  display: flex;
+  & > button {
+    display: block;
+    width: 50%;
+  }
+}
+
 .show-tab {
   border: none;
   outline: none;
   background-color: transparent;
+}
+
+.validation-message {
+  background-color: lighten($main-color, 10%);
+  padding: 0 20px 20px;
+  & > p {
+    margin-bottom: 5px;
+  }
 }
 
 .form {
@@ -33,6 +50,8 @@
   flex-direction: column;
   background-color: lighten($main-color, 10%);
   padding: 30px;
+  min-height: inherit;
+  justify-content: space-evenly;
 
   label {
     display: flex;

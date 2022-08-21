@@ -9,14 +9,14 @@ export class Form {
       <button class="show-sign-in show-tab">Sign-in</button>
       <button class="show-sign-up show-tab active-form">Sign-up</button>
     </div>
-    <form action="#" class="sign-up form">
+    <form action="" class="sign-up form">
       <label class="label-name">
         Name:
         <input type="text" class="registration-name" placeholder="name">
       </label>
       <label class="label-email">
         E-mail:
-        <input type="email" class="registration-email" placeholder="email">
+        <input type="text" class="registration-email" placeholder="email">
       </label>
       <label class="label-password">
         Password:
@@ -24,7 +24,7 @@ export class Form {
       </label>
       <button class="registration-submit">Submit</button>
     </form>
-    <form action="#" class="sign-in form hidden">
+    <form action="" class="sign-in form hidden">
       <label class="label-email">
         E-mail:
         <input type="text" class="login-email" placeholder="email">
@@ -35,6 +35,12 @@ export class Form {
       </label>
       <button class="login-submit">Submit</button>
     </form>
+    <div class="validation-message">
+      <p class="invalid-email hidden">You should use valid email (@ and . are necessary)</p>
+      <p class="invalid-password hidden">Password length must be at least 8 symbols</p>
+      <p class="invalid-name hidden">Field name shouldn't be empty</p>
+
+    </div>
   `
   }
 }
