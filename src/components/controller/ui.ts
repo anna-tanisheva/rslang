@@ -3,7 +3,7 @@ import {WordDetails} from "../view/textbook";
 import {IResWordsPage, IWord} from "../../typings";
 import {fetchWords, postUser, logIn} from "./api";
 import { textbookState, appState } from "./state";
-import { isHTMLButtonElement, isHTMLElement, isHTMLInputElement } from "../../typings/utils/utils";
+import { isHTMLButtonElement, isHTMLElement, isHTMLDivElement, isHTMLInputElement } from "../../typings/utils/utils";
 import { ISignInResponse } from "../../typings/typings"
 
 export function drawWordDetails(element: IWord) {
@@ -43,18 +43,54 @@ function setCurrentUser(data: ISignInResponse) {
   logOutBtn.removeAttribute('disabled');
 }
 
-// function validateForm() {
-//   const nameInput = document.querySelector('.registration-name');
-//   if(!isHTMLInputElement(nameInput)) return;
-//   const emailInput = document.querySelector('.registration-email');
-//   if(!isHTMLInputElement(emailInput)) return;
-//   const passwordInput = document.querySelector('.registration-password');
-//   if(!isHTMLInputElement(passwordInput)) return;
-//   // if(!nameInput.value || emailInput.value.indexOf('@') === -1 || emailInput.value.indexOf('.') === -1 || )
-//   if(!nameInput.value) {
+function validationHandler(nodeList: Node[]) {
+  let valid = true;
+  if (nodeList[0]) {
+    if (!(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(.\w{2,3})+$/.test((nodeList[0] as HTMLInputElement).value))) {
+      valid = false;
+      console.log('You should use valid email (@ and . are necessary)');
+    }
+  }
+  if (nodeList[1]) {
+    if ((nodeList[1] as HTMLInputElement).value.length < 8) {
+        valid = false;
+        console.log('Password length must be at least 8 symbols');
+      }
+    }
+  if (nodeList[2]) {
+    if ((nodeList[2] as HTMLInputElement).value.length === 0) {
+      valid = false;
+      console.log('Field name shouldn\'t be empty')
+    }
+  }
+  console.log(valid);
+  return valid;
+}
 
-//   }
-// }
+function validateForm(form: string): boolean | undefined {
+  let nameInput; let emailInput; let passwordInput;
+  let isValid = true;
+  switch(form) {
+    case 'registration':
+      nameInput = document.querySelector('.registration-name');
+      if(!isHTMLInputElement(nameInput)) return undefined;
+      passwordInput = document.querySelector('.registration-password');
+      if(!isHTMLInputElement(passwordInput)) return undefined;
+      emailInput = document.querySelector('.registration-email');
+      if(!isHTMLInputElement(emailInput)) return undefined;
+      isValid = validationHandler([emailInput, passwordInput, nameInput])
+      break;
+    case 'login':
+      emailInput = document.querySelector('.login-email');
+      if(!isHTMLInputElement(emailInput)) return undefined;
+      passwordInput = document.querySelector('.login-password');
+      if(!isHTMLInputElement(passwordInput)) return undefined;
+      isValid = validationHandler([emailInput, passwordInput])
+      break;
+      default: break;
+    }
+    return isValid;
+}
 
 export function setCurrentUserOnLoad() {
   if(!localStorage.appState) return;
@@ -91,6 +127,7 @@ export async function addNewUserHandler(): Promise<void> {
   if(!isHTMLInputElement(emailInput)) return;
   const passwordInput = document.querySelector('.registration-password');
   if(!isHTMLInputElement(passwordInput)) return;
+  if (!validateForm('registration')) return;
   const userData = {
     name: nameInput.value,
     email: emailInput.value,
@@ -101,6 +138,9 @@ export async function addNewUserHandler(): Promise<void> {
     email: userData.email,
     password: userData.password
   });
+  const formContainer = document.querySelector('.form-container');
+  if(!isHTMLDivElement(formContainer)) return;
+  formContainer.classList.add('hidden');
   setCurrentUser(signedIn);
   appState.isSignedIn = true;
   localStorage.setItem('appState', JSON.stringify(appState));
@@ -114,6 +154,7 @@ export async function signInHandler(): Promise<void> {
   if(!isHTMLInputElement(emailInput)) return;
   const passwordInput = document.querySelector('.login-password');
   if(!isHTMLInputElement(passwordInput)) return;
+  if (!validateForm('login')) return;
   const userData = {
     email: emailInput.value,
     password: passwordInput.value
@@ -122,6 +163,9 @@ export async function signInHandler(): Promise<void> {
     email: userData.email,
     password: userData.password
   });
+  const formContainer = document.querySelector('.form-container');
+  if(!isHTMLDivElement(formContainer)) return;
+  formContainer.classList.add('hidden');
   setCurrentUser(signedIn);
   appState.isSignedIn = true;
   localStorage.setItem('appState', JSON.stringify(appState));

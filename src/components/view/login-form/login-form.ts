@@ -16,7 +16,7 @@ export class Form {
       </label>
       <label class="label-email">
         E-mail:
-        <input type="email" class="registration-email" placeholder="email">
+        <input type="text" class="registration-email" placeholder="email">
       </label>
       <label class="label-password">
         Password:

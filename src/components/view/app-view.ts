@@ -14,7 +14,7 @@ export class AppView {
   private header = new Header().create();
 
   private footer = new Footer().create();
-  
+
   private main = new MainPage().create();
 
     private textbook = new TextbookView(textbookState);
