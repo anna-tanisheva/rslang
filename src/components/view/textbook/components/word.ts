@@ -1,17 +1,17 @@
-import {IWord} from "../../../typings";
-import {createElementWithClassnames} from "../utils";
+import {IWord} from "../../../../typings";
+import {createElementWithClassnames} from "../../utils";
 
 export class WordItem {
-    public template: HTMLElement;
+    public data: IWord;
 
-    constructor(wordData: IWord) {
-        this.template = this.setItem(wordData);
+    constructor(data: IWord) {
+        this.data = data;
     }
 
-    setItem(data: IWord): HTMLElement {
+    create() {
         const item = createElementWithClassnames("div", "words-item");
         const word = createElementWithClassnames("div", "item-word");
-        word.textContent = data.word;
+        word.textContent = this.data.word;
         item.append(word);
         // #toDo Заменить условие. Нужно показывать перевод если выбрана данная настройка
         // eslint-disable-next-line no-constant-condition
@@ -20,7 +20,7 @@ export class WordItem {
                 "div",
                 "item-translate"
             );
-            translate.textContent = data.wordTranslate;
+            translate.textContent = this.data.wordTranslate;
             item.append(translate);
         }
         return item;

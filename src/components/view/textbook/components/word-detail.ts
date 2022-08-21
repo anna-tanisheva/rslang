@@ -1,5 +1,5 @@
-import {IWord} from "../../../typings";
-import {createElementWithClassnames} from "../utils";
+import {IWord} from "../../../../typings";
+import {createElementWithClassnames} from "../../utils";
 
 export class WordDetails {
     public template: HTMLElement;

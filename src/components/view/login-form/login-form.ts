@@ -1,10 +1,12 @@
 import './login-form.scss';
 
 export class Form {
-  template: string;
+    create() {
+        const formContainer = document.createElement("div");
 
-  constructor() {
-    this.template = `
+        formContainer.classList.add("form-container");
+        formContainer.classList.add("hidden");
+        formContainer.innerHTML = `
     <div class="show-form-wrapper">
       <button class="show-sign-in show-tab">Sign-in</button>
       <button class="show-sign-up show-tab active-form">Sign-up</button>
@@ -41,6 +43,7 @@ export class Form {
       <p class="invalid-name hidden">Field name shouldn't be empty</p>
       <p class="incorrect-data"></p>
     </div>
-  `
-  }
+  `;
+        return formContainer;
+    }
 }

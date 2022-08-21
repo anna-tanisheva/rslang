@@ -1,26 +1,30 @@
 import "./style.scss";
-import {GroupPagination, PagePagination, WordDetails, WordsItem} from ".";
-import {ITextbookState} from "../../../typings";
+import {
+    GroupPagination,
+    PagePagination,
+    WordDetails,
+    WordsItem,
+} from "./components";
+
 import {
     createElementWithAttributes,
     createElementWithClassnames,
     createElementWithContent,
 } from "../utils";
 
-export class TextbookView {
-    public template: HTMLElement;
+import {appState} from "../../controller/state";
+import {IWord} from "../../../typings";
 
-    constructor(textbookState: ITextbookState) {
-        this.template = this.setItem(textbookState);
+export class TextbookView {
+    public wordsData: IWord[] = [];
+
+    public wordsComponent = new WordsItem(this.wordsData).create();
+
+    constructor(wordsData?: IWord[]) {
+        this.wordsData = wordsData?.length ? wordsData : [];
     }
 
-    setItem({
-        group,
-        page,
-        maxPage,
-        activeWord,
-        wordsArray,
-    }: ITextbookState): HTMLElement {
+    create() {
         const textbookContainer = createElementWithClassnames(
             "section",
             "textbook-container"
@@ -101,13 +105,9 @@ export class TextbookView {
         textbookControls.append(textbookSettingsButton);
         const groupHeading = createElementWithClassnames("h2", "group-heading");
         groupHeading.textContent = "Выберите группу:";
-        const groups = new GroupPagination();
+        const groups = new GroupPagination().create();
 
-        textbookContainer.append(
-            textbookControls,
-            groupHeading,
-            groups.template
-        );
+        textbookContainer.append(textbookControls, groupHeading, groups);
 
         const wordsWrapper = createElementWithClassnames(
             "div",
@@ -116,26 +116,19 @@ export class TextbookView {
         const wordsHeading = createElementWithContent("h2", "Слова");
         const wordsGroup = createElementWithClassnames(
             "div",
-            `words-group-${group}`
+            `words-group-${appState.group}`
         );
-        const wordsComponent = new WordsItem({
-            wordsData: wordsArray,
-            currentPage: page,
-        });
-        wordsGroup.append(wordsComponent.template);
-        if (!Number.isNaN(activeWord)) {
-            const wordDetailsComponent = new WordDetails(
-                wordsArray[activeWord]
-            );
+        const wordsComponent = new WordsItem(this.wordsData).create();
+        this.wordsComponent = wordsComponent;
+        wordsGroup.append(wordsComponent);
+
+        if (this.wordsData.length) {
+            const wordDetailsComponent = new WordDetails(this.wordsData[0]);
             wordsGroup.append(wordDetailsComponent.template);
         }
 
-        const pagePaginationComponent = new PagePagination(maxPage);
-        wordsWrapper.append(
-            wordsHeading,
-            wordsGroup,
-            pagePaginationComponent.template
-        );
+        const pagePaginationComponent = new PagePagination().create();
+        wordsWrapper.append(wordsHeading, wordsGroup, pagePaginationComponent);
         // #toDo Сделать блок с запуском игр
         return textbookContainer;
     }
