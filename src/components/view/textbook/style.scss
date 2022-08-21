@@ -18,6 +18,7 @@ $colorGroup5:lightskyblue;
 $colorGroup6:lighten(blue,
 25%);
 .textbook-container {
+    flex: 1 0 auto;
     padding: 1rem 0;
     width: min(1200px, calc(100% - $sides-padding));
     margin: 0 auto;

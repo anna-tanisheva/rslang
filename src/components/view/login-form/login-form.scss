@@ -1,65 +1,64 @@
 .form-container {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: column;
-  width: 20%;
-  min-height: 250px;
-  padding: 10px;
-  border: 2px solid $main-color;
-  border-radius: 5px;
+    position: fixed;
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    width: fit-content;
+    min-height: 250px;
+    padding: 10px;
+    border: 2px solid $main-color;
+    border-radius: 5px;
 }
 
 .show-form {
-  width: 40px;
-  height: 40px;
-  background-image: url("../../../assets/images/login.png");
-  background-size: cover;
-  cursor: pointer;
-  border: none;
-  outline: none;
+    width: 40px;
+    height: 40px;
+    background-image: url("../../../assets/images/login.png");
+    background-size: cover;
+    cursor: pointer;
+    border: none;
+    outline: none;
 }
 
 .show-form-wrapper {
-  display: flex;
-  & > button {
-    display: block;
-    width: 50%;
-  }
+    display: flex;
+    &>button {
+        display: block;
+        width: 50%;
+    }
 }
 
 .show-tab {
-  border: none;
-  outline: none;
-  background-color: transparent;
+    border: none;
+    outline: none;
+    background-color: transparent;
 }
 
 .validation-message {
-  background-color: lighten($main-color, 10%);
-  padding: 0 20px 20px;
-  & > p {
-    margin-bottom: 5px;
-  }
+    background-color: lighten($main-color, 10%);
+    padding: 0 20px 20px;
+    &>p {
+        margin-bottom: 5px;
+    }
 }
 
 .form {
-  display: flex;
-  flex-direction: column;
-  background-color: lighten($main-color, 10%);
-  padding: 30px;
-  min-height: inherit;
-  justify-content: space-evenly;
-
-  label {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
+    flex-direction: column;
+    background-color: lighten($main-color, 10%);
+    padding: 30px;
+    min-height: inherit;
+    justify-content: space-evenly;
+    label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
 }
 
 .active-form {
-  background-color: lighten($main-color, 10%);
+    background-color: lighten($main-color, 10%);
 }

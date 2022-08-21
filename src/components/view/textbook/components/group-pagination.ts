@@ -1,25 +1,20 @@
 import {
+    TEXTBOOK_GROUP_COUNT,
+    TEXTBOOK_GROUP_SIZE,
+} from "../../../controller/state";
+import {
     createElementWithAttributes,
     createElementWithClassnames,
     createElementWithContent,
-} from "../utils";
-
-const GROUP_QUANTITY = 6;
-const GROUP_SIZE = 600;
+} from "../../utils";
 
 export class GroupPagination {
-    public template: HTMLElement;
-
-    constructor() {
-        this.template = this.setItem();
-    }
-
-    setItem(): HTMLElement {
+    create() {
         const groupsContainer = createElementWithClassnames(
             "div",
             "group-container"
         );
-        for (let i = 0; i < GROUP_QUANTITY; i += 1) {
+        for (let i = 0; i < TEXTBOOK_GROUP_COUNT; i += 1) {
             const groupItem = createElementWithClassnames("div", "group-item");
             const inputAttributes = {
                 type: "radio",
@@ -42,7 +37,9 @@ export class GroupPagination {
             const groupName = createElementWithContent("h2", `Группа ${i + 1}`);
             const groupRange = createElementWithContent(
                 "p",
-                `${GROUP_SIZE * i + 1}-${GROUP_SIZE * (i + 1)}`
+                `${TEXTBOOK_GROUP_SIZE * i + 1}-${
+                    TEXTBOOK_GROUP_SIZE * (i + 1)
+                }`
             );
             const groupStatus = createElementWithClassnames(
                 "div",
