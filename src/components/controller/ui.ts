@@ -104,6 +104,20 @@ function validateForm(form: string): boolean | undefined {
     return isValid;
 }
 
+function serverErrorsHandler(message: string) {
+  const messageContainer = document.querySelector('.incorrect-data');
+  if(!isHTMLElement(messageContainer)) return;
+  if(message === '403') {
+    messageContainer.innerText = 'Access denied, probably password was incorrect';
+  } else if (message === '404') {
+    messageContainer.innerText = 'We couldn\'t find this user, check email';
+  } else if (message === '417') {
+    messageContainer.innerText = 'This email is already used';
+  } else if (message === '422') {
+    messageContainer.innerText = 'Incorrect email or password';
+  }
+}
+
 export function setCurrentUserOnLoad() {
   if(!localStorage.appState) return;
   const {user} = JSON.parse(localStorage.appState);
@@ -146,7 +160,12 @@ export async function addNewUserHandler(e: Event): Promise<void> {
     email: emailInput.value,
     password: passwordInput.value
   }
-  await postUser(userData);
+  try {
+    await postUser(userData);
+  } catch(err) {
+    serverErrorsHandler((err as Error).message)
+    return;
+  }
   const signedIn = await logIn({
     email: userData.email,
     password: userData.password
@@ -173,10 +192,16 @@ export async function signInHandler(e: Event): Promise<void> {
     email: emailInput.value,
     password: passwordInput.value
   }
-  const signedIn = await logIn({
-    email: userData.email,
-    password: userData.password
-  });
+  let signedIn;
+  try {
+    signedIn = await logIn({
+        email: userData.email,
+        password: userData.password
+      });
+  } catch (err) {
+    serverErrorsHandler((err as Error).message)
+    return;
+  }
   const formContainer = document.querySelector('.form-container');
   if(!isHTMLDivElement(formContainer)) return;
   formContainer.classList.add('hidden');

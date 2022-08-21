@@ -39,7 +39,7 @@ export class Form {
       <p class="invalid-email hidden">You should use valid email (@ and . are necessary)</p>
       <p class="invalid-password hidden">Password length must be at least 8 symbols</p>
       <p class="invalid-name hidden">Field name shouldn't be empty</p>
-
+      <p class="incorrect-data"></p>
     </div>
   `
   }
