@@ -1,4 +1,3 @@
-
 import {WordDetails} from "../view/textbook";
 import {IResWordsPage, IWord} from "../../typings";
 import {fetchWords, postUser, logIn} from "./api";
@@ -43,33 +42,46 @@ function setCurrentUser(data: ISignInResponse) {
   logOutBtn.removeAttribute('disabled');
 }
 
-function validationHandler(nodeList: Node[]) {
+function validationHandler(nodeList: Node[]): boolean | undefined {
   let valid = true;
+  const invalidEmail = document.querySelector('.invalid-email');
+  if(!isHTMLElement(invalidEmail)) return undefined;
+  const invalidPassword = document.querySelector('.invalid-password');
+  if(!isHTMLElement(invalidPassword)) return undefined;
+  const invalidName = document.querySelector('.invalid-name');
+  if(!isHTMLElement(invalidName)) return undefined;
+  invalidEmail.classList.add('hidden');
+  invalidPassword.classList.add('hidden');
+  invalidName.classList.add('hidden');
   if (nodeList[0]) {
     if (!(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(.\w{2,3})+$/.test((nodeList[0] as HTMLInputElement).value))) {
       valid = false;
-      console.log('You should use valid email (@ and . are necessary)');
+      invalidEmail.classList.remove('hidden');
     }
   }
   if (nodeList[1]) {
     if ((nodeList[1] as HTMLInputElement).value.length < 8) {
         valid = false;
-        console.log('Password length must be at least 8 symbols');
+        invalidPassword.classList.remove('hidden');
       }
     }
   if (nodeList[2]) {
     if ((nodeList[2] as HTMLInputElement).value.length === 0) {
       valid = false;
-      console.log('Field name shouldn\'t be empty')
+      invalidName.classList.remove('hidden');
     }
   }
-  console.log(valid);
+  if (valid) {
+    invalidEmail.classList.add('hidden');
+    invalidPassword.classList.add('hidden');
+    invalidName.classList.add('hidden');
+  };
   return valid;
 }
 
 function validateForm(form: string): boolean | undefined {
   let nameInput; let emailInput; let passwordInput;
-  let isValid = true;
+  let isValid: boolean | undefined = true;
   switch(form) {
     case 'registration':
       nameInput = document.querySelector('.registration-name');
@@ -120,7 +132,8 @@ export function showForms(e: Event): void {
   }
 }
 
-export async function addNewUserHandler(): Promise<void> {
+export async function addNewUserHandler(e: Event): Promise<void> {
+  e.preventDefault();
   const nameInput = document.querySelector('.registration-name');
   if(!isHTMLInputElement(nameInput)) return;
   const emailInput = document.querySelector('.registration-email');
@@ -149,7 +162,8 @@ export async function addNewUserHandler(): Promise<void> {
   nameInput.value = '';
 }
 
-export async function signInHandler(): Promise<void> {
+export async function signInHandler(e: Event): Promise<void> {
+  e.preventDefault();
   const emailInput = document.querySelector('.login-email');
   if(!isHTMLInputElement(emailInput)) return;
   const passwordInput = document.querySelector('.login-password');
