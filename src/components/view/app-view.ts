@@ -5,11 +5,12 @@ import {ShowFormPanel} from "./login-form/show-button";
 import {HeaderView} from "./header/header-view";
 import {MainView} from "./main/main-view";
 import {FooterView} from "./footer/footer-view";
+import { currentView } from "../controller/state";
 
 export class AppView {
     private headerView = new HeaderView().create();
 
-    private mainView = new MainView().create();
+    private mainView = new MainView(currentView.view).create();
 
     private footerView = new FooterView().create();
 
@@ -28,5 +29,14 @@ export class AppView {
         root.append(this.headerView, this.mainView, this.footerView, this.form);
         document.body.append(root);
         this.drawForm();
+    }
+
+    public redrawView(view: string): void {
+      const root = document.querySelector('.main');
+      if (!isHTMLElement(root)) return;
+      console.log(this.mainView)
+      this.mainView = new MainView(view).create();
+      root.replaceChildren();
+      root.append(this.mainView)
     }
 }

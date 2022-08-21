@@ -27,3 +27,7 @@ export const textbookState: ITextbookState = {
     activeWord: NaN,
     maxPage: 29,
 };
+
+export const currentView = {
+    view: 'index'
+}
