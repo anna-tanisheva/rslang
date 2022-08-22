@@ -7,9 +7,8 @@ export class App {
   private view = new AppView();
 
   public start(): void {
+
     this.view.drawView();
-
-
     const tabFormButtons = document.querySelector('.show-form-wrapper');
     if(!isHTMLDivElement(tabFormButtons)) return;
     const submitRegistrationBtn = document.querySelector('.registration-submit');
@@ -30,6 +29,7 @@ export class App {
     submitLogInBtn.addEventListener('click', signInHandler);
     submitLogOutBtn.addEventListener('click', logOutHandler);
     showForm.addEventListener('click', showFormHandler);
+
     // routing
     navigation.addEventListener('click', getRouteHandler);
     navigation.addEventListener('click', (e: Event) => {
@@ -39,7 +39,10 @@ export class App {
       const link = target.getAttribute('href');
       if(!link) return;
       this.view.redrawView(link);
-     });
-
+    });
+    // change view on popstate event
+    window.addEventListener('popstate', () => {
+      this.view.redrawView(window.history.state.view);
+     })
   }
 }
