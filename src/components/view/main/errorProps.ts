@@ -1,4 +1,4 @@
-export interface errorProps {
+export interface ErrorProps {
     status?: number;
     message?: string;
 }
