@@ -43,10 +43,11 @@ export interface ISignInResponse {
 }
 
 export interface IAppState {
-  isSignedIn: boolean;
-  user: IUser;
-  group: number;
-  page: number;
+    isSignedIn: boolean;
+    user: IUser;
+    group: number;
+    page: number;
+    view: string;
 }
 
 export interface IWordProgress {
@@ -64,11 +65,3 @@ export interface IResWordsPage {
     page: number;
 }
 
-export interface ITextbookState {
-    id: string;
-    group: number;
-    page: number;
-    activeWord: number;
-    wordsArray: WordsData;
-    maxPage: number;
-}
