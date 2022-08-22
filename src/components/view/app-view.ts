@@ -34,7 +34,6 @@ export class AppView {
     public redrawView(view: string): void {
       const root = document.querySelector('.main');
       if (!isHTMLElement(root)) return;
-      console.log(this.mainView)
       this.mainView = new MainView(view).create();
       root.replaceChildren();
       root.append(this.mainView)

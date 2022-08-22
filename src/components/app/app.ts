@@ -3,12 +3,12 @@ import { isHTMLDivElement, isHTMLButtonElement, isHTMLElement } from "../../typi
 import { showForms, addNewUserHandler, signInHandler, logOutHandler, setCurrentUserOnLoad, showFormHandler } from '../controller/ui';
 import { getRouteHandler } from '../controller/routing';
 
-
 export class App {
   private view = new AppView();
 
   public start(): void {
     this.view.drawView();
+
 
     const tabFormButtons = document.querySelector('.show-form-wrapper');
     if(!isHTMLDivElement(tabFormButtons)) return;
@@ -30,6 +30,7 @@ export class App {
     submitLogInBtn.addEventListener('click', signInHandler);
     submitLogOutBtn.addEventListener('click', logOutHandler);
     showForm.addEventListener('click', showFormHandler);
+    // routing
     navigation.addEventListener('click', getRouteHandler);
     navigation.addEventListener('click', (e: Event) => {
       const {target} = e;
@@ -39,5 +40,6 @@ export class App {
       if(!link) return;
       this.view.redrawView(link);
      });
+
   }
 }

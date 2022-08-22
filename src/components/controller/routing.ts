@@ -12,11 +12,9 @@ export function getRouteHandler(e: Event) {
   if(!isHTMLElement(target)) return;
   if (!target.classList.contains('nav-link')) return;
   const link = target.getAttribute('href');
-  console.log(link)
   e.preventDefault();
   if(!link) return;
   currentView.view = link;
   setURL();
 }
-
 
