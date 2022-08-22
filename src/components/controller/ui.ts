@@ -1,7 +1,7 @@
 import {WordDetails} from "../view/textbook/components";
 import {IResWordsPage, IWord} from "../../typings";
 import {fetchWords, postUser, logIn} from "./api";
-import {textbookState, appState} from "./state";
+import {appState} from "./state";
 import {
     isHTMLButtonElement,
     isHTMLElement,
@@ -17,8 +17,8 @@ export function drawWordDetails(element: IWord) {
 
 async function getWords(): Promise<IResWordsPage> {
     const pageData = await fetchWords({
-        group: textbookState.group,
-        page: textbookState.page,
+        group: appState.group,
+        page: appState.page,
     });
     return pageData;
 }
@@ -240,4 +240,22 @@ export function logOutHandler(): void {
 
 export function showFormHandler() {
     document.querySelector(".form-container")?.classList.toggle("hidden");
+}
+
+export function setLocalStorage() {
+    localStorage.clear();
+    localStorage.setItem("appState", JSON.stringify(appState));
+}
+
+export function getLocalStorage() {
+    if (localStorage.getItem("appState")) {
+        const {isSignedIn, group, page, user, view} = JSON.parse(
+            localStorage.appState
+        );
+        appState.isSignedIn = isSignedIn;
+        appState.group = group;
+        appState.page = page;
+        appState.user = user;
+        appState.view = view;
+    }
 }
