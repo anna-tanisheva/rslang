@@ -22,7 +22,7 @@ export class Form {
       </label>
       <label class="label-password">
         Password:
-        <input type="password" class="registration-password" placeholder="password">
+        <input type="password" class="registration-password" placeholder="password" autocomplete="off">
       </label>
       <button class="registration-submit">Submit</button>
     </form>
@@ -33,7 +33,7 @@ export class Form {
       </label>
       <label class="label-password">
         Password:
-        <input type="password" class="login-password" placeholder="password">
+        <input type="password" class="login-password" placeholder="password" autocomplete="off">
       </label>
       <button class="login-submit">Submit</button>
     </form>
