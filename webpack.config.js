@@ -54,6 +54,14 @@ const baseConfig = {
                 outputPath: 'images'
               }
             },
+            {
+              test: /\.mp3$/,
+              loader: "file-loader",
+              options: {
+                name: '[name].[ext]',
+                outputPath: 'sounds'
+              }
+            },
         ],
     },
     resolve: {

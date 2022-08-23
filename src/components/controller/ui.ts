@@ -10,6 +10,7 @@ import {
 } from "../../typings/utils/utils";
 import {ISignInResponse, WordsData} from "../../typings/typings";
 import { GamePopUp } from "../view/audio-call/game-page";
+import { getRandomPage } from "../view/utils";
 
 export function drawWordDetails(element: IWord) {
     const card = new WordDetails(element);
@@ -263,8 +264,8 @@ export function getLocalStorage() {
 
 // games
 
-function startGame(container: HTMLElement, section: number, game: string) {
-    const popup = new GamePopUp().create(section, game);
+function startGame(container: HTMLElement, section: number, game: string, page: number) {
+    const popup = new GamePopUp().create(section, game, page);
     container.append(popup);
     const closeButton = container.querySelector('.close-button');
     if (!isHTMLElement(closeButton)) return;
@@ -289,7 +290,8 @@ export function startGameHandler(e: Event): void {
         // startGame(gameContainer, section, SPRINT);
     } else {
         const section = Number(target.closest('.game-container')?.querySelector('select')?.value);
-        startGame(gameContainer, section, CALL);
+        const page = getRandomPage();
+        startGame(gameContainer, section, CALL, page);
     }
 }
 
@@ -312,3 +314,28 @@ export function playWordInGameHandler(e: Event){
     audio.play();
 }
 
+export function getOptions(arr: string[], word: string) {
+    const options = [word];
+    while (options.length < 4) {
+        const ind = Math.floor(Math.random() * arr.length);
+        if (!options.includes(arr[ind])) options.push(arr[ind])
+    }
+    return options;
+}
+
+export function choseAnswerHandler(e: Event, answer: string) {
+    const {target} = e;
+    if(!isHTMLButtonElement(target)) return;
+    const container = target.closest('.game-popup');
+    if(!isHTMLDivElement(container)) return;
+    const wrongSound = container.querySelector('.wrong-sound');
+    if(!isHTMLElement(wrongSound)) return;
+    const correctSound = container.querySelector('.correct-sound');
+    if(!isHTMLElement(wrongSound)) return;
+    if(!isHTMLButtonElement(target)) return;
+    if (target.getAttribute('data-option') !== answer) {
+        (wrongSound as HTMLAudioElement).play();
+    } else {
+        (correctSound as HTMLAudioElement).play();
+    }
+}
