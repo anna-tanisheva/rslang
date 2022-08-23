@@ -45,8 +45,9 @@ export interface ISignInResponse {
 export interface IAppState {
     isSignedIn: boolean;
     user: IUser;
-    group: number;
-    page: number;
+    viewsStates: {
+        textbook: ITextbookViewState;
+    };
     view: string;
 }
 
@@ -57,10 +58,8 @@ export interface IWordProgress {
     page: number;
 }
 
-export type WordsData = IWord[];
-
-export interface IResWordsPage {
-    words: WordsData;
+export interface ITextbookViewState {
+    words: IWord[];
     group: number;
     page: number;
 }

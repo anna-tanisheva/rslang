@@ -1,5 +1,3 @@
-import {WordDetails} from "../view/textbook/components";
-import {IResWordsPage, IWord} from "../../typings";
 import {fetchWords, postUser, logIn} from "./api";
 import {appState} from "./state";
 import {
@@ -9,24 +7,7 @@ import {
     isHTMLInputElement,
 } from "../../typings/utils/utils";
 import {ISignInResponse} from "../../typings/typings";
-
-export function drawWordDetails(element: IWord) {
-    const card = new WordDetails(element);
-    return card.template;
-}
-
-async function getWords(): Promise<IResWordsPage> {
-    const pageData = await fetchWords({
-        group: appState.group,
-        page: appState.page,
-    });
-    return pageData;
-}
-
-export async function drawTextbook(): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const pageData = await getWords();
-}
+import {AppView} from "../view/app-view";
 
 function setCurrentUser(data: ISignInResponse) {
     appState.user.name = data.name;
@@ -35,12 +16,12 @@ function setCurrentUser(data: ISignInResponse) {
     appState.user.token = data.token;
     const welcomeContainer = document.querySelector(".welcome-text");
     if (!isHTMLElement(welcomeContainer)) return;
-    if (data.name === "unknown") {
+    if (!data.name) {
         welcomeContainer.innerText = `Welcome stranger`;
     } else {
         welcomeContainer.innerText = `Welcome ${data.name} `;
     }
-    if (data.name === "unknown") return;
+    if (!data.name) return;
     const logOutBtn = document.querySelector(".logout-submit");
     if (!isHTMLButtonElement(logOutBtn)) return;
     logOutBtn.removeAttribute("disabled");
@@ -226,7 +207,7 @@ export async function signInHandler(e: Event): Promise<void> {
 
 export function logOutHandler(): void {
     Object.keys(appState.user).forEach((key) => {
-        appState.user[key as keyof typeof appState.user] = "unknown";
+        appState.user[key as keyof typeof appState.user] = "";
     });
     appState.isSignedIn = false;
     localStorage.setItem("appState", JSON.stringify(appState));
@@ -242,6 +223,20 @@ export function showFormHandler() {
     document.querySelector(".form-container")?.classList.toggle("hidden");
 }
 
+export async function getActiveView() {
+    switch (appState.view) {
+        case "textbook": {
+            await fetchWords({
+                group: appState.viewsStates.textbook.group,
+                page: appState.viewsStates.textbook.page,
+            });
+            break;
+        }
+        default:
+            AppView.redrawView(appState.view);
+    }
+}
+
 export function setLocalStorage() {
     localStorage.clear();
     localStorage.setItem("appState", JSON.stringify(appState));
@@ -249,12 +244,11 @@ export function setLocalStorage() {
 
 export function getLocalStorage() {
     if (localStorage.getItem("appState")) {
-        const {isSignedIn, group, page, user, view} = JSON.parse(
+        const {isSignedIn, user, view, viewsStates} = JSON.parse(
             localStorage.appState
         );
         appState.isSignedIn = isSignedIn;
-        appState.group = group;
-        appState.page = page;
+        appState.viewsStates = viewsStates;
         appState.user = user;
         appState.view = view;
     }

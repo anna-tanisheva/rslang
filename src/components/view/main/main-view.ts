@@ -4,7 +4,6 @@ import {TextbookView} from "../textbook/textbook-view";
 import {createElementWithClassnames} from "../utils";
 import {ErrorView} from "./error-view";
 
-
 export class MainView {
     public activeViewName: string | undefined;
 
@@ -29,5 +28,4 @@ export class MainView {
         main.append(this[this.activeViewName]);
         return main;
     }
-
 }

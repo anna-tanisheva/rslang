@@ -9,7 +9,7 @@ import {FooterView} from "./footer/footer-view";
 export class AppView {
     private headerView = new HeaderView().create();
 
-    private mainView = createElementWithAttributes("main", {class: "main"});
+    static mainView = createElementWithAttributes("main", {class: "main"});
 
     private footerView = new FooterView().create();
 
@@ -25,15 +25,20 @@ export class AppView {
 
     public drawView(): void {
         const root = createElementWithAttributes("div", {id: "root"});
-        root.append(this.headerView, this.mainView, this.footerView, this.form);
+        root.append(
+            this.headerView,
+            AppView.mainView,
+            this.footerView,
+            this.form
+        );
         document.body.append(root);
         this.drawForm();
     }
 
-    public redrawView(view: string): void {
+    static redrawView(view: string): void {
         const root = document.querySelector(".main");
         if (!isHTMLElement(root)) return;
-        this.mainView = new MainView(view).create();
+        AppView.mainView = new MainView(view).create();
         root.replaceChildren();
         root.append(...this.mainView.children);
     }

@@ -1,5 +1,9 @@
 import {IWord} from "../../../../typings";
-import {createElementWithClassnames} from "../../utils";
+import {
+    createElementWithAttributes,
+    createElementWithClassnames,
+} from "../../utils";
+import {WordDetails} from "./word-detail";
 
 export class WordItem {
     public data: IWord;
@@ -9,20 +13,42 @@ export class WordItem {
     }
 
     create() {
-        const item = createElementWithClassnames("div", "words-item");
-        const word = createElementWithClassnames("div", "item-word");
+        const item = createElementWithClassnames("div", "words-item-wrapper");
+        const word = createElementWithClassnames("span", "item-word");
+        const inputAttributes = {
+            type: "radio",
+            name: "words-item-radio",
+            id: `word-${this.data.id}`,
+        };
+        const inputRadio = createElementWithAttributes(
+            "input",
+            inputAttributes
+        );
+        const labelAttributes = {
+            type: "label",
+            for: inputAttributes.id,
+            class: "words-item",
+        };
+        const inputLabel = createElementWithAttributes(
+            "label",
+            labelAttributes
+        );
         word.textContent = this.data.word;
-        item.append(word);
+        inputLabel.append(word);
         // #toDo Заменить условие. Нужно показывать перевод если выбрана данная настройка
         // eslint-disable-next-line no-constant-condition
         if (true) {
             const translate = createElementWithClassnames(
-                "div",
+                "span",
                 "item-translate"
             );
             translate.textContent = this.data.wordTranslate;
-            item.append(translate);
+            inputLabel.append(translate);
         }
+        (inputRadio as HTMLInputElement).addEventListener("input", () => {
+            WordDetails.setCard(this.data);
+        });
+        item.append(inputRadio, inputLabel);
         return item;
     }
 }

@@ -1,4 +1,7 @@
+import {isHTMLInputElement} from "../../../../typings/utils/utils";
+import {fetchWordsInPage} from "../../../controller/api";
 import {
+    appState,
     TEXTBOOK_GROUP_COUNT,
     TEXTBOOK_GROUP_SIZE,
 } from "../../../controller/state";
@@ -20,6 +23,7 @@ export class GroupPagination {
                 type: "radio",
                 name: "group-radio",
                 id: `group-${i + 1}`,
+                value: `${i}`,
             };
             const inputRadio = createElementWithAttributes(
                 "input",
@@ -45,10 +49,18 @@ export class GroupPagination {
                 "div",
                 `group-status`
             );
-            if (i === 0) {
+            if (i === appState.viewsStates.textbook.group) {
                 (inputRadio as HTMLInputElement).checked = true;
             }
             inputLabel.append(groupName, groupRange, groupStatus);
+            (inputRadio as HTMLInputElement).addEventListener("input", (e) => {
+                if (!isHTMLInputElement(e.target)) return;
+                const group = Number((e.target as HTMLInputElement).value);
+                const page = 0;
+                appState.viewsStates.textbook.group = group;
+                appState.viewsStates.textbook.page = page;
+                fetchWordsInPage({group, page});
+            });
             groupItem.append(inputRadio, inputLabel);
             groupsContainer.append(groupItem);
         }

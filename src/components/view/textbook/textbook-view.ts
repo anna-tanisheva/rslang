@@ -20,11 +20,8 @@ export class TextbookView {
 
     public wordsComponent = new WordsItem(this.wordsData).create();
 
-    constructor(wordsData?: IWord[]) {
-        this.wordsData = wordsData?.length ? wordsData : [];
-    }
-
     create() {
+        this.wordsData = appState.viewsStates.textbook.words;
         const textbookContainer = createElementWithClassnames(
             "section",
             "textbook-container"
@@ -114,22 +111,25 @@ export class TextbookView {
             `words-wrapper`
         );
         const wordsHeading = createElementWithContent("h2", "Слова");
+        wordsHeading.classList.add("words-heading");
         const wordsGroup = createElementWithClassnames(
             "div",
-            `words-group-${appState.group}`
+            "words-group",
+            `words-group-${appState.viewsStates.textbook.group}`
         );
         const wordsComponent = new WordsItem(this.wordsData).create();
         this.wordsComponent = wordsComponent;
         wordsGroup.append(wordsComponent);
-
         if (this.wordsData.length) {
-            const wordDetailsComponent = new WordDetails(this.wordsData[0]);
-            wordsGroup.append(wordDetailsComponent.template);
+            const wordDetailsComponent = new WordDetails().ctreate(
+                this.wordsData[0]
+            );
+            wordsGroup.append(wordDetailsComponent);
         }
-
         const pagePaginationComponent = new PagePagination().create();
         wordsWrapper.append(wordsHeading, wordsGroup, pagePaginationComponent);
         // #toDo Сделать блок с запуском игр
+        textbookContainer.append(wordsWrapper);
         return textbookContainer;
     }
 }
