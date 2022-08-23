@@ -11,6 +11,7 @@ import {
 import {ISignInResponse, WordsData} from "../../typings/typings";
 import { GamePopUp } from "../view/audio-call/game-page";
 import { getRandomPage } from "../view/utils";
+import { AudioCall } from "../view/audio-call/audio-call";
 
 export function drawWordDetails(element: IWord) {
     const card = new WordDetails(element);
@@ -335,6 +336,19 @@ export function getOptions(arr: string[], word: string) {
     return options;
 }
 
+function addToCurrentGameState(guess: boolean){
+    console.log((currentGame.game as AudioCall).state, guess);
+    if (guess){
+        (currentGame.game as AudioCall).state.correctGuesses += 1;
+        (currentGame.game as AudioCall).state.currentStrick += 1;
+        if ((currentGame.game as AudioCall).state.currentStrick > (currentGame.game as AudioCall).state.maxStrick) {
+            (currentGame.game as AudioCall).state.maxStrick = (currentGame.game as AudioCall).state.currentStrick;
+        }
+    } else {
+        (currentGame.game as AudioCall).state.currentStrick = 0;
+    }
+}
+
 export function choseAnswerHandler(e: Event, answer: string) {
     const {target} = e;
     if(!isHTMLButtonElement(target)) return;
@@ -348,7 +362,6 @@ export function choseAnswerHandler(e: Event, answer: string) {
     if(!isHTMLDivElement(card)) return;
     const flipContainer = card.querySelector('.flip-container');
     if(!isHTMLDivElement(flipContainer)) return;
-    // console.log(target.closest('.flip-container'))
     flipContainer.classList.add('answered');
     const img = card.querySelector('img');
     if(!isHTMLElement(img)) return;
@@ -359,13 +372,15 @@ export function choseAnswerHandler(e: Event, answer: string) {
         answerButtons.forEach(button=>{
             (button as HTMLButtonElement).setAttribute('disabled', 'true');
         });
-        // img.classList.remove('hidden');
+        addToCurrentGameState(false)
     } else {
         target.classList.add('correct-answer');
         (correctSound as HTMLAudioElement).play();
         answerButtons.forEach(button=>{
             (button as HTMLButtonElement).setAttribute('disabled', 'true');
         })
-        // img.classList.remove('hidden');
+        addToCurrentGameState(true)
     }
+    // написано состояние содержащее максимальный стрик и количество правильных ответов
+    console.log((currentGame.game as AudioCall).state)
 }

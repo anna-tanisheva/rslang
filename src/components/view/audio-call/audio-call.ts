@@ -18,9 +18,21 @@ export class AudioCall {
 
   page: number;
 
+  state: {
+    correctGuesses: number,
+    currentStrick: number,
+    maxStrick: number
+  }
+
   constructor(sec: number, page: number) {
     this.section = sec;
-    this.page = page
+    this.page = page;
+    this.state = {
+      correctGuesses: 0,
+      currentStrick: 0,
+      maxStrick: 0
+
+    }
   }
 
   async create(): Promise<HTMLElement> {
@@ -30,7 +42,6 @@ export class AudioCall {
       page: this.page
     })
     const game = createElementWithClassnames("div", "audio-call");
-    console.log(words);
     const arrOfTranslations: string[] = [];
     words.words.forEach(word => {
       arrOfTranslations.push(word.wordTranslate)
@@ -43,15 +54,11 @@ export class AudioCall {
         src: `${ENDPOINT}/${word.audio}`,
         type: 'audio/mpeg'
       };
-
       const imgAttr = {
         src: `${ENDPOINT}/${word.image}`,
         alt: `${word.word}`,
-        // class: 'hidden'
       }
-
       const options = getOptions(arrOfTranslations, word.wordTranslate);
-      console.log(options)
       const audio = createElementWithAttributes('audio', audioAttr);
       const flipContainer = createElementWithClassnames('div', 'flip-container');
       const flipper = createElementWithClassnames('div', 'flipper');
