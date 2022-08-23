@@ -1,4 +1,4 @@
-import {IAppState} from "../../typings/typings";
+import {IAppState, IGameState} from "../../typings/typings";
 
 export const ENDPOINT = "http://localhost:3000";
 
@@ -18,3 +18,9 @@ export const appState: IAppState = {
 export const TEXTBOOK_GROUP_COUNT = 6;
 export const TEXTBOOK_GROUP_SIZE = 600;
 export const TEXTBOOK_PAGE_COUNT = 30;
+
+export const gameState: IGameState = {
+    wordsLearnt: 0,
+    correctAnswers: 0,
+    correctAnswersStrick: 0
+  }

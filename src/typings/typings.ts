@@ -65,3 +65,11 @@ export interface IResWordsPage {
     page: number;
 }
 
+export interface IStatisticState {
+    wordsLearnt: number;
+    correctAnswers: number;
+}
+
+export interface IGameState extends IStatisticState {
+    correctAnswersStrick: number;
+}
