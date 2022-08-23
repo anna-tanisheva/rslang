@@ -263,7 +263,20 @@ export function getLocalStorage() {
 
 // games
 
+function startGame(container: HTMLElement, section: number, game: string) {
+    const popup = new GamePopUp().create(section, game);
+    container.append(popup);
+    const closeButton = container.querySelector('.close-button');
+    if (!isHTMLElement(closeButton)) return;
+    closeButton.addEventListener('click', ()=>{
+        currentGame.game = null;
+        container.removeChild(popup);
+    })
+}
+
 export function startGameHandler(e: Event): void {
+    const CALL = 'call';
+    // const SPRINT = 'sprint';
     const {target} = e;
     const gameContainer = document.querySelector('.games');
     if (!isHTMLElement(gameContainer)) return;
@@ -272,16 +285,11 @@ export function startGameHandler(e: Event): void {
     if (target.classList.contains('sprint')) {
         console.log('sprint');
         // логика по созданию экземпляра игры
+        // const section = Number(target.closest('.game-container')?.querySelector('select')?.value);
+        // startGame(gameContainer, section, SPRINT);
     } else {
-        const popup = new GamePopUp().create();
-        console.log(currentGame.game);
-        gameContainer.append(popup);
-        const closeButton = gameContainer.querySelector('.close-button');
-        if (!isHTMLElement(closeButton)) return;
-        closeButton.addEventListener('click', ()=>{
-            currentGame.game = null;
-            gameContainer.removeChild(popup);
-        })
+        const section = Number(target.closest('.game-container')?.querySelector('select')?.value);
+        startGame(gameContainer, section, CALL);
     }
 }
 
@@ -304,6 +312,3 @@ export function playWordInGameHandler(e: Event){
     audio.play();
 }
 
-// export function closeGamePopupHandler(){
-
-// }

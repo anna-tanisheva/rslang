@@ -23,7 +23,7 @@ export class GameStartView {
   }
 
   create(){
-    const startGameContainer = createElementWithClassnames("div", "call-container");
+    const startGameContainer = createElementWithClassnames("div", `${this.options.game}-container`);
     startGameContainer.classList.add('game-container');
     const imgAttributes = {
       src: this.options.pathToImg,
