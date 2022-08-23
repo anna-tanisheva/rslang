@@ -13,6 +13,8 @@ export class GamePopUp {
     const gameContainer = createElementWithClassnames("div", "game-popup");
     const closeButton = createElementWithClassnames('div', 'close-button');
     closeButton.innerText = '+'
+    const nextButton = createElementWithClassnames('button', 'next-button');
+    nextButton.innerText = 'Дальше';
     // в конструктор передаем номер раздела от пользователя или слова страницы учебника, с которой была запущена игра
     if(game === 'call') {
       currentGame.game = new AudioCall(section, page);
@@ -41,8 +43,7 @@ export class GamePopUp {
     wrongSound.classList.add('wrong-sound');
     const correctSound = createElementWithAttributes('audio', correctSoundAttr);
     correctSound.classList.add('correct-sound');
-    gameContainer.append(wrongSound, correctSound)
-    gameContainer.append(closeButton);
+    gameContainer.append(wrongSound, correctSound, closeButton, nextButton)
     return gameContainer;
   }
 }

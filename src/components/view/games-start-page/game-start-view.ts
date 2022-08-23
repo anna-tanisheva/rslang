@@ -44,7 +44,7 @@ export class GameStartView {
     <option value="4">Уровень 5</option>
     <option value="5">Уровень 6</option>
     `
-    const startButton = createElementWithClassnames('button', `start-button`, this.options.game);
+    const startButton = createElementWithClassnames('button', `start-button`, `${this.options.game}-button`);
     startButton.textContent = 'Поехали!'
     startGameContainer.append(callImg, callText, gameLevel, startButton);
     return startGameContainer;

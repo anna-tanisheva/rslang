@@ -273,6 +273,18 @@ function startGame(container: HTMLElement, section: number, game: string, page: 
         currentGame.game = null;
         container.removeChild(popup);
     })
+    const nextButton = container.querySelector('.next-button');
+    if (!isHTMLElement(nextButton)) return;
+    nextButton.addEventListener('click', ()=>{
+        const sliderContainer = popup.querySelector('.audio-call');
+        if (!isHTMLDivElement(sliderContainer)) return;
+        if (sliderContainer.style.left !== '-800%') {
+            sliderContainer.style.left = `${Number((sliderContainer.style.left).split('%')[0]) - 100}%`
+        } else {
+            sliderContainer.style.left = `${Number((sliderContainer.style.left).split('%')[0]) - 100}%`
+            nextButton.setAttribute('disabled', 'true');
+        }
+    })
 }
 
 export function startGameHandler(e: Event): void {
