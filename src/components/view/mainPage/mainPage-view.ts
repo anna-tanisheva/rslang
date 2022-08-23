@@ -6,10 +6,13 @@ import "../../../assets/images/icons8-динамик-100.png";
 import "../../../assets/images/Pngtree-freelancer.png";
 import "../../../assets/images/kisspng-programmer.png";
 import "../../../assets/images/pngwing.com.png";
+import {createElementWithAttributes} from "../utils";
 
 export class MainPageView {
     create() {
-        const mainPage = document.createElement("main");
+        const mainPage = createElementWithAttributes("section", {
+            class: "main-page",
+        });
         mainPage.innerHTML = `
       <section class="section-start-screen">
               <div class="start-screen-content">

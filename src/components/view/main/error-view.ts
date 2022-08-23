@@ -1,14 +1,14 @@
 import "./style.scss";
 
 import {createElementWithClassnames} from "../utils";
-import {errorProps} from "./errorProps.1";
+import {ErrorProps} from "./errorProps";
 
 export class ErrorView {
     public errorStatus: string;
 
     public errorMessage: string;
 
-    constructor({status, message}: errorProps) {
+    constructor({status, message}: ErrorProps) {
         this.errorStatus = status ? `${status}` : "404";
         this.errorMessage = message ? `${message}` : "Ошибочная страница";
     }

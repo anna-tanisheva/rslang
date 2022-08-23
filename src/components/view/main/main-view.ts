@@ -4,18 +4,23 @@ import {TextbookView} from "../textbook/textbook-view";
 import {createElementWithClassnames} from "../utils";
 import {ErrorView} from "./error-view";
 
+
 export class MainView {
-    public activeViewName = "mainPageView";
+    public activeViewName: string | undefined;
 
-    private mainPageView = new MainPageView().create();
+    constructor(activeViewName: string | undefined) {
+        this.activeViewName = activeViewName;
+    }
 
-    private textBookView = new TextbookView().create();
+    private index = new MainPageView().create();
+
+    private textbook = new TextbookView().create();
 
     create() {
         const main = createElementWithClassnames("main", "main");
         if (
-            this.activeViewName !== "mainPageView" &&
-            this.activeViewName !== "textBookView"
+            this.activeViewName !== "index" &&
+            this.activeViewName !== "textbook"
         ) {
             const errorView = new ErrorView({}).create();
             main.append(errorView);
@@ -24,4 +29,5 @@ export class MainView {
         main.append(this[this.activeViewName]);
         return main;
     }
+
 }
