@@ -26,3 +26,11 @@ export function createElementWithContent(
     element.textContent = elementContent;
     return element;
 }
+
+export function getRandomSection(){
+    return Math.floor(Math.random() * 6);
+}
+
+export function getRandomPage(){
+    return Math.floor(Math.random() * 30);
+}

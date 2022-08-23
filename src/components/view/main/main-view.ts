@@ -20,7 +20,7 @@ export class MainView {
     private textbook = new TextbookView().create();
 
     private games = new GamesPage().create();
-    
+
     private stats = new StatisticView().create(gameState);
 
     create() {
@@ -28,7 +28,7 @@ export class MainView {
         if (
             this.activeViewName !== "index" &&
             this.activeViewName !== "textbook" &&
-            this.activeViewName !== "games"
+            this.activeViewName !== "games" &&
             this.activeViewName !== "stats"
         ) {
             const errorView = new ErrorView({}).create();

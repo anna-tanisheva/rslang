@@ -1,4 +1,4 @@
-import {IAppState, IGameState} from "../../typings/typings";
+import {IAppState, IGameState, ICurrentGame} from "../../typings/typings";
 
 export const ENDPOINT = "http://localhost:3000";
 
@@ -24,3 +24,5 @@ export const gameState: IGameState = {
     correctAnswers: 0,
     correctAnswersStrick: 0
   }
+
+export const currentGame: ICurrentGame = {game: null}

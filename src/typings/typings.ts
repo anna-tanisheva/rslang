@@ -73,3 +73,7 @@ export interface IStatisticState {
 export interface IGameState extends IStatisticState {
     correctAnswersStrick: number;
 }
+
+export interface ICurrentGame {
+    game: unknown;
+}

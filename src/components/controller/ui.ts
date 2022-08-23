@@ -1,14 +1,15 @@
 import {WordDetails} from "../view/textbook/components";
 import {IResWordsPage, IWord} from "../../typings";
 import {fetchWords, postUser, logIn} from "./api";
-import {appState} from "./state";
+import {appState, currentGame} from "./state";
 import {
     isHTMLButtonElement,
     isHTMLElement,
     isHTMLDivElement,
     isHTMLInputElement,
 } from "../../typings/utils/utils";
-import {ISignInResponse} from "../../typings/typings";
+import {ISignInResponse, WordsData} from "../../typings/typings";
+import { GamePopUp } from "../view/audio-call/game-page";
 
 export function drawWordDetails(element: IWord) {
     const card = new WordDetails(element);
@@ -259,3 +260,50 @@ export function getLocalStorage() {
         appState.view = view;
     }
 }
+
+// games
+
+export function startGameHandler(e: Event): void {
+    const {target} = e;
+    const gameContainer = document.querySelector('.games');
+    if (!isHTMLElement(gameContainer)) return;
+    if (!isHTMLButtonElement(target)) return;
+    if (!target.classList.contains('start-button')) return;
+    if (target.classList.contains('sprint')) {
+        console.log('sprint');
+        // логика по созданию экземпляра игры
+    } else {
+        const popup = new GamePopUp().create();
+        console.log(currentGame.game);
+        gameContainer.append(popup);
+        const closeButton = gameContainer.querySelector('.close-button');
+        if (!isHTMLElement(closeButton)) return;
+        closeButton.addEventListener('click', ()=>{
+            currentGame.game = null;
+            gameContainer.removeChild(popup);
+        })
+    }
+}
+
+export function getGameWordsArr(arr: WordsData) {
+    const output: IWord[] = [];
+    while(output.length < 10) {
+        const ind = Math.floor(Math.random() * arr.length);
+        if (!output.includes(arr[ind])) output.push(arr[ind])
+    }
+    return output;
+}
+
+export function playWordInGameHandler(e: Event){
+    const {target} = e;
+    if(!isHTMLButtonElement(target)) return;
+    const container = target.closest('.word-card');
+    if(!isHTMLDivElement(container)) return;
+    const audio = container.querySelector('audio');
+    if(!isHTMLElement(audio)) return;
+    audio.play();
+}
+
+// export function closeGamePopupHandler(){
+
+// }
