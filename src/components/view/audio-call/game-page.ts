@@ -14,7 +14,7 @@ export class GamePopUp {
     const closeButton = createElementWithClassnames('div', 'close-button');
     closeButton.innerText = '+'
     const nextButton = createElementWithClassnames('button', 'next-button');
-    nextButton.innerText = 'Дальше';
+    nextButton.innerHTML = '&#8594;';
     // в конструктор передаем номер раздела от пользователя или слова страницы учебника, с которой была запущена игра
     if(game === 'call') {
       currentGame.game = new AudioCall(section, page);

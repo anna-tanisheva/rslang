@@ -46,15 +46,18 @@ export class AudioCall {
 
       const imgAttr = {
         src: `${ENDPOINT}/${word.image}`,
-        type: 'audio/mpeg'
+        alt: `${word.word}`,
+        // class: 'hidden'
       }
 
       const options = getOptions(arrOfTranslations, word.wordTranslate);
       console.log(options)
       const audio = createElementWithAttributes('audio', audioAttr);
+      const flipContainer = createElementWithClassnames('div', 'flip-container');
+      const flipper = createElementWithClassnames('div', 'flipper');
+
       const button = createElementWithClassnames('button', 'play-button');
       const img = createElementWithAttributes('img', imgAttr);
-      button.innerText = 'Послушать';
       button.addEventListener('click', playWordInGameHandler);
       const answersContainer = createElementWithClassnames('div', 'answers-container');
       options.forEach(option=>{
@@ -64,7 +67,9 @@ export class AudioCall {
         tag.innerText += option;
         answersContainer.append(tag);
       })
-      card.append(img, audio, button, answersContainer);
+      flipper.append(button, img)
+      flipContainer.append(flipper)
+      card.append(audio, answersContainer, flipContainer);
       game.append(card);
     })
 

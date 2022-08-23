@@ -344,10 +344,28 @@ export function choseAnswerHandler(e: Event, answer: string) {
     if(!isHTMLElement(wrongSound)) return;
     const correctSound = container.querySelector('.correct-sound');
     if(!isHTMLElement(wrongSound)) return;
-    if(!isHTMLButtonElement(target)) return;
+    const card = target.closest('.word-card');
+    if(!isHTMLDivElement(card)) return;
+    const flipContainer = card.querySelector('.flip-container');
+    if(!isHTMLDivElement(flipContainer)) return;
+    // console.log(target.closest('.flip-container'))
+    flipContainer.classList.add('answered');
+    const img = card.querySelector('img');
+    if(!isHTMLElement(img)) return;
+    const answerButtons = card.querySelectorAll('.option');
     if (target.getAttribute('data-option') !== answer) {
         (wrongSound as HTMLAudioElement).play();
+        target.classList.add('incorrect-answer');
+        answerButtons.forEach(button=>{
+            (button as HTMLButtonElement).setAttribute('disabled', 'true');
+        });
+        // img.classList.remove('hidden');
     } else {
+        target.classList.add('correct-answer');
         (correctSound as HTMLAudioElement).play();
+        answerButtons.forEach(button=>{
+            (button as HTMLButtonElement).setAttribute('disabled', 'true');
+        })
+        // img.classList.remove('hidden');
     }
 }

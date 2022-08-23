@@ -34,10 +34,23 @@
 }
 .next-button {
   position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
   z-index: 10;
+  width: 40px;
+  height: 40px;
+  bottom: 0;
+  right: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  background-color: saddlebrown;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  color: aquamarine;
+}
+.next-button:disabled {
+  background-color: lighten(saddlebrown, 30%);
+  color: lighten(aquamarine, 30%);
 }
 .audio-call {
   position: absolute;
@@ -51,4 +64,73 @@
 .word-card {
   width: 25%;
   transition: all 1s ease;
+  display: grid;
+  grid-template-rows: 1fr 100px 50px 25px;
+  grid-template-columns: repeat(12, 1fr);
+  grid-gap: 5px;
+  .flip-container {
+    grid-column: 4 / 10;
+    justify-self: center;
+    align-self: center;
+    display: flex;
+    perspective: 1000;
+    width: 390px;
+    height: 260px;
+  }
+  .flip-container.answered .flipper {
+    transform: rotateY(180deg);
+  }
+  .flipper {
+    transition: 0.6s;
+    transform-style: preserve-3d;
+    position: relative;
+    flex-basis: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  img,
+  .play-button {
+    backface-visibility: hidden;
+    position: absolute;
+  }
+  img {
+    flex-basis: 100%;
+    border-radius: 10px;
+    transform: rotateY(180deg);
+    top: 0;
+    left: 0;
+  }
+  .play-button {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    justify-self: center;
+    align-self: center;
+    background-image: url("../../../assets/images/icons8-динамик-100.png");
+    background-size: cover;
+    cursor: pointer;
+    z-index: 2;
+    transform: rotateY(0deg);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -47%);
+  }
+  .answers-container {
+    grid-column: 2 / 12;
+    grid-row: 3 / 4;
+    display: flex;
+    justify-content: space-between;
+    .option {
+      flex-basis: 20%;
+      cursor: pointer;
+    }
+  }
+}
+.correct-answer {
+  background-color: $main-color;
+}
+.incorrect-answer {
+  background-color: #ce331f;
 }
