@@ -1,5 +1,7 @@
 .game-popup {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 1000px;
   height: 500px;
   position: absolute;
@@ -60,6 +62,7 @@
   width: 1000%;
   height: 100%;
   transition: all 1s ease;
+  background-color: honeydew;
 }
 .word-card {
   width: 25%;
@@ -137,6 +140,7 @@
   font-size: 1.5rem;
   transition: 0.3s;
 }
+
 .correct-answer {
   background-color: $main-color;
 }
@@ -154,4 +158,16 @@
   .button {
     flex-basis: 40%;
   }
+}
+.game-stats {
+  flex-basis: 50%;
+  padding: 10px;
+  font-size: 1.1rem;
+  min-height: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+.option:disabled {
+  color: #312828;
 }

@@ -6,12 +6,11 @@ import {
   createElementWithAttributes,
   createElementWithClassnames,
   createElementWithContent,
-  getRandomPage,
+  // getRandomPage,
 } from "../utils";
 import { fetchWords } from "../../controller/api";
-import { ENDPOINT, currentGame } from '../../controller/state';
-import { playWordInGameHandler, getGameWordsArr, getOptions, choseAnswerHandler, startGame } from '../../controller/ui';
-import { isHTMLDivElement, isHTMLElement } from '../../../typings/utils/utils';
+import { ENDPOINT } from '../../controller/state';
+import { playWordInGameHandler, getGameWordsArr, getOptions, choseAnswerHandler, } from '../../controller/ui';
 
 
 export class AudioCall {
@@ -24,9 +23,12 @@ export class AudioCall {
     correctGuesses: number,
     currentStrick: number,
     maxStrick: number
-  }
+  };
 
-  constructor(sec: number, page: number) {
+  gameName: string
+
+  constructor(sec: number, page: number, gameName: string) {
+    this.gameName = gameName;
     this.section = sec;
     this.page = page;
     this.state = {
@@ -49,7 +51,7 @@ export class AudioCall {
       arrOfTranslations.push(word.wordTranslate)
     })
     const wordsInGame = getGameWordsArr(words.words);
-    wordsInGame.forEach((word, ind) => {
+    wordsInGame.forEach(word => {
       const card = createElementWithClassnames('div', 'word-card');
       card.setAttribute('data-id', word.id);
       const audioAttr = {
@@ -84,27 +86,6 @@ export class AudioCall {
       flipContainer.append(flipper)
       card.append(audio, answersContainer, flipContainer, answer);
       game.append(card);
-      if (ind === wordsInGame.length - 1) {
-        const buttonWrapper = createElementWithClassnames('div', 'buttons-wrapper');
-        const playAgain = createElementWithClassnames('button', 'play-again', 'button');
-        playAgain.textContent = 'Играть еще раз';
-        playAgain.addEventListener('click', () => {
-          currentGame.game = null;
-          const CALL_GAME = 'call';
-          const PAGE = getRandomPage();
-          const container = document.querySelector('.games');
-          if(!isHTMLElement(container)) return;
-          const gameContainer = container.querySelector('.game-popup');
-          if(!isHTMLDivElement(gameContainer)) return;
-          container.removeChild(gameContainer);
-          startGame(container, this.section, CALL_GAME, PAGE);
-        })
-
-        const gameStats = createElementWithClassnames('button', 'game-stats', 'button');
-        gameStats.textContent = 'Статистика игры';
-        buttonWrapper.append(gameStats, playAgain)
-        card.append(buttonWrapper);
-      }
     })
 
     return game;

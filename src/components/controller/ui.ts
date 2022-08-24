@@ -10,7 +10,7 @@ import {
 } from "../../typings/utils/utils";
 import {ISignInResponse, WordsData} from "../../typings/typings";
 import { GamePopUp } from "../view/audio-call/game-page";
-import { getRandomPage } from "../view/utils";
+import { createElementWithContent, getRandomPage } from "../view/utils";
 import { AudioCall } from "../view/audio-call/audio-call";
 
 export function drawWordDetails(element: IWord) {
@@ -265,6 +265,19 @@ export function getLocalStorage() {
 
 // games
 
+export function moveGameSlider(sliderContainer: HTMLElement, nextButton: HTMLElement) {
+    const innerSliderContainer = sliderContainer;
+    if (sliderContainer.style.left !== '-900%') {
+        innerSliderContainer.style.left = `${Number((innerSliderContainer.style.left).split('%')[0]) - 100}%`
+    } else {
+        innerSliderContainer.style.left = `${Number((innerSliderContainer.style.left).split('%')[0]) - 100}%`;
+        const container = sliderContainer.closest('.game-popup');
+        if (!isHTMLElement(container)) return;
+        container.querySelector('.game-stats-wrapper')?.classList.remove('opacity-hidden');
+        nextButton.setAttribute('disabled', 'true');
+    }
+}
+
 export function startGame(container: HTMLElement, section: number, game: string, page: number) {
     const popup = new GamePopUp().create(section, game, page);
     container.append(popup);
@@ -279,18 +292,13 @@ export function startGame(container: HTMLElement, section: number, game: string,
     nextButton.addEventListener('click', ()=>{
         const sliderContainer = popup.querySelector('.audio-call');
         if (!isHTMLDivElement(sliderContainer)) return;
-        if (sliderContainer.style.left !== '-800%') {
-            sliderContainer.style.left = `${Number((sliderContainer.style.left).split('%')[0]) - 100}%`
-        } else {
-            sliderContainer.style.left = `${Number((sliderContainer.style.left).split('%')[0]) - 100}%`
-            nextButton.setAttribute('disabled', 'true');
-        }
+        moveGameSlider(sliderContainer, nextButton)
     })
 }
 
 export function startGameHandler(e: Event): void {
-    const CALL = 'call';
-    // const SPRINT = 'sprint';
+    const CALL_GAME = 'Audio Call';
+    // const SPRINT = 'Sprint';
     const {target} = e;
     const gameContainer = document.querySelector('.games');
     if (!isHTMLElement(gameContainer)) return;
@@ -304,7 +312,7 @@ export function startGameHandler(e: Event): void {
     } else {
         const section = Number(target.closest('.game-container')?.querySelector('select')?.value);
         const page = getRandomPage();
-        startGame(gameContainer, section, CALL, page);
+        startGame(gameContainer, section, CALL_GAME, page);
     }
 }
 
@@ -348,6 +356,14 @@ function addToCurrentGameState(guess: boolean){
     }
 }
 
+export function appendGameStats(wrapper: HTMLElement) {
+    const correctAnswers = createElementWithContent('p', `Вы ответили правильно на ${String((currentGame.game as AudioCall).state.correctGuesses)} вопросов`);
+    const strick = createElementWithContent('p', `Самая длинная последовательность правильных ответов: ${String((currentGame.game as AudioCall).state.maxStrick)}`);
+    const name = createElementWithContent('h3', String((currentGame.game as AudioCall).gameName));
+    wrapper.append(name, strick, correctAnswers);
+    return wrapper;
+}
+
 export function choseAnswerHandler(e: Event, answer: string) {
     const {target} = e;
     if(!isHTMLButtonElement(target)) return;
@@ -384,6 +400,13 @@ export function choseAnswerHandler(e: Event, answer: string) {
         addToCurrentGameState(true)
     }
     correctAnswer.classList.remove('opacity-hidden');
+    const statsCurrentContainer = document.querySelector('.game-stats-wrapper');
+    if(!isHTMLElement(statsCurrentContainer)) return;
+    const statsOld = statsCurrentContainer.querySelector('.game-stats');
+    if(!isHTMLElement(statsOld)) return;
+    statsOld.replaceChildren();
+    const statsNew = appendGameStats(statsOld);
+    statsCurrentContainer.replaceChild(statsOld, statsNew);
     gameState.correctAnswers = (currentGame.game as AudioCall).state.correctGuesses;
     gameState.correctAnswersStrick = (currentGame.game as AudioCall).state.maxStrick;
 }
