@@ -278,6 +278,14 @@ export function moveGameSlider(sliderContainer: HTMLElement, nextButton: HTMLEle
     }
 }
 
+export function playWordInGameHandler(audio: HTMLAudioElement){
+    audio.play();
+}
+
+function stopPlayingWordHandler(audio: HTMLAudioElement){
+    audio.pause();
+}
+
 export function startGame(container: HTMLElement, section: number, game: string, page: number) {
     const popup = new GamePopUp().create(section, game, page);
     container.append(popup);
@@ -291,8 +299,13 @@ export function startGame(container: HTMLElement, section: number, game: string,
     if (!isHTMLElement(nextButton)) return;
     nextButton.addEventListener('click', ()=>{
         const sliderContainer = popup.querySelector('.audio-call');
+        (currentGame.game as AudioCall).currentSlide += 1;
         if (!isHTMLDivElement(sliderContainer)) return;
-        moveGameSlider(sliderContainer, nextButton)
+        moveGameSlider(sliderContainer, nextButton);
+        const audio = sliderContainer.querySelector(`.word-card:nth-child(${(currentGame.game as AudioCall).currentSlide + 1})>audio`);
+        const prevAudio = sliderContainer.querySelector(`.word-card:nth-child(${(currentGame.game as AudioCall).currentSlide})>audio`);
+        stopPlayingWordHandler(prevAudio as HTMLAudioElement);
+        playWordInGameHandler(audio as HTMLAudioElement);
     })
 }
 
@@ -319,28 +332,19 @@ export function startGameHandler(e: Event): void {
 export function getGameWordsArr(arr: WordsData) {
     const output: IWord[] = [];
     while(output.length < 10) {
-        const ind = Math.floor(Math.random() * arr.length);
+        const ind = getRandomInRange(arr.length);
         if (!output.includes(arr[ind])) output.push(arr[ind])
     }
     return output;
 }
 
-export function playWordInGameHandler(e: Event){
-    const {target} = e;
-    if(!isHTMLButtonElement(target)) return;
-    const container = target.closest('.word-card');
-    if(!isHTMLDivElement(container)) return;
-    const audio = container.querySelector('audio');
-    if(!isHTMLElement(audio)) return;
-    audio.play();
-}
-
 export function getOptions(arr: string[], word: string) {
     const options = [word];
     while (options.length < 4) {
-        const ind = Math.floor(Math.random() * arr.length);
+        const ind = getRandomInRange(arr.length);
         if (!options.includes(arr[ind])) options.push(arr[ind])
     }
+    options.sort(() => (Math.random() > .5) ? 1 : -1);
     return options;
 }
 

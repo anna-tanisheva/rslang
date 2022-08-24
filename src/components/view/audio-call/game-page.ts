@@ -8,7 +8,7 @@ import { isHTMLElement,
   } from "../../../typings/utils/utils";
 import { AudioCall } from "./audio-call";
 import { currentGame, TEXTBOOK_PAGE_COUNT } from "../../controller/state";
-import { startGame } from '../../controller/ui';
+import { startGame, playWordInGameHandler } from '../../controller/ui';
 
 
 
@@ -26,8 +26,12 @@ export class GamePopUp {
       currentGame.game = new AudioCall(section, page, game);
       (currentGame.game as AudioCall).create()
       .then((res)=>{
-        gameContainer.append(res);
+        gameContainer.append(res)
+      }).finally(()=>{
+        const audio = gameContainer?.querySelector('.audio-call>.word-card:first-child>audio');
+        playWordInGameHandler(audio as HTMLAudioElement);
       });
+
     } else {
     // здесь создаем спринт
 
