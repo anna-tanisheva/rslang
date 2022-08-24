@@ -1,3 +1,5 @@
+import {TEXTBOOK_GROUP_COUNT, TEXTBOOK_PAGE_COUNT} from "../controller/state";
+
 export function createElementWithClassnames(
     elementName: string,
     ...elementClassnames: string[]
@@ -27,10 +29,9 @@ export function createElementWithContent(
     return element;
 }
 
-export function getRandomSection(){
-    return Math.floor(Math.random() * 6);
-}
-
-export function getRandomPage(){
-    return Math.floor(Math.random() * 30);
+export function getRandomPageInRandomGroup() {
+    return {
+        page: Math.floor(Math.random() * TEXTBOOK_PAGE_COUNT),
+        group: Math.floor(Math.random() * TEXTBOOK_GROUP_COUNT),
+    };
 }
