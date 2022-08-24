@@ -20,6 +20,8 @@ export const TEXTBOOK_GROUP_SIZE = 600;
 export const TEXTBOOK_PAGE_COUNT = 30;
 
 export const gameState: IGameState = {
+    // для неавторизованного пользователя количество выученных слов всегда 0, после авторизации эту логику надо прописать
+    gameName: '',
     wordsLearnt: 0,
     correctAnswers: 0,
     correctAnswersStrick: 0

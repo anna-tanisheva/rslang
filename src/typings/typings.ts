@@ -71,6 +71,7 @@ export interface IStatisticState {
 }
 
 export interface IGameState extends IStatisticState {
+    gameName: string;
     correctAnswersStrick: number;
 }
 

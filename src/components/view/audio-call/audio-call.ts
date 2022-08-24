@@ -5,11 +5,13 @@ import "../../../assets/sounds/correct.mp3";
 import {
   createElementWithAttributes,
   createElementWithClassnames,
-  // createElementWithContent,
+  createElementWithContent,
+  getRandomPage,
 } from "../utils";
 import { fetchWords } from "../../controller/api";
-import { ENDPOINT } from '../../controller/state';
-import { playWordInGameHandler, getGameWordsArr, getOptions, choseAnswerHandler } from '../../controller/ui';
+import { ENDPOINT, currentGame } from '../../controller/state';
+import { playWordInGameHandler, getGameWordsArr, getOptions, choseAnswerHandler, startGame } from '../../controller/ui';
+import { isHTMLDivElement, isHTMLElement } from '../../../typings/utils/utils';
 
 
 export class AudioCall {
@@ -47,7 +49,7 @@ export class AudioCall {
       arrOfTranslations.push(word.wordTranslate)
     })
     const wordsInGame = getGameWordsArr(words.words);
-    wordsInGame.forEach(word => {
+    wordsInGame.forEach((word, ind) => {
       const card = createElementWithClassnames('div', 'word-card');
       card.setAttribute('data-id', word.id);
       const audioAttr = {
@@ -59,12 +61,16 @@ export class AudioCall {
         alt: `${word.word}`,
       }
       const options = getOptions(arrOfTranslations, word.wordTranslate);
+      options.sort(() => (Math.random() > .5) ? 1 : -1);
       const audio = createElementWithAttributes('audio', audioAttr);
       const flipContainer = createElementWithClassnames('div', 'flip-container');
       const flipper = createElementWithClassnames('div', 'flipper');
 
       const button = createElementWithClassnames('button', 'play-button');
       const img = createElementWithAttributes('img', imgAttr);
+      const answer = createElementWithContent('p', `${word.word} ${word.transcription}`);
+      answer.classList.add('opacity-hidden');
+      answer.classList.add('answer');
       button.addEventListener('click', playWordInGameHandler);
       const answersContainer = createElementWithClassnames('div', 'answers-container');
       options.forEach(option=>{
@@ -76,8 +82,29 @@ export class AudioCall {
       })
       flipper.append(button, img)
       flipContainer.append(flipper)
-      card.append(audio, answersContainer, flipContainer);
+      card.append(audio, answersContainer, flipContainer, answer);
       game.append(card);
+      if (ind === wordsInGame.length - 1) {
+        const buttonWrapper = createElementWithClassnames('div', 'buttons-wrapper');
+        const playAgain = createElementWithClassnames('button', 'play-again', 'button');
+        playAgain.textContent = 'Играть еще раз';
+        playAgain.addEventListener('click', () => {
+          currentGame.game = null;
+          const CALL_GAME = 'call';
+          const PAGE = getRandomPage();
+          const container = document.querySelector('.games');
+          if(!isHTMLElement(container)) return;
+          const gameContainer = container.querySelector('.game-popup');
+          if(!isHTMLDivElement(gameContainer)) return;
+          container.removeChild(gameContainer);
+          startGame(container, this.section, CALL_GAME, PAGE);
+        })
+
+        const gameStats = createElementWithClassnames('button', 'game-stats', 'button');
+        gameStats.textContent = 'Статистика игры';
+        buttonWrapper.append(gameStats, playAgain)
+        card.append(buttonWrapper);
+      }
     })
 
     return game;

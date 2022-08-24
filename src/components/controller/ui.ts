@@ -1,7 +1,7 @@
 import {WordDetails} from "../view/textbook/components";
 import {IResWordsPage, IWord} from "../../typings";
 import {fetchWords, postUser, logIn} from "./api";
-import {appState, currentGame} from "./state";
+import {appState, currentGame, gameState} from "./state";
 import {
     isHTMLButtonElement,
     isHTMLElement,
@@ -265,7 +265,7 @@ export function getLocalStorage() {
 
 // games
 
-function startGame(container: HTMLElement, section: number, game: string, page: number) {
+export function startGame(container: HTMLElement, section: number, game: string, page: number) {
     const popup = new GamePopUp().create(section, game, page);
     container.append(popup);
     const closeButton = container.querySelector('.close-button');
@@ -337,7 +337,6 @@ export function getOptions(arr: string[], word: string) {
 }
 
 function addToCurrentGameState(guess: boolean){
-    console.log((currentGame.game as AudioCall).state, guess);
     if (guess){
         (currentGame.game as AudioCall).state.correctGuesses += 1;
         (currentGame.game as AudioCall).state.currentStrick += 1;
@@ -366,10 +365,13 @@ export function choseAnswerHandler(e: Event, answer: string) {
     const img = card.querySelector('img');
     if(!isHTMLElement(img)) return;
     const answerButtons = card.querySelectorAll('.option');
+    const correctAnswer = card.querySelector('.answer');
+    if(!isHTMLElement(correctAnswer)) return;
     if (target.getAttribute('data-option') !== answer) {
         (wrongSound as HTMLAudioElement).play();
         target.classList.add('incorrect-answer');
         answerButtons.forEach(button=>{
+            if(button.getAttribute('data-option') === answer) button.classList.add('correct-answer');
             (button as HTMLButtonElement).setAttribute('disabled', 'true');
         });
         addToCurrentGameState(false)
@@ -381,6 +383,7 @@ export function choseAnswerHandler(e: Event, answer: string) {
         })
         addToCurrentGameState(true)
     }
-    // написано состояние содержащее максимальный стрик и количество правильных ответов
-    console.log((currentGame.game as AudioCall).state)
+    correctAnswer.classList.remove('opacity-hidden');
+    gameState.correctAnswers = (currentGame.game as AudioCall).state.correctGuesses;
+    gameState.correctAnswersStrick = (currentGame.game as AudioCall).state.maxStrick;
 }
