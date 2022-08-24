@@ -1,7 +1,7 @@
 import {WordDetails} from "../view/textbook/components";
 import {IResWordsPage, IWord} from "../../typings";
 import {fetchWords, postUser, logIn} from "./api";
-import {appState, currentGame, statisticState} from "./state";
+import {appState, currentGame, statisticState, TEXTBOOK_PAGE_COUNT} from "./state";
 import {
     isHTMLButtonElement,
     isHTMLElement,
@@ -10,7 +10,7 @@ import {
 } from "../../typings/utils/utils";
 import {ISignInResponse, WordsData} from "../../typings/typings";
 import { GamePopUp } from "../view/audio-call/game-page";
-import { createElementWithContent, getRandomPage } from "../view/utils";
+import { createElementWithContent, getRandomInRange } from "../view/utils";
 import { AudioCall } from "../view/audio-call/audio-call";
 
 export function drawWordDetails(element: IWord) {
@@ -311,7 +311,7 @@ export function startGameHandler(e: Event): void {
         // startGame(gameContainer, section, SPRINT);
     } else {
         const section = Number(target.closest('.game-container')?.querySelector('select')?.value);
-        const page = getRandomPage();
+        const page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
         startGame(gameContainer, section, CALL_GAME, page);
     }
 }

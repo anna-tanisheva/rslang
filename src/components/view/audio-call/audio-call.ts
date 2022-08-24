@@ -6,7 +6,7 @@ import {
   createElementWithAttributes,
   createElementWithClassnames,
   createElementWithContent,
-  // getRandomPage,
+  // getRandomInRange,
 } from "../utils";
 import { fetchWords } from "../../controller/api";
 import { ENDPOINT } from '../../controller/state';

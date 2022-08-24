@@ -1,13 +1,13 @@
 import {
   createElementWithClassnames,
   createElementWithAttributes,
-  getRandomPage
+  getRandomInRange
 } from "../utils";
 import { isHTMLElement,
   //  isHTMLDivElement
   } from "../../../typings/utils/utils";
 import { AudioCall } from "./audio-call";
-import { currentGame } from "../../controller/state";
+import { currentGame, TEXTBOOK_PAGE_COUNT } from "../../controller/state";
 import { startGame } from '../../controller/ui';
 
 
@@ -57,7 +57,7 @@ export class GamePopUp {
     playAgain.addEventListener('click', () => {
       currentGame.game = null;
       const CALL_GAME = 'Audio Call';
-      const PAGE = getRandomPage();
+      const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);
       const container = document.querySelector('.games');
       if(!isHTMLElement(container)) return;
       container.removeChild(gameContainer);
