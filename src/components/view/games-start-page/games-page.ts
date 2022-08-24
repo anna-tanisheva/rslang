@@ -5,6 +5,7 @@ import {
   createElementWithClassnames,
 } from "../utils";
 import { GameStartView } from './game-start-view';
+import { startGameHandler } from '../../controller/ui';
 
 export class GamesPage {
 
@@ -23,6 +24,9 @@ export class GamesPage {
     }).create();
 
     gamesContainer.append(callStartView, sprintStartView);
+
+    gamesContainer.addEventListener('click', startGameHandler);
+
     return gamesContainer;
   }
 }

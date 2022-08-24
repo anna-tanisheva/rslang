@@ -1,3 +1,5 @@
+import {TEXTBOOK_GROUP_COUNT, TEXTBOOK_PAGE_COUNT} from "../controller/state";
+
 export function createElementWithClassnames(
     elementName: string,
     ...elementClassnames: string[]
@@ -25,4 +27,11 @@ export function createElementWithContent(
     const element = document.createElement(elementName);
     element.textContent = elementContent;
     return element;
+}
+
+export function getRandomPageInRandomGroup() {
+    return {
+        page: Math.floor(Math.random() * TEXTBOOK_PAGE_COUNT),
+        group: Math.floor(Math.random() * TEXTBOOK_GROUP_COUNT),
+    };
 }

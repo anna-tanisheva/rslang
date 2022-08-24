@@ -23,7 +23,7 @@ export class GameStartView {
   }
 
   create(){
-    const startGameContainer = createElementWithClassnames("div", "call-container");
+    const startGameContainer = createElementWithClassnames("div", `${this.options.game}-container`);
     startGameContainer.classList.add('game-container');
     const imgAttributes = {
       src: this.options.pathToImg,
@@ -44,7 +44,7 @@ export class GameStartView {
     <option value="4">Уровень 5</option>
     <option value="5">Уровень 6</option>
     `
-    const startButton = createElementWithClassnames('button', `start-button`, this.options.game);
+    const startButton = createElementWithClassnames('button', `start-button`, `${this.options.game}-button`);
     startButton.textContent = 'Поехали!'
     startGameContainer.append(callImg, callText, gameLevel, startButton);
     return startGameContainer;

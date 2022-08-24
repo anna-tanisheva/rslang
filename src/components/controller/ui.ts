@@ -1,14 +1,17 @@
 import {WordDetails} from "../view/textbook/components";
 import {IResWordsPage, IWord} from "../../typings";
 import {fetchWords, postUser, logIn} from "./api";
-import {appState} from "./state";
+import {appState, currentGame, statisticState} from "./state";
 import {
     isHTMLButtonElement,
     isHTMLElement,
     isHTMLDivElement,
     isHTMLInputElement,
 } from "../../typings/utils/utils";
-import {ISignInResponse} from "../../typings/typings";
+import {ISignInResponse, WordsData} from "../../typings/typings";
+import { GamePopUp } from "../view/audio-call/game-page";
+import { createElementWithContent, getRandomPage } from "../view/utils";
+import { AudioCall } from "../view/audio-call/audio-call";
 
 export function drawWordDetails(element: IWord) {
     const card = new WordDetails(element);
@@ -258,4 +261,152 @@ export function getLocalStorage() {
         appState.user = user;
         appState.view = view;
     }
+}
+
+// games
+
+export function moveGameSlider(sliderContainer: HTMLElement, nextButton: HTMLElement) {
+    const innerSliderContainer = sliderContainer;
+    if (sliderContainer.style.left !== '-900%') {
+        innerSliderContainer.style.left = `${Number((innerSliderContainer.style.left).split('%')[0]) - 100}%`
+    } else {
+        innerSliderContainer.style.left = `${Number((innerSliderContainer.style.left).split('%')[0]) - 100}%`;
+        const container = sliderContainer.closest('.game-popup');
+        if (!isHTMLElement(container)) return;
+        container.querySelector('.game-stats-wrapper')?.classList.remove('opacity-hidden');
+        nextButton.setAttribute('disabled', 'true');
+    }
+}
+
+export function startGame(container: HTMLElement, section: number, game: string, page: number) {
+    const popup = new GamePopUp().create(section, game, page);
+    container.append(popup);
+    const closeButton = container.querySelector('.close-button');
+    if (!isHTMLElement(closeButton)) return;
+    closeButton.addEventListener('click', ()=>{
+        currentGame.game = null;
+        container.removeChild(popup);
+    })
+    const nextButton = container.querySelector('.next-button');
+    if (!isHTMLElement(nextButton)) return;
+    nextButton.addEventListener('click', ()=>{
+        const sliderContainer = popup.querySelector('.audio-call');
+        if (!isHTMLDivElement(sliderContainer)) return;
+        moveGameSlider(sliderContainer, nextButton)
+    })
+}
+
+export function startGameHandler(e: Event): void {
+    const CALL_GAME = 'Audio Call';
+    // const SPRINT = 'Sprint';
+    const {target} = e;
+    const gameContainer = document.querySelector('.games');
+    if (!isHTMLElement(gameContainer)) return;
+    if (!isHTMLButtonElement(target)) return;
+    if (!target.classList.contains('start-button')) return;
+    if (target.classList.contains('sprint-button')) {
+        console.log('sprint');
+        // логика по созданию экземпляра игры
+        // const section = Number(target.closest('.game-container')?.querySelector('select')?.value);
+        // startGame(gameContainer, section, SPRINT);
+    } else {
+        const section = Number(target.closest('.game-container')?.querySelector('select')?.value);
+        const page = getRandomPage();
+        startGame(gameContainer, section, CALL_GAME, page);
+    }
+}
+
+export function getGameWordsArr(arr: WordsData) {
+    const output: IWord[] = [];
+    while(output.length < 10) {
+        const ind = Math.floor(Math.random() * arr.length);
+        if (!output.includes(arr[ind])) output.push(arr[ind])
+    }
+    return output;
+}
+
+export function playWordInGameHandler(e: Event){
+    const {target} = e;
+    if(!isHTMLButtonElement(target)) return;
+    const container = target.closest('.word-card');
+    if(!isHTMLDivElement(container)) return;
+    const audio = container.querySelector('audio');
+    if(!isHTMLElement(audio)) return;
+    audio.play();
+}
+
+export function getOptions(arr: string[], word: string) {
+    const options = [word];
+    while (options.length < 4) {
+        const ind = Math.floor(Math.random() * arr.length);
+        if (!options.includes(arr[ind])) options.push(arr[ind])
+    }
+    return options;
+}
+
+function addToCurrentGameState(guess: boolean){
+    if (guess){
+        (currentGame.game as AudioCall).state.correctGuesses += 1;
+        (currentGame.game as AudioCall).state.currentStrick += 1;
+        if ((currentGame.game as AudioCall).state.currentStrick > (currentGame.game as AudioCall).state.maxStrick) {
+            (currentGame.game as AudioCall).state.maxStrick = (currentGame.game as AudioCall).state.currentStrick;
+        }
+    } else {
+        (currentGame.game as AudioCall).state.currentStrick = 0;
+    }
+}
+
+export function appendGameStats(wrapper: HTMLElement) {
+    const correctAnswers = createElementWithContent('p', `Вы ответили правильно на ${String((currentGame.game as AudioCall).state.correctGuesses)} вопросов`);
+    const strick = createElementWithContent('p', `Самая длинная последовательность правильных ответов: ${String((currentGame.game as AudioCall).state.maxStrick)}`);
+    const name = createElementWithContent('h3', String((currentGame.game as AudioCall).gameName));
+    wrapper.append(name, strick, correctAnswers);
+    return wrapper;
+}
+
+export function choseAnswerHandler(e: Event, answer: string) {
+    const {target} = e;
+    if(!isHTMLButtonElement(target)) return;
+    const container = target.closest('.game-popup');
+    if(!isHTMLDivElement(container)) return;
+    const wrongSound = container.querySelector('.wrong-sound');
+    if(!isHTMLElement(wrongSound)) return;
+    const correctSound = container.querySelector('.correct-sound');
+    if(!isHTMLElement(wrongSound)) return;
+    const card = target.closest('.word-card');
+    if(!isHTMLDivElement(card)) return;
+    const flipContainer = card.querySelector('.flip-container');
+    if(!isHTMLDivElement(flipContainer)) return;
+    flipContainer.classList.add('answered');
+    const img = card.querySelector('img');
+    if(!isHTMLElement(img)) return;
+    const answerButtons = card.querySelectorAll('.option');
+    const correctAnswer = card.querySelector('.answer');
+    if(!isHTMLElement(correctAnswer)) return;
+    if (target.getAttribute('data-option') !== answer) {
+        (wrongSound as HTMLAudioElement).play();
+        target.classList.add('incorrect-answer');
+        answerButtons.forEach(button=>{
+            if(button.getAttribute('data-option') === answer) button.classList.add('correct-answer');
+            (button as HTMLButtonElement).setAttribute('disabled', 'true');
+        });
+        addToCurrentGameState(false)
+    } else {
+        target.classList.add('correct-answer');
+        (correctSound as HTMLAudioElement).play();
+        answerButtons.forEach(button=>{
+            (button as HTMLButtonElement).setAttribute('disabled', 'true');
+        })
+        addToCurrentGameState(true)
+    }
+    correctAnswer.classList.remove('opacity-hidden');
+    const statsCurrentContainer = document.querySelector('.game-stats-wrapper');
+    if(!isHTMLElement(statsCurrentContainer)) return;
+    const statsOld = statsCurrentContainer.querySelector('.game-stats');
+    if(!isHTMLElement(statsOld)) return;
+    statsOld.replaceChildren();
+    const statsNew = appendGameStats(statsOld);
+    statsCurrentContainer.replaceChild(statsOld, statsNew);
+    statisticState.audioCall.correctAnswers = (currentGame.game as AudioCall).state.correctGuesses;
+    statisticState.audioCall.correctAnswersStrick = (currentGame.game as AudioCall).state.maxStrick;
 }
