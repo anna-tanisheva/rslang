@@ -1,7 +1,7 @@
 import {WordDetails} from "../view/textbook/components";
 import {IResWordsPage, IWord} from "../../typings";
 import {fetchWords, postUser, logIn} from "./api";
-import {appState, currentGame, gameState} from "./state";
+import {appState, currentGame, statisticState} from "./state";
 import {
     isHTMLButtonElement,
     isHTMLElement,
@@ -304,7 +304,7 @@ export function startGameHandler(e: Event): void {
     if (!isHTMLElement(gameContainer)) return;
     if (!isHTMLButtonElement(target)) return;
     if (!target.classList.contains('start-button')) return;
-    if (target.classList.contains('sprint')) {
+    if (target.classList.contains('sprint-button')) {
         console.log('sprint');
         // логика по созданию экземпляра игры
         // const section = Number(target.closest('.game-container')?.querySelector('select')?.value);
@@ -407,6 +407,6 @@ export function choseAnswerHandler(e: Event, answer: string) {
     statsOld.replaceChildren();
     const statsNew = appendGameStats(statsOld);
     statsCurrentContainer.replaceChild(statsOld, statsNew);
-    gameState.correctAnswers = (currentGame.game as AudioCall).state.correctGuesses;
-    gameState.correctAnswersStrick = (currentGame.game as AudioCall).state.maxStrick;
+    statisticState.audioCall.correctAnswers = (currentGame.game as AudioCall).state.correctGuesses;
+    statisticState.audioCall.correctAnswersStrick = (currentGame.game as AudioCall).state.maxStrick;
 }

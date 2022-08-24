@@ -66,13 +66,21 @@ export interface IResWordsPage {
 }
 
 export interface IStatisticState {
-    wordsLearnt: number;
-    correctAnswers: number;
-}
-
-export interface IGameState extends IStatisticState {
-    gameName: string;
-    correctAnswersStrick: number;
+    'total': {
+        'wordsLearnt': number;
+        'correctAnswers': number;
+        'correctAnswersStrick': number
+    },
+    'audioCall': {
+        'wordsLearnt': number;
+        'correctAnswers': number;
+        'correctAnswersStrick': number;
+    },
+    'sprint': {
+        'wordsLearnt': number;
+        'correctAnswers': number;
+        'correctAnswersStrick': number;
+    }
 }
 
 export interface ICurrentGame {
