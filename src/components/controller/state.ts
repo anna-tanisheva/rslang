@@ -21,20 +21,20 @@ export const TEXTBOOK_PAGE_COUNT = 30;
 
 export const statisticState: IStatisticState = {
     // для неавторизованного пользователя количество выученных слов всегда 0, после авторизации эту логику надо прописать
-    'total': {
-        'wordsLearnt': 0,
-        'correctAnswers': 0,
-        'correctAnswersStrick': 0,
+    total: {
+        wordsLearnt: 0,
+        correctAnswers: 0,
+        correctAnswersStrick: 0,
     },
-    'audioCall': {
-        'wordsLearnt': 0,
-        'correctAnswers': 0,
-        'correctAnswersStrick': 0,
+    audioCall: {
+        wordsLearnt: 0,
+        correctAnswers: 0,
+        correctAnswersStrick: 0,
     },
-    'sprint': {
-        'wordsLearnt': 0,
-        'correctAnswers': 0,
-        'correctAnswersStrick': 0
+    sprint: {
+        wordsLearnt: 0,
+        correctAnswers: 0,
+        correctAnswersStrick: 0
     }
 }
 

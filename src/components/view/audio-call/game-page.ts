@@ -6,7 +6,7 @@ import {
 import { isHTMLElement,
   //  isHTMLDivElement
   } from "../../../typings/utils/utils";
-import { AudioCall } from "./audio-call";
+import { AudioCall } from "./call/audio-call";
 import { currentGame, TEXTBOOK_PAGE_COUNT } from "../../controller/state";
 import { startGame, playWordInGameHandler, appendGameStats } from '../../controller/ui';
 

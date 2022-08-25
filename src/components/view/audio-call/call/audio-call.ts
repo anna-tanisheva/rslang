@@ -1,16 +1,16 @@
 import './audio-call.scss';
-import "../../../assets/sounds/wrong.mp3";
-import "../../../assets/sounds/correct.mp3";
+import "../../../../assets/sounds/wrong.mp3";
+import "../../../../assets/sounds/correct.mp3";
 
 import {
   createElementWithAttributes,
   createElementWithClassnames,
   createElementWithContent,
   // getRandomInRange,
-} from "../utils";
-import { fetchWords } from "../../controller/api";
-import { ENDPOINT } from '../../controller/state';
-import { playWordInGameHandler, getGameWordsArr, getOptions, choseAnswerHandler, } from '../../controller/ui';
+} from "../../utils";
+import { fetchWords } from "../../../controller/api";
+import { ENDPOINT } from '../../../controller/state';
+import { playWordInGameHandler, getGameWordsArr, getOptions, choseAnswerHandler, } from '../../../controller/ui';
 
 
 export class AudioCall {

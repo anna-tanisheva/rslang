@@ -11,7 +11,7 @@ import {
 import {ISignInResponse, WordsData} from "../../typings/typings";
 import { GamePopUp } from "../view/audio-call/game-page";
 import { createElementWithContent, getRandomInRange } from "../view/utils";
-import { AudioCall } from "../view/audio-call/audio-call";
+import { AudioCall } from "../view/audio-call/call/audio-call";
 
 export function drawWordDetails(element: IWord) {
     const card = new WordDetails(element);
