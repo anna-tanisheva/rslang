@@ -11,6 +11,7 @@ import {
 import { fetchWords } from "../../../controller/api";
 import { ENDPOINT } from '../../../controller/state';
 import { playWordInGameHandler, getGameWordsArr, getOptions, choseAnswerHandler, } from '../../../controller/ui';
+import { IWord } from '../../../../typings';
 
 
 export class AudioCall {
@@ -20,25 +21,36 @@ export class AudioCall {
   page: number;
 
   state: {
-    correctGuesses: number,
+    // correctGuesses: number,
     currentStrick: number,
-    maxStrick: number
+    maxStrick: number,
+    answers: {
+      true: string[],
+      false: string[]
+    }
   };
 
   gameName: string;
 
   currentSlide: number;
 
+  wordsInGame: IWord[] | null;
+
   constructor(sec: number, page: number, gameName: string, currentSlide = 0) {
     this.gameName = gameName;
     this.section = sec;
     this.page = page;
     this.state = {
-      correctGuesses: 0,
+      // correctGuesses: 0,
       currentStrick: 0,
-      maxStrick: 0
+      maxStrick: 0,
+      answers: {
+        true: [],
+        false: []
+      }
     };
     this.currentSlide = currentSlide;
+    this.wordsInGame = null;
   }
 
   async create(): Promise<HTMLElement> {
@@ -52,8 +64,8 @@ export class AudioCall {
     words.words.forEach(word => {
       arrOfTranslations.push(word.wordTranslate)
     })
-    const wordsInGame = getGameWordsArr(words.words);
-    wordsInGame.forEach(word => {
+    this.wordsInGame = getGameWordsArr(words.words);
+    this.wordsInGame.forEach(word => {
       const card = createElementWithClassnames('div', 'word-card');
       card.setAttribute('data-id', word.id);
       const audioAttr = {

@@ -1,7 +1,7 @@
 import {WordDetails} from "../view/textbook/components";
 import {IResWordsPage, IWord} from "../../typings";
 import {fetchWords, postUser, logIn} from "./api";
-import {appState, currentGame, statisticState, TEXTBOOK_PAGE_COUNT} from "./state";
+import {appState, currentGame, statisticState, TEXTBOOK_PAGE_COUNT, ENDPOINT} from "./state";
 import {
     isHTMLButtonElement,
     isHTMLElement,
@@ -10,8 +10,9 @@ import {
 } from "../../typings/utils/utils";
 import {ISignInResponse, WordsData} from "../../typings/typings";
 import { GamePopUp } from "../view/audio-call/game-page";
-import { createElementWithContent, getRandomInRange } from "../view/utils";
+import { getRandomInRange, createElementWithAttributes, createElementWithClassnames, createElementWithContent } from "../view/utils";
 import { AudioCall } from "../view/audio-call/call/audio-call";
+import { GameStats } from "../view/audio-call/call/game-stats";
 
 export function drawWordDetails(element: IWord) {
     const card = new WordDetails(element);
@@ -349,23 +350,54 @@ export function getOptions(arr: string[], word: string) {
     return options;
 }
 
-function addToCurrentGameState(guess: boolean){
+function createAnswerCardInner(answer: string, container: HTMLElement) {
+    const word = (currentGame.game as AudioCall).wordsInGame?.find((wordObj: IWord) => wordObj.id === answer);
+    const answerCard = createElementWithClassnames('div', 'answer-card');
+    const play = createElementWithClassnames('button', 'audio-play');
+    const audioAttr = {
+    src: `${ENDPOINT}/${word?.audio}`,
+    type: 'audio/mpeg'
+    }
+    const audio = createElementWithAttributes('audio', audioAttr);
+    play.addEventListener('click', ()=>{playWordInGameHandler((audio as HTMLAudioElement))})
+    const wordTag = createElementWithContent('p', (word?.word as string));
+    wordTag.classList.add('answer-word');
+    const transcriptionTag = createElementWithContent('p', (word?.transcription as string));
+    transcriptionTag.classList.add('answer-transcription');
+    const translationTag = createElementWithContent('p', (word?.wordTranslate as string));
+    translationTag.classList.add('answer-translation')
+    answerCard.append(play, audio, wordTag, transcriptionTag, translationTag);
+    container.append(answerCard);
+}
+
+export function createAnswersCards(key: boolean, container: HTMLElement){
+    if (key === true) {
+        (currentGame.game as AudioCall).state.answers.true.forEach(answer => {
+            createAnswerCardInner(answer, container);
+        })
+    } else {
+        (currentGame.game as AudioCall).state.answers.false.forEach(answer => {
+            createAnswerCardInner(answer, container);
+        })
+    }
+}
+
+function addToCurrentGameState(guess: boolean, wordId: string){
     if (guess){
-        (currentGame.game as AudioCall).state.correctGuesses += 1;
+        // (currentGame.game as AudioCall).state.correctGuesses += 1;
         (currentGame.game as AudioCall).state.currentStrick += 1;
         if ((currentGame.game as AudioCall).state.currentStrick > (currentGame.game as AudioCall).state.maxStrick) {
             (currentGame.game as AudioCall).state.maxStrick = (currentGame.game as AudioCall).state.currentStrick;
-        }
+        };
+        (currentGame.game as AudioCall).state.answers.true.push(wordId);
     } else {
         (currentGame.game as AudioCall).state.currentStrick = 0;
+        (currentGame.game as AudioCall).state.answers.false.push(wordId);
     }
 }
 
 export function appendGameStats(wrapper: HTMLElement) {
-    const correctAnswers = createElementWithContent('p', `Вы ответили правильно на ${String((currentGame.game as AudioCall).state.correctGuesses)} вопросов`);
-    const strick = createElementWithContent('p', `Самая длинная последовательность правильных ответов: ${String((currentGame.game as AudioCall).state.maxStrick)}`);
-    const name = createElementWithContent('h3', String((currentGame.game as AudioCall).gameName));
-    wrapper.append(name, strick, correctAnswers);
+    wrapper.append(new GameStats().create());
     return wrapper;
 }
 
@@ -388,6 +420,7 @@ export function choseAnswerHandler(e: Event, answer: string) {
     const answerButtons = card.querySelectorAll('.option');
     const correctAnswer = card.querySelector('.answer');
     if(!isHTMLElement(correctAnswer)) return;
+    const wordId = card.getAttribute('data-id');
     if (target.getAttribute('data-option') !== answer) {
         (wrongSound as HTMLAudioElement).play();
         target.classList.add('incorrect-answer');
@@ -395,14 +428,14 @@ export function choseAnswerHandler(e: Event, answer: string) {
             if(button.getAttribute('data-option') === answer) button.classList.add('correct-answer');
             (button as HTMLButtonElement).setAttribute('disabled', 'true');
         });
-        addToCurrentGameState(false)
+        addToCurrentGameState(false, (wordId as string))
     } else {
         target.classList.add('correct-answer');
         (correctSound as HTMLAudioElement).play();
         answerButtons.forEach(button=>{
             (button as HTMLButtonElement).setAttribute('disabled', 'true');
         })
-        addToCurrentGameState(true)
+        addToCurrentGameState(true, (wordId as string)); // !TODO
     }
     correctAnswer.classList.remove('opacity-hidden');
     const statsCurrentContainer = document.querySelector('.game-stats-wrapper');
@@ -412,6 +445,6 @@ export function choseAnswerHandler(e: Event, answer: string) {
     statsOld.replaceChildren();
     const statsNew = appendGameStats(statsOld);
     statsCurrentContainer.replaceChild(statsOld, statsNew);
-    statisticState.audioCall.correctAnswers = (currentGame.game as AudioCall).state.correctGuesses;
+    statisticState.audioCall.correctAnswers = (currentGame.game as AudioCall).state.answers.true.length;
     statisticState.audioCall.correctAnswersStrick = (currentGame.game as AudioCall).state.maxStrick;
 }

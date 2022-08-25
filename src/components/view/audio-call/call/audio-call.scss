@@ -147,9 +147,7 @@
 .incorrect-answer {
   background-color: #ce331f;
 }
-.opacity-hidden {
-  opacity: 0;
-}
+
 .buttons-wrapper {
   grid-row: 2 / 3;
   grid-column: 5 / 9;
@@ -158,16 +156,4 @@
   .button {
     flex-basis: 40%;
   }
-}
-.game-stats {
-  flex-basis: 50%;
-  padding: 10px;
-  font-size: 1.1rem;
-  min-height: 50%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-}
-.option:disabled {
-  color: #312828;
 }
