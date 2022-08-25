@@ -66,20 +66,20 @@ export interface IResWordsPage {
 }
 
 export interface IStatisticState {
-    'total': {
-        'wordsLearnt': number;
-        'correctAnswers': number;
-        'correctAnswersStrick': number
+    total: {
+        wordsLearnt: number;
+        correctAnswers: number;
+        correctAnswersStrick: number
     },
-    'audioCall': {
-        'wordsLearnt': number;
-        'correctAnswers': number;
-        'correctAnswersStrick': number;
+    audioCall: {
+        wordsLearnt: number;
+        correctAnswers: number;
+        correctAnswersStrick: number;
     },
-    'sprint': {
-        'wordsLearnt': number;
-        'correctAnswers': number;
-        'correctAnswersStrick': number;
+    sprint: {
+        wordsLearnt: number;
+        correctAnswers: number;
+        correctAnswersStrick: number;
     }
 }
 

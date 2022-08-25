@@ -6,9 +6,9 @@ import {
 import { isHTMLElement,
   //  isHTMLDivElement
   } from "../../../typings/utils/utils";
-import { AudioCall } from "./audio-call";
+import { AudioCall } from "./call/audio-call";
 import { currentGame, TEXTBOOK_PAGE_COUNT } from "../../controller/state";
-import { startGame } from '../../controller/ui';
+import { startGame, playWordInGameHandler, appendGameStats } from '../../controller/ui';
 
 
 
@@ -26,8 +26,16 @@ export class GamePopUp {
       currentGame.game = new AudioCall(section, page, game);
       (currentGame.game as AudioCall).create()
       .then((res)=>{
-        gameContainer.append(res);
+        gameContainer.append(res)
+      })
+      .catch((err)=>{
+        console.log(JSON.stringify(err))
+      })
+      .finally(()=>{
+        const audio = gameContainer?.querySelector('.audio-call>.word-card:first-child>audio');
+        playWordInGameHandler(audio as HTMLAudioElement);
       });
+
     } else {
     // здесь создаем спринт
 
@@ -52,6 +60,8 @@ export class GamePopUp {
 
     const gameStatsWrapper = createElementWithClassnames('div', 'game-stats-wrapper');
     gameStatsWrapper.classList.add('opacity-hidden');
+    const stats = createElementWithClassnames('div', 'game-stats');
+    gameStatsWrapper.append(appendGameStats(stats));
     const playAgain = createElementWithClassnames('button', 'play-again-btn', 'button');
     playAgain.textContent = 'Играть еще раз';
     playAgain.addEventListener('click', () => {
