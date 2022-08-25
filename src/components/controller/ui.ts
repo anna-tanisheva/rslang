@@ -305,6 +305,7 @@ export function startGame(container: HTMLElement, section: number, game: string,
         const audio = sliderContainer.querySelector(`.word-card:nth-child(${(currentGame.game as AudioCall).currentSlide + 1})>audio`);
         const prevAudio = sliderContainer.querySelector(`.word-card:nth-child(${(currentGame.game as AudioCall).currentSlide})>audio`);
         stopPlayingWordHandler(prevAudio as HTMLAudioElement);
+        if (!audio) return;
         playWordInGameHandler(audio as HTMLAudioElement);
     })
 }
