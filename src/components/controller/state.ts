@@ -1,4 +1,4 @@
-import {IAppState} from "../../typings/typings";
+import {IAppState, ITextbookState} from "../../typings/typings";
 
 export const ENDPOINT = "http://localhost:3000";
 
@@ -14,10 +14,13 @@ export const appState: IAppState = {
         textbook: {
             group: 0,
             page: 0,
-            words: [],
         },
     },
     view: "index",
+};
+
+export const textbookState: ITextbookState = {
+    words: [],
 };
 
 export const TEXTBOOK_GROUP_COUNT = 6;

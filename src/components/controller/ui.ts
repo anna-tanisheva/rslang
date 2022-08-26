@@ -1,4 +1,4 @@
-import {fetchWords, postUser, logIn} from "./api";
+import {postUser, logIn, fetchWords} from "./api";
 import {appState} from "./state";
 import {
     isHTMLButtonElement,
@@ -233,8 +233,8 @@ export async function getActiveView() {
             break;
         }
         default:
-            AppView.redrawView(appState.view);
     }
+    AppView.redrawView(appState.view);
 }
 
 export function setLocalStorage() {

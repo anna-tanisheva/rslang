@@ -59,8 +59,10 @@ export interface IWordProgress {
 }
 
 export interface ITextbookViewState {
-    words: IWord[];
     group: number;
     page: number;
 }
 
+export interface ITextbookState {
+    words: IWord[];
+}

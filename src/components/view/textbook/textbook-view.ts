@@ -12,16 +12,16 @@ import {
     createElementWithContent,
 } from "../utils";
 
-import {appState} from "../../controller/state";
+import {appState, textbookState} from "../../controller/state";
 import {IWord} from "../../../typings";
 
 export class TextbookView {
     public wordsData: IWord[] = [];
 
-    public wordsComponent = new WordsItem(this.wordsData).create();
+    public wordsComponent = new WordsItem(textbookState.words).create();
 
     create() {
-        this.wordsData = appState.viewsStates.textbook.words;
+        this.wordsData = textbookState.words;
         const textbookContainer = createElementWithClassnames(
             "section",
             "textbook-container"

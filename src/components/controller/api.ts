@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {appState, ENDPOINT} from "./state";
+import {appState, ENDPOINT, textbookState} from "./state";
 import {
     IUserSignUp,
     IUser,
@@ -84,7 +84,7 @@ export async function fetchWords({
 }): Promise<void> {
     const res = await fetch(`${WORDS}?group=${group}&page=${page}`);
     const words = (await res.json()) as IWord[];
-    appState.viewsStates.textbook.words = words;
+    textbookState.words = words;
     PagePagination.setDisabled();
     AppView.redrawView(appState.view);
     PagePagination.moveSlider();
@@ -99,7 +99,7 @@ export async function fetchWordsInPage({
 }): Promise<void> {
     const res = await fetch(`${WORDS}?group=${group}&page=${page}`);
     const words = (await res.json()) as IWord[];
-    appState.viewsStates.textbook.words = words;
+    textbookState.words = words;
     PagePagination.setDisabled();
     WordsItem.drawNewWordsItem(words);
     WordDetails.setCard(words[0]);

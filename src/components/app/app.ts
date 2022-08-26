@@ -42,7 +42,6 @@ export class App {
 
         window.addEventListener("DOMContentLoaded", () => {
             setCurrentUserOnLoad();
-            getLocalStorage();
         });
 
         tabFormButtons.addEventListener("click", showForms);
@@ -59,7 +58,7 @@ export class App {
             if (!target.classList.contains("nav-link")) return;
             const link = target.getAttribute("href");
             if (!link) return;
-            AppView.redrawView(link);
+            getActiveView();
         });
         // change view on popstate event
         window.addEventListener("popstate", () => {
