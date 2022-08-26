@@ -1,1 +1,17 @@
+<<<<<<< HEAD
 node_modules
+=======
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional eslint cache
+.eslintcache
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+>>>>>>> 2cf9f715e7a5e445a9f9639e9445420b56a84f27

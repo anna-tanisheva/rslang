@@ -1,0 +1,340 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik+Mono+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,700;0,900;1,400;1,700;1,900&display=swap');
+$sides-padding: 1rem;
+$colorActiveBg:lighten(lightgrey,
+15%);
+$colorActive:lighten(black,
+40%);
+$colorAccent:gold;
+$colorGroup1:darken( aquamarine,
+35%);
+$colorGroup2:lighten(orange,
+5%);
+$colorGroup3:darken(pink,
+10%);
+$colorGroup4:lighten(red,
+20%);
+$colorGroup5:lightskyblue;
+$colorGroup6:lighten(blue,
+25%);
+.textbook-container {
+    flex: 1 0 auto;
+    padding: 1rem 0;
+    width: min(1200px, calc(100% - $sides-padding));
+    margin: 0 auto;
+    .group-heading,
+    .group-container {
+        font-family: 'Rubik', sans-serif;
+        font-weight: 300;
+        padding: calc($sides-padding/2);
+        background-color: $colorActiveBg;
+    }
+    .group-heading {
+        border-radius: 0 1rem 0 0;
+    }
+    .group-container {
+        padding-bottom: calc($sides-padding/2);
+    }
+}
+
+.textbook-controls {
+    display: flex;
+    width: min-content;
+    gap: 0.5em;
+}
+
+.group-label,
+.textbook-mode,
+.textbook-settings {
+    padding: calc($sides-padding/2);
+    font-size: 1rem;
+    letter-spacing: -0.1em;
+    cursor: pointer;
+    border: unset;
+    background: unset;
+    transition: 0.2s;
+}
+
+.textbook-control {
+    display: grid;
+}
+
+.group-label,
+.textbook-mode {
+    font-family: 'Rubik Mono One', sans-serif;
+    color: lightgrey;
+    border-radius: 1rem 1rem 0 0;
+    display: grid;
+    place-items: center;
+    padding-bottom: 0;
+    transition: 0.2s;
+}
+
+input[name="textbook-mode"],
+input[name="group-radio"],
+input[name="words-item-radio"] {
+    width: 0;
+    height: 0;
+    opacity: 0;
+    display: none;
+}
+
+input[name="textbook-mode"]:checked+.textbook-mode,
+input[name="group-radio"]:checked+.group-label {
+    color: $colorActive;
+}
+
+input[name="textbook-mode"]:checked+.textbook-mode {
+    background-color: $colorActiveBg;
+}
+
+.textbook-mode:hover {
+    color: $colorAccent;
+}
+
+.textbook-settings {
+    font-size: 1.5rem;
+    color: $colorActive;
+    display: grid;
+    place-items: center;
+}
+
+.textbook-settings .settings-icon {
+    fill: currentColor;
+    width: 1em;
+    height: 1em;
+    transition: 0.3s;
+}
+
+.textbook-settings:hover .settings-icon {
+    transform: rotate(120deg);
+}
+
+.group-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1em;
+}
+
+.group-item {
+    color: lightgrey;
+    flex: 1;
+}
+
+.group-item h2 {
+    min-width: 160px;
+}
+
+.group-item p {
+    text-align: right;
+}
+
+.group-item:nth-child(1) input[name="group-radio"]:checked+.group-label {
+    color: $colorGroup1;
+    box-shadow: 2px 2px 0px 0px currentColor;
+}
+
+.group-item:nth-child(2) input[name="group-radio"]:checked+.group-label {
+    color: $colorGroup2;
+    box-shadow: 2px 2px 0px 0px currentColor;
+}
+
+.group-item:nth-child(3) input[name="group-radio"]:checked+.group-label {
+    color: $colorGroup3;
+    box-shadow: 2px 2px 0px 0px currentColor;
+}
+
+.group-item:nth-child(4) input[name="group-radio"]:checked+.group-label {
+    color: $colorGroup4;
+    box-shadow: 2px 2px 0px 0px currentColor;
+}
+
+.group-item:nth-child(5) input[name="group-radio"]:checked+.group-label {
+    color: $colorGroup5;
+    box-shadow: 2px 2px 0px 0px currentColor;
+}
+
+.group-item:nth-child(6) input[name="group-radio"]:checked+.group-label {
+    color: $colorGroup6;
+    box-shadow: 2px 2px 0px 0px currentColor;
+}
+
+.group-label {
+    background-color: lighten(lightgrey, 11%);
+    font-family: 'Rubik Mono One', sans-serif;
+    color: currentColor;
+    border-radius: 1rem;
+    place-items: unset;
+}
+
+.words-wrapper {
+    background-color: $colorActiveBg;
+    padding: calc($sides-padding/2) 0;
+    border-radius: 0 0 1rem 1rem;
+    color: $colorActive;
+    .words-heading {
+        font-family: "Rubik", sans-serif;
+        font-weight: 300;
+        padding: 0.5rem;
+    }
+    display: flex;
+    flex-direction: column;
+    .words-group {
+        display: flex;
+        gap: 1rem;
+        color: $colorActive;
+        .card {
+            width: 250px;
+            background-color: lighten(lightgrey, 11%);
+            margin: calc($sides-padding/2);
+            border-radius: 9rem 1rem 1rem 1rem;
+            .card-image {
+                height: 150px;
+                background-size: cover;
+                background-repeat: no-repeat;
+                border-radius: 5rem 1rem 5rem 1rem;
+            }
+        }
+        .words-page {
+            padding: calc($sides-padding/2);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            width: calc(100% - 250px);
+            .words-item-wrapper {
+                min-width: 210px;
+                flex: 1;
+                height: 100px;
+                border-radius: 1rem;
+                background-color: lighten(lightgrey, 11%);
+                font-family: "Rubik", sans-serif;
+                .words-item {
+                    cursor: pointer;
+                    padding: 1rem 1rem 0 1rem;
+                    flex: 1;
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    color: currentColor;
+                    .item-word {
+                        font-size: 1.4rem;
+                        font-weight: 700;
+                    }
+                }
+            }
+        }
+    }
+    .pages-container {
+        margin: 0 auto;
+        padding: calc($sides-padding) 0;
+        width: fit-content;
+        display: flex;
+        gap: 5px;
+        .page-button {
+            background-color: lighten(lightgrey, 9%);
+            font-family: "Rubik", sans-serif;
+            color: $colorActive;
+            font-weight: 700;
+            font-size: 1.5rem;
+            height: 2.5rem;
+            width: 2.5rem;
+            flex-shrink: 0;
+            border: unset;
+            border-radius: 50%;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: 0.2s;
+            &:disabled {
+                cursor: auto;
+                pointer-events: none;
+                color: #999;
+                box-shadow: 1px 1px 0px 0px currentColor;
+            }
+            &:hover {
+                box-shadow: 2px 2px 0px 0px currentColor;
+            }
+            &:active {
+                box-shadow: 1px 1px 0px 0px currentColor;
+            }
+        }
+        .slider-buttons-wrapper {
+            position: relative;
+            display: flex;
+            max-width: 200px;
+            overflow: clip;
+            &::after,
+            &::before {
+                position: absolute;
+                content: "";
+                width: 20px;
+                right: 0px;
+                height: 100%;
+                background: linear-gradient(-90deg, rgba(249, 249, 249, 1) 5%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0) 100%);
+                z-index: 5;
+                pointer-events: none;
+            }
+            &::before {
+                background: linear-gradient(90deg, rgba(249, 249, 249, 1) 5%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0) 100%);
+                right: unset;
+                left: 0;
+            }
+            .slider-buttons {
+                transform: translateX(0px);
+                display: flex;
+                transition: 0.2s;
+                padding-bottom: 5px;
+                gap: 5px;
+            }
+        }
+    }
+}
+
+.card {
+    font-family: "Rubik", sans-serif;
+    min-height: 700px;
+    height: 100%;
+    .card-content {
+        padding: $sides-padding;
+        .card-heading {
+            display: flex;
+            flex-wrap: wrap;
+            row-gap: 0.5rem;
+        }
+        .card-word {
+            font-size: 1.5rem;
+            font-weight: 700;
+            width: 100%;
+        }
+        .card-translate,
+        .card-transcription {
+            font-size: 1.1rem;
+            letter-spacing: -1px;
+            font-weight: 400;
+            width: 100%;
+        }
+        .card-transcription {
+            letter-spacing: 2px;
+            vertical-align: middle;
+            width: fit-content;
+            align-self: flex-end;
+        }
+        .card-buttot-audio {
+            margin: 0 0 0 1rem;
+            width: 30px;
+            height: 30px;
+            background-image: url("../../../assets/images/icons8-динамик-100.png");
+            background-size: contain;
+            border: unset;
+            border-radius: 50%;
+            transition: 0.3s;
+            cursor: pointer;
+            filter: grayscale(100%);
+            &:hover {
+                filter: grayscale(0%);
+                background-color: lightgreen;
+            }
+        }
+    }
+}
