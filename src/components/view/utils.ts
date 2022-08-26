@@ -26,3 +26,7 @@ export function createElementWithContent(
     element.textContent = elementContent;
     return element;
 }
+
+export function getRandomInRange(num: number) {
+    return Math.floor(Math.random() * num)
+}

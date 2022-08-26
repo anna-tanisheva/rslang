@@ -1,5 +1,4 @@
 export interface IWord {
-
     id: string;
     audio: string;
     audioExample: string;
@@ -64,6 +63,28 @@ export interface IResWordsPage {
     words: WordsData;
     group: number;
     page: number;
+}
+
+export interface IStatisticState {
+    total: {
+        wordsLearnt: number;
+        correctAnswers: number;
+        correctAnswersStrick: number;
+    };
+    audioCall: {
+        wordsLearnt: number;
+        correctAnswers: number;
+        correctAnswersStrick: number;
+    };
+    sprint: {
+        wordsLearnt: number;
+        correctAnswers: number;
+        correctAnswersStrick: number;
+    };
+}
+
+export interface ICurrentGame {
+    game: unknown;
 }
 
 export interface ITextbookViewState {

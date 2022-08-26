@@ -40,6 +40,7 @@ export class App {
         const navigation = document.querySelector(".nav");
         if (!isHTMLElement(navigation)) return;
 
+
         window.addEventListener("DOMContentLoaded", () => {
             setCurrentUserOnLoad();
         });

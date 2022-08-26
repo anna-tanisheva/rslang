@@ -101,9 +101,11 @@ export async function fetchWordsInTextbook({
     const res = await fetch(`${WORDS}?group=${group}&page=${page}`);
     const words = (await res.json()) as IWord[];
     textbookState.words = words;
-    PagePagination.setDisabled();
-    AppView.redrawView(appState.view);
-    PagePagination.moveSlider();
+    //    AppView.redrawView(appState.view);
+    // PagePagination.setDisabled();
+    /* WordsItem.drawNewWordsItem(words);
+    WordDetails.setCard(words[0]); */
+    // PagePagination.moveSlider();
 }
 
 export async function fetchWordsInPage({

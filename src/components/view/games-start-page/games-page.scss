@@ -1,0 +1,21 @@
+.games {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+  min-height: 100%;
+}
+
+.game-container {
+  flex-basis: 30%;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: lighten($main-color, 20%);
+  align-items: center;
+  & > img {
+    width: 20%;
+  }
+}
