@@ -58,6 +58,14 @@ export interface IWordProgress {
     page: number;
 }
 
+export type WordsData = IWord[];
+
+export interface IResWordsPage {
+    words: WordsData;
+    group: number;
+    page: number;
+}
+
 export interface ITextbookViewState {
     group: number;
     page: number;

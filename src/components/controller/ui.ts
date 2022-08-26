@@ -1,4 +1,6 @@
-import {postUser, logIn, fetchWords} from "./api";
+import {WordDetails} from "../view/textbook/components";
+import {IResWordsPage, IWord} from "../../typings";
+import {fetchWords, postUser, logIn, fetchWordsInTextbook} from "./api";
 import {appState} from "./state";
 import {
     isHTMLButtonElement,
@@ -226,7 +228,7 @@ export function showFormHandler() {
 export async function getActiveView() {
     switch (appState.view) {
         case "textbook": {
-            await fetchWords({
+            await fetchWordsInTextbook({
                 group: appState.viewsStates.textbook.group,
                 page: appState.viewsStates.textbook.page,
             });

@@ -6,6 +6,7 @@ import {
     IUserSignIn,
     ISignInResponse,
     IWord,
+    IResWordsPage,
 } from "../../typings/typings";
 import {AppView} from "../view/app-view";
 import {
@@ -13,7 +14,6 @@ import {
     WordDetails,
     WordsItem,
 } from "../view/textbook/components";
-import {isHTMLButtonElement} from "../../typings/utils/utils";
 
 export const BASE_URL = "http://localhost:3000";
 const ID = "";
@@ -76,6 +76,22 @@ export async function getUser(id: string, token: string) {
 }
 
 export async function fetchWords({
+    group,
+    page,
+}: {
+    group: number;
+    page: number;
+}): Promise<IResWordsPage> {
+    const res = await fetch(`${WORDS}?group=${group}&page=${page}`);
+    const words = await res.json();
+    return {
+        words,
+        group,
+        page,
+    };
+}
+
+export async function fetchWordsInTextbook({
     group,
     page,
 }: {
