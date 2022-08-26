@@ -1,7 +1,12 @@
-import {WordDetails} from "../view/textbook/components";
-import {IResWordsPage, IWord} from "../../typings";
-import {fetchWords, postUser, logIn} from "./api";
-import {appState, currentGame, statisticState, TEXTBOOK_PAGE_COUNT, ENDPOINT} from "./state";
+import {IWord} from "../../typings";
+import {postUser, logIn, fetchWordsInTextbook} from "./api";
+import {
+    appState,
+    currentGame,
+    statisticState,
+    TEXTBOOK_PAGE_COUNT,
+    ENDPOINT,
+} from "./state";
 import {
     isHTMLButtonElement,
     isHTMLElement,
@@ -9,28 +14,17 @@ import {
     isHTMLInputElement,
 } from "../../typings/utils/utils";
 import {ISignInResponse, WordsData} from "../../typings/typings";
-import { GamePopUp } from "../view/audio-call/game-page";
-import { getRandomInRange, createElementWithAttributes, createElementWithClassnames, createElementWithContent } from "../view/utils";
-import { AudioCall } from "../view/audio-call/call/audio-call";
-import { GameStats } from "../view/audio-call/call/game-stats";
-
-export function drawWordDetails(element: IWord) {
-    const card = new WordDetails(element);
-    return card.template;
-}
-
-async function getWords(): Promise<IResWordsPage> {
-    const pageData = await fetchWords({
-        group: appState.group,
-        page: appState.page,
-    });
-    return pageData;
-}
-
-export async function drawTextbook(): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const pageData = await getWords();
-}
+import {GamePopUp} from "../view/audio-call/game-page";
+import {
+    getRandomInRange,
+    createElementWithAttributes,
+    createElementWithClassnames,
+    createElementWithContent,
+} from "../view/utils";
+import {AudioCall} from "../view/audio-call/call/audio-call";
+import {GameStats} from "../view/audio-call/call/game-stats";
+import {AppView} from "../view/app-view";
+import {PagePagination} from "../view/textbook/components";
 
 function setCurrentUser(data: ISignInResponse) {
     appState.user.name = data.name;
@@ -39,12 +33,12 @@ function setCurrentUser(data: ISignInResponse) {
     appState.user.token = data.token;
     const welcomeContainer = document.querySelector(".welcome-text");
     if (!isHTMLElement(welcomeContainer)) return;
-    if (data.name === "unknown") {
+    if (!data.name) {
         welcomeContainer.innerText = `Welcome stranger`;
     } else {
         welcomeContainer.innerText = `Welcome ${data.name} `;
     }
-    if (data.name === "unknown") return;
+    if (!data.name) return;
     const logOutBtn = document.querySelector(".logout-submit");
     if (!isHTMLButtonElement(logOutBtn)) return;
     logOutBtn.removeAttribute("disabled");
@@ -230,7 +224,7 @@ export async function signInHandler(e: Event): Promise<void> {
 
 export function logOutHandler(): void {
     Object.keys(appState.user).forEach((key) => {
-        appState.user[key as keyof typeof appState.user] = "unknown";
+        appState.user[key as keyof typeof appState.user] = "";
     });
     appState.isSignedIn = false;
     localStorage.setItem("appState", JSON.stringify(appState));
@@ -246,6 +240,21 @@ export function showFormHandler() {
     document.querySelector(".form-container")?.classList.toggle("hidden");
 }
 
+export async function getActiveView() {
+    switch (appState.view) {
+        case "textbook": {
+            await fetchWordsInTextbook({
+                group: appState.viewsStates.textbook.group,
+                page: appState.viewsStates.textbook.page,
+            });
+            break;
+        }
+        default:
+    }
+    AppView.redrawView(appState.view);
+    if (appState.view === "textbook") PagePagination.moveSlider();
+}
+
 export function setLocalStorage() {
     localStorage.clear();
     localStorage.setItem("appState", JSON.stringify(appState));
@@ -253,12 +262,11 @@ export function setLocalStorage() {
 
 export function getLocalStorage() {
     if (localStorage.getItem("appState")) {
-        const {isSignedIn, group, page, user, view} = JSON.parse(
+        const {isSignedIn, user, view, viewsStates} = JSON.parse(
             localStorage.appState
         );
         appState.isSignedIn = isSignedIn;
-        appState.group = group;
-        appState.page = page;
+        appState.viewsStates = viewsStates;
         appState.user = user;
         appState.view = view;
     }
@@ -266,66 +274,90 @@ export function getLocalStorage() {
 
 // games
 
-export function moveGameSlider(sliderContainer: HTMLElement, nextButton: HTMLElement) {
+export function moveGameSlider(
+    sliderContainer: HTMLElement,
+    nextButton: HTMLElement
+) {
     const innerSliderContainer = sliderContainer;
-    if (sliderContainer.style.left !== '-900%') {
-        innerSliderContainer.style.left = `${Number((innerSliderContainer.style.left).split('%')[0]) - 100}%`
+    if (sliderContainer.style.left !== "-900%") {
+        innerSliderContainer.style.left = `${
+            Number(innerSliderContainer.style.left.split("%")[0]) - 100
+        }%`;
     } else {
-        innerSliderContainer.style.left = `${Number((innerSliderContainer.style.left).split('%')[0]) - 100}%`;
-        const container = sliderContainer.closest('.game-popup');
+        innerSliderContainer.style.left = `${
+            Number(innerSliderContainer.style.left.split("%")[0]) - 100
+        }%`;
+        const container = sliderContainer.closest(".game-popup");
         if (!isHTMLElement(container)) return;
-        container.querySelector('.game-stats-wrapper')?.classList.remove('opacity-hidden');
-        nextButton.setAttribute('disabled', 'true');
+        container
+            .querySelector(".game-stats-wrapper")
+            ?.classList.remove("opacity-hidden");
+        nextButton.setAttribute("disabled", "true");
     }
 }
 
-export function playWordInGameHandler(audio: HTMLAudioElement){
+export function playWordInGameHandler(audio: HTMLAudioElement) {
     audio.play();
 }
 
-function stopPlayingWordHandler(audio: HTMLAudioElement){
+function stopPlayingWordHandler(audio: HTMLAudioElement) {
     audio.pause();
 }
 
-export function startGame(container: HTMLElement, section: number, game: string, page: number) {
+export function startGame(
+    container: HTMLElement,
+    section: number,
+    game: string,
+    page: number
+) {
     const popup = new GamePopUp().create(section, game, page);
     container.append(popup);
-    const closeButton = container.querySelector('.close-button');
+    const closeButton = container.querySelector(".close-button");
     if (!isHTMLElement(closeButton)) return;
-    closeButton.addEventListener('click', ()=>{
+    closeButton.addEventListener("click", () => {
         currentGame.game = null;
         container.removeChild(popup);
-    })
-    const nextButton = container.querySelector('.next-button');
+    });
+    const nextButton = container.querySelector(".next-button");
     if (!isHTMLElement(nextButton)) return;
-    nextButton.addEventListener('click', ()=>{
-        const sliderContainer = popup.querySelector('.audio-call');
+    nextButton.addEventListener("click", () => {
+        const sliderContainer = popup.querySelector(".audio-call");
         (currentGame.game as AudioCall).currentSlide += 1;
         if (!isHTMLDivElement(sliderContainer)) return;
         moveGameSlider(sliderContainer, nextButton);
-        const audio = sliderContainer.querySelector(`.word-card:nth-child(${(currentGame.game as AudioCall).currentSlide + 1})>audio`);
-        const prevAudio = sliderContainer.querySelector(`.word-card:nth-child(${(currentGame.game as AudioCall).currentSlide})>audio`);
+        const audio = sliderContainer.querySelector(
+            `.word-card:nth-child(${
+                (currentGame.game as AudioCall).currentSlide + 1
+            })>audio`
+        );
+        const prevAudio = sliderContainer.querySelector(
+            `.word-card:nth-child(${
+                (currentGame.game as AudioCall).currentSlide
+            })>audio`
+        );
         stopPlayingWordHandler(prevAudio as HTMLAudioElement);
         if (!audio) return;
         playWordInGameHandler(audio as HTMLAudioElement);
-    })
+    });
 }
 
 export function startGameHandler(e: Event): void {
-    const CALL_GAME = 'Audio Call';
+    const CALL_GAME = "Audio Call";
     // const SPRINT = 'Sprint';
     const {target} = e;
-    const gameContainer = document.querySelector('.games');
+    const gameContainer = document.querySelector(".games");
     if (!isHTMLElement(gameContainer)) return;
     if (!isHTMLButtonElement(target)) return;
-    if (!target.classList.contains('start-button')) return;
-    if (target.classList.contains('sprint-button')) {
-        console.log('sprint');
+    if (!target.classList.contains("start-button")) return;
+    if (target.classList.contains("sprint-button")) {
+        console.log("sprint");
         // логика по созданию экземпляра игры
         // const section = Number(target.closest('.game-container')?.querySelector('select')?.value);
         // startGame(gameContainer, section, SPRINT);
     } else {
-        const section = Number(target.closest('.game-container')?.querySelector('select')?.value);
+        const section = Number(
+            target.closest(".game-container")?.querySelector("select")?.value
+        );
         const page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
         startGame(gameContainer, section, CALL_GAME, page);
     }
@@ -333,9 +365,9 @@ export function startGameHandler(e: Event): void {
 
 export function getGameWordsArr(arr: WordsData) {
     const output: IWord[] = [];
-    while(output.length < 10) {
+    while (output.length < 10) {
         const ind = getRandomInRange(arr.length);
-        if (!output.includes(arr[ind])) output.push(arr[ind])
+        if (!output.includes(arr[ind])) output.push(arr[ind]);
     }
     return output;
 }
@@ -344,51 +376,66 @@ export function getOptions(arr: string[], word: string) {
     const options = [word];
     while (options.length < 4) {
         const ind = getRandomInRange(arr.length);
-        if (!options.includes(arr[ind])) options.push(arr[ind])
+        if (!options.includes(arr[ind])) options.push(arr[ind]);
     }
-    options.sort(() => (Math.random() > .5) ? 1 : -1);
+    options.sort(() => (Math.random() > 0.5 ? 1 : -1));
     return options;
 }
 
 function createAnswerCardInner(answer: string, container: HTMLElement) {
-    const word = (currentGame.game as AudioCall).wordsInGame?.find((wordObj: IWord) => wordObj.id === answer);
-    const answerCard = createElementWithClassnames('div', 'answer-card');
-    const play = createElementWithClassnames('button', 'audio-play');
+    const word = (currentGame.game as AudioCall).wordsInGame?.find(
+        (wordObj: IWord) => wordObj.id === answer
+    );
+    const answerCard = createElementWithClassnames("div", "answer-card");
+    const play = createElementWithClassnames("button", "audio-play");
     const audioAttr = {
-    src: `${ENDPOINT}/${word?.audio}`,
-    type: 'audio/mpeg'
-    }
-    const audio = createElementWithAttributes('audio', audioAttr);
-    play.addEventListener('click', ()=>{playWordInGameHandler((audio as HTMLAudioElement))})
-    const wordTag = createElementWithContent('p', (word?.word as string));
-    wordTag.classList.add('answer-word');
-    const transcriptionTag = createElementWithContent('p', (word?.transcription as string));
-    transcriptionTag.classList.add('answer-transcription');
-    const translationTag = createElementWithContent('p', (word?.wordTranslate as string));
-    translationTag.classList.add('answer-translation')
+        src: `${ENDPOINT}/${word?.audio}`,
+        type: "audio/mpeg",
+    };
+    const audio = createElementWithAttributes("audio", audioAttr);
+    play.addEventListener("click", () => {
+        playWordInGameHandler(audio as HTMLAudioElement);
+    });
+    const wordTag = createElementWithContent("p", word?.word as string);
+    wordTag.classList.add("answer-word");
+    const transcriptionTag = createElementWithContent(
+        "p",
+        word?.transcription as string
+    );
+    transcriptionTag.classList.add("answer-transcription");
+    const translationTag = createElementWithContent(
+        "p",
+        word?.wordTranslate as string
+    );
+    translationTag.classList.add("answer-translation");
     answerCard.append(play, audio, wordTag, transcriptionTag, translationTag);
     container.append(answerCard);
 }
 
-export function createAnswersCards(key: boolean, container: HTMLElement){
+export function createAnswersCards(key: boolean, container: HTMLElement) {
     if (key === true) {
-        (currentGame.game as AudioCall).state.answers.true.forEach(answer => {
+        (currentGame.game as AudioCall).state.answers.true.forEach((answer) => {
             createAnswerCardInner(answer, container);
-        })
+        });
     } else {
-        (currentGame.game as AudioCall).state.answers.false.forEach(answer => {
-            createAnswerCardInner(answer, container);
-        })
+        (currentGame.game as AudioCall).state.answers.false.forEach(
+            (answer) => {
+                createAnswerCardInner(answer, container);
+            }
+        );
     }
 }
 
-function addToCurrentGameState(guess: boolean, wordId: string){
-    if (guess){
+function addToCurrentGameState(guess: boolean, wordId: string) {
+    if (guess) {
         // (currentGame.game as AudioCall).state.correctGuesses += 1;
         (currentGame.game as AudioCall).state.currentStrick += 1;
-        if ((currentGame.game as AudioCall).state.currentStrick > (currentGame.game as AudioCall).state.maxStrick) {
+        if (
+            (currentGame.game as AudioCall).state.currentStrick >
+            (currentGame.game as AudioCall).state.maxStrick
+        ) {
             (currentGame.game as AudioCall).state.maxStrick = (currentGame.game as AudioCall).state.currentStrick;
-        };
+        }
         (currentGame.game as AudioCall).state.answers.true.push(wordId);
     } else {
         (currentGame.game as AudioCall).state.currentStrick = 0;
@@ -403,45 +450,46 @@ export function appendGameStats(wrapper: HTMLElement) {
 
 export function choseAnswerHandler(e: Event, answer: string) {
     const {target} = e;
-    if(!isHTMLButtonElement(target)) return;
-    const container = target.closest('.game-popup');
-    if(!isHTMLDivElement(container)) return;
-    const wrongSound = container.querySelector('.wrong-sound');
-    if(!isHTMLElement(wrongSound)) return;
-    const correctSound = container.querySelector('.correct-sound');
-    if(!isHTMLElement(wrongSound)) return;
-    const card = target.closest('.word-card');
-    if(!isHTMLDivElement(card)) return;
-    const flipContainer = card.querySelector('.flip-container');
-    if(!isHTMLDivElement(flipContainer)) return;
-    flipContainer.classList.add('answered');
-    const img = card.querySelector('img');
-    if(!isHTMLElement(img)) return;
-    const answerButtons = card.querySelectorAll('.option');
-    const correctAnswer = card.querySelector('.answer');
-    if(!isHTMLElement(correctAnswer)) return;
-    const wordId = card.getAttribute('data-id');
-    if (target.getAttribute('data-option') !== answer) {
+    if (!isHTMLButtonElement(target)) return;
+    const container = target.closest(".game-popup");
+    if (!isHTMLDivElement(container)) return;
+    const wrongSound = container.querySelector(".wrong-sound");
+    if (!isHTMLElement(wrongSound)) return;
+    const correctSound = container.querySelector(".correct-sound");
+    if (!isHTMLElement(wrongSound)) return;
+    const card = target.closest(".word-card");
+    if (!isHTMLDivElement(card)) return;
+    const flipContainer = card.querySelector(".flip-container");
+    if (!isHTMLDivElement(flipContainer)) return;
+    flipContainer.classList.add("answered");
+    const img = card.querySelector("img");
+    if (!isHTMLElement(img)) return;
+    const answerButtons = card.querySelectorAll(".option");
+    const correctAnswer = card.querySelector(".answer");
+    if (!isHTMLElement(correctAnswer)) return;
+    const wordId = card.getAttribute("data-id");
+    if (target.getAttribute("data-option") !== answer) {
         (wrongSound as HTMLAudioElement).play();
-        target.classList.add('incorrect-answer');
-        answerButtons.forEach(button=>{
-            if(button.getAttribute('data-option') === answer) button.classList.add('correct-answer');
-            (button as HTMLButtonElement).setAttribute('disabled', 'true');
+        target.classList.add("incorrect-answer");
+        answerButtons.forEach((button) => {
+            if (button.getAttribute("data-option") === answer)
+                button.classList.add("correct-answer");
+            (button as HTMLButtonElement).setAttribute("disabled", "true");
         });
-        addToCurrentGameState(false, (wordId as string))
+        addToCurrentGameState(false, wordId as string);
     } else {
-        target.classList.add('correct-answer');
+        target.classList.add("correct-answer");
         (correctSound as HTMLAudioElement).play();
-        answerButtons.forEach(button=>{
-            (button as HTMLButtonElement).setAttribute('disabled', 'true');
-        })
-        addToCurrentGameState(true, (wordId as string)); // !TODO
+        answerButtons.forEach((button) => {
+            (button as HTMLButtonElement).setAttribute("disabled", "true");
+        });
+        addToCurrentGameState(true, wordId as string); // !TODO
     }
-    correctAnswer.classList.remove('opacity-hidden');
-    const statsCurrentContainer = document.querySelector('.game-stats-wrapper');
-    if(!isHTMLElement(statsCurrentContainer)) return;
-    const statsOld = statsCurrentContainer.querySelector('.game-stats');
-    if(!isHTMLElement(statsOld)) return;
+    correctAnswer.classList.remove("opacity-hidden");
+    const statsCurrentContainer = document.querySelector(".game-stats-wrapper");
+    if (!isHTMLElement(statsCurrentContainer)) return;
+    const statsOld = statsCurrentContainer.querySelector(".game-stats");
+    if (!isHTMLElement(statsOld)) return;
     statsOld.replaceChildren();
     const statsNew = appendGameStats(statsOld);
     statsCurrentContainer.replaceChild(statsOld, statsNew);

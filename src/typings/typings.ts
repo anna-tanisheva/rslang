@@ -1,5 +1,4 @@
 export interface IWord {
-
     id: string;
     audio: string;
     audioExample: string;
@@ -45,8 +44,9 @@ export interface ISignInResponse {
 export interface IAppState {
     isSignedIn: boolean;
     user: IUser;
-    group: number;
-    page: number;
+    viewsStates: {
+        textbook: ITextbookViewState;
+    };
     view: string;
 }
 
@@ -69,20 +69,29 @@ export interface IStatisticState {
     total: {
         wordsLearnt: number;
         correctAnswers: number;
-        correctAnswersStrick: number
-    },
+        correctAnswersStrick: number;
+    };
     audioCall: {
         wordsLearnt: number;
         correctAnswers: number;
         correctAnswersStrick: number;
-    },
+    };
     sprint: {
         wordsLearnt: number;
         correctAnswers: number;
         correctAnswersStrick: number;
-    }
+    };
 }
 
 export interface ICurrentGame {
     game: unknown;
+}
+
+export interface ITextbookViewState {
+    group: number;
+    page: number;
+}
+
+export interface ITextbookState {
+    words: IWord[];
 }

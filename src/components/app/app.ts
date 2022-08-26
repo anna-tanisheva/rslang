@@ -9,6 +9,7 @@ import {
     showFormHandler,
     getLocalStorage,
     setLocalStorage,
+    getActiveView,
 } from "../controller/ui";
 import {getRouteHandler} from "../controller/routing";
 import {appState} from "../controller/state";
@@ -19,8 +20,8 @@ export class App {
     public start(): void {
         getLocalStorage();
         this.view.drawView();
+        getActiveView();
         this.addEventListeners();
-        this.view.redrawView(appState.view);
     }
 
     public addEventListeners() {
@@ -42,7 +43,6 @@ export class App {
 
         window.addEventListener("DOMContentLoaded", () => {
             setCurrentUserOnLoad();
-            getLocalStorage();
         });
 
         tabFormButtons.addEventListener("click", showForms);
@@ -59,11 +59,11 @@ export class App {
             if (!target.classList.contains("nav-link")) return;
             const link = target.getAttribute("href");
             if (!link) return;
-            this.view.redrawView(link);
+            getActiveView();
         });
         // change view on popstate event
         window.addEventListener("popstate", () => {
-            this.view.redrawView(window.history.state.view);
+            AppView.redrawView(window.history.state.view);
             const array = window.location.href.split("/");
             const lastword = array[array.length - 1];
             if (!array.includes(appState.view)) {

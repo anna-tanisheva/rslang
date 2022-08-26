@@ -7,7 +7,6 @@ import { GamesPage } from "../games-start-page/games-page";
 import { StatisticView } from "../stats/statistic-view";
 import { statisticState } from "../../controller/state";
 
-
 export class MainView {
     public activeViewName: string | undefined;
 
@@ -38,5 +37,4 @@ export class MainView {
         main.append(this[this.activeViewName]);
         return main;
     }
-
 }
