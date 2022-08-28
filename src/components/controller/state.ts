@@ -17,6 +17,7 @@ export const appState: IAppState = {
     },
     viewsStates: {
         textbook: {
+            mode: "textbook",
             group: 0,
             page: 0,
         },
@@ -54,3 +55,12 @@ export const statisticState: IStatisticState = {
 export const currentGame: ICurrentGame = {game: null};
 
 export const audio = new Audio();
+
+export const COLORS = [
+    "#00cc87",
+    "#ffae1a",
+    "#ff8da1",
+    "#ff6666",
+    "#87cefa",
+    "#8080ff",
+];

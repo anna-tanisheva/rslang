@@ -88,6 +88,7 @@ export interface ICurrentGame {
 }
 
 export interface ITextbookViewState {
+    mode: string;
     group: number;
     page: number;
 }
