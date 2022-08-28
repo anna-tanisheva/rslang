@@ -20,6 +20,7 @@ export interface IUser {
     name: string;
     token?: string;
     refreshToken?: string;
+    statsToday?: unknown;
 }
 
 export interface IUserSignUp {
@@ -48,6 +49,17 @@ export interface IAppState {
         textbook: ITextbookViewState;
     };
     view: string;
+    userNull: IUserStats;
+    usersStats: unknown[];
+}
+
+export interface IUserStats {
+    statisticTimeStamp: string | null;
+    statisticState: IStatisticState;
+}
+
+export interface ILSUserStats {
+    [key: string]: IUserStats;
 }
 
 export interface IWordProgress {

@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import {IWord} from "../../typings";
 import {postUser, logIn, fetchWordsInTextbook} from "./api";
 import {
@@ -13,7 +14,7 @@ import {
     isHTMLDivElement,
     isHTMLInputElement,
 } from "../../typings/utils/utils";
-import {ISignInResponse, WordsData} from "../../typings/typings";
+import {ISignInResponse, WordsData, IUser, IUserStats} from "../../typings/typings";
 import {GamePopUp} from "../view/audio-call/game-page";
 import {
     getRandomInRange,
@@ -25,6 +26,58 @@ import {AudioCall} from "../view/audio-call/call/audio-call";
 import {GameStats} from "../view/audio-call/call/game-stats";
 import {AppView} from "../view/app-view";
 import {PagePagination} from "../view/textbook/components";
+
+// stats
+
+export function isUserInUserStats(user: IUser) {
+    const id = `user${user.userId}`;
+    return appState.usersStats.find((elem) => Object.keys(elem as IUserStats)[0] === id) || false;
+}
+
+export function setEmptyStatistic(str: string){
+    return {
+        statisticTimeStamp: str,
+        statisticState: {
+            total: {
+                wordsLearnt: 0,
+                correctAnswers: 0,
+                correctAnswersStrick: 0,
+            },
+            audioCall: {
+                wordsLearnt: 0,
+                correctAnswers: 0,
+                correctAnswersStrick: 0,
+            },
+            sprint: {
+                wordsLearnt: 0,
+                correctAnswers: 0,
+                correctAnswersStrick: 0
+            },
+        }
+    }
+}
+
+export function areDaysEqual(oldDate: string, newDate :string) {
+    [oldDate] = oldDate.split('T');
+    [newDate] = newDate.split('T');
+    oldDate = oldDate.slice(oldDate.length - 2);
+    newDate = newDate.slice(newDate.length - 2);
+    if(Number(oldDate) !== Number(newDate)) {
+        return false;
+    }
+    return true;
+}
+
+export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в типы добавить 2ю игру, когда появится
+    user.statisticState.total.correctAnswers += game.state.answers.true.length;
+    user.statisticState.audioCall.correctAnswers += game.state.answers.true.length;
+    // user.statisticState.audioCall.correctAnswersStrick += game.state.maxStrick;
+    if(user.statisticState.audioCall.correctAnswersStrick < game.state.maxStrick) {
+        user.statisticState.audioCall.correctAnswersStrick = game.state.maxStrick;
+    }
+}
+
+// logIn
 
 function setCurrentUser(data: ISignInResponse) {
     appState.user.name = data.name;
@@ -226,6 +279,7 @@ export function logOutHandler(): void {
     Object.keys(appState.user).forEach((key) => {
         appState.user[key as keyof typeof appState.user] = "";
     });
+    appState.user.statsToday = setEmptyStatistic('');
     appState.isSignedIn = false;
     localStorage.setItem("appState", JSON.stringify(appState));
     const welcomeContainer = document.querySelector(".welcome-text");
@@ -262,13 +316,31 @@ export function setLocalStorage() {
 
 export function getLocalStorage() {
     if (localStorage.getItem("appState")) {
-        const {isSignedIn, user, view, viewsStates} = JSON.parse(
+        const newDate = new Date().toJSON();
+        const {isSignedIn, user, view, viewsStates, userNull} = JSON.parse(
             localStorage.appState
         );
         appState.isSignedIn = isSignedIn;
         appState.viewsStates = viewsStates;
         appState.user = user;
         appState.view = view;
+        appState.userNull = userNull;
+
+        if (appState.isSignedIn) {
+            console.log(appState.isSignedIn)
+        } else {
+            if (!JSON.parse(localStorage.appState).userNull.statisticTimeStamp) {
+                appState.userNull = setEmptyStatistic(newDate);
+                return;
+            }
+            const oldDate = JSON.parse(localStorage.appState).userNull.statisticTimeStamp;
+            if (!areDaysEqual(oldDate, newDate)) {
+                appState.userNull = setEmptyStatistic(newDate);
+            } else {
+                appState.userNull.statisticTimeStamp = oldDate;
+                appState.userNull.statisticState = JSON.parse(localStorage.appState).userNull.statisticState;
+            }
+        }
     }
 }
 
@@ -315,6 +387,12 @@ export function startGame(
     const closeButton = container.querySelector(".close-button");
     if (!isHTMLElement(closeButton)) return;
     closeButton.addEventListener("click", () => {
+        if(!appState.isSignedIn) {
+            setStats((currentGame.game as AudioCall), appState.userNull);
+        } else {
+            setStats((currentGame.game as AudioCall), (appState.user.statsToday as IUserStats));
+        }
+
         currentGame.game = null;
         container.removeChild(popup);
     });
@@ -496,3 +574,6 @@ export function choseAnswerHandler(e: Event, answer: string) {
     statisticState.audioCall.correctAnswers = (currentGame.game as AudioCall).state.answers.true.length;
     statisticState.audioCall.correctAnswersStrick = (currentGame.game as AudioCall).state.maxStrick;
 }
+
+
+

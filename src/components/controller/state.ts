@@ -14,6 +14,26 @@ export const appState: IAppState = {
         name: "",
         token: "",
         refreshToken: "",
+        statsToday: {
+            statisticTimeStamp: null,
+            statisticState: {
+                total: {
+                    wordsLearnt: 0,
+                    correctAnswers: 0,
+                    correctAnswersStrick: 0,
+                },
+                audioCall: {
+                    wordsLearnt: 0,
+                    correctAnswers: 0,
+                    correctAnswersStrick: 0,
+                },
+                sprint: {
+                    wordsLearnt: 0,
+                    correctAnswers: 0,
+                    correctAnswersStrick: 0
+                },
+            }
+        }
     },
     viewsStates: {
         textbook: {
@@ -22,6 +42,27 @@ export const appState: IAppState = {
         },
     },
     view: "index",
+    userNull: {
+        statisticTimeStamp: null,
+        statisticState: {
+            total: {
+                wordsLearnt: 0,
+                correctAnswers: 0,
+                correctAnswersStrick: 0,
+            },
+            audioCall: {
+                wordsLearnt: 0,
+                correctAnswers: 0,
+                correctAnswersStrick: 0,
+            },
+            sprint: {
+                wordsLearnt: 0,
+                correctAnswers: 0,
+                correctAnswersStrick: 0
+            },
+        }
+    },
+    usersStats: []
 };
 
 export const textbookState: ITextbookState = {
