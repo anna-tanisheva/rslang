@@ -14,7 +14,7 @@ import {
     isHTMLDivElement,
     isHTMLInputElement,
 } from "../../typings/utils/utils";
-import {ISignInResponse, WordsData, IUser, IUserStats} from "../../typings/typings";
+import {ISignInResponse, WordsData, IUser, IUserStats, IUserStatsInArr} from "../../typings/typings";
 import {GamePopUp} from "../view/audio-call/game-page";
 import {
     getRandomInRange,
@@ -68,22 +68,41 @@ export function areDaysEqual(oldDate: string, newDate :string) {
     return true;
 }
 
+function setNewDate() {
+    return new Date().toJSON();
+}
+
+function setUserStatsArr(user: IUser){
+    const userInUserStats = isUserInUserStats(user);
+    if(!userInUserStats) {
+        const id = `user${user.userId}`
+        const newUser: IUserStatsInArr = {};
+        newUser[id] = (user.statsToday as IUserStats);
+        appState.usersStats.push(newUser);
+    } else {
+        console.log(userInUserStats);
+    }
+}
+
 export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в типы добавить 2ю игру, когда появится
     user.statisticState.total.correctAnswers += game.state.answers.true.length;
     user.statisticState.audioCall.correctAnswers += game.state.answers.true.length;
-    // user.statisticState.audioCall.correctAnswersStrick += game.state.maxStrick;
     if(user.statisticState.audioCall.correctAnswersStrick < game.state.maxStrick) {
         user.statisticState.audioCall.correctAnswersStrick = game.state.maxStrick;
     }
+    if(!appState.isSignedIn) return;
+    setUserStatsArr(appState.user);
 }
 
 // logIn
 
 function setCurrentUser(data: ISignInResponse) {
+    const newDate = setNewDate();
     appState.user.name = data.name;
     appState.user.userId = data.userId;
     appState.user.refreshToken = data.refreshToken;
     appState.user.token = data.token;
+    const userInUserStats = isUserInUserStats(appState.user);
     const welcomeContainer = document.querySelector(".welcome-text");
     if (!isHTMLElement(welcomeContainer)) return;
     if (!data.name) {
@@ -92,6 +111,18 @@ function setCurrentUser(data: ISignInResponse) {
         welcomeContainer.innerText = `Welcome ${data.name} `;
     }
     if (!data.name) return;
+    if(userInUserStats) {
+        const id = `user${appState.user.userId}`
+        const oldDate = (userInUserStats as IUserStatsInArr)[id].statisticTimeStamp;
+        if(areDaysEqual((oldDate as string), newDate)) {
+            appState.user.statsToday = (userInUserStats as IUserStatsInArr)[id];
+            console.log(appState.user.statsToday)
+        } else {
+            appState.user.statsToday = setEmptyStatistic(newDate);
+        }
+    } else {
+        appState.user.statsToday = setEmptyStatistic(newDate);
+    }
     const logOutBtn = document.querySelector(".logout-submit");
     if (!isHTMLButtonElement(logOutBtn)) return;
     logOutBtn.removeAttribute("disabled");
@@ -317,7 +348,7 @@ export function setLocalStorage() {
 export function getLocalStorage() {
     if (localStorage.getItem("appState")) {
         const newDate = new Date().toJSON();
-        const {isSignedIn, user, view, viewsStates, userNull} = JSON.parse(
+        const {isSignedIn, user, view, viewsStates, userNull, usersStats} = JSON.parse(
             localStorage.appState
         );
         appState.isSignedIn = isSignedIn;
@@ -325,6 +356,7 @@ export function getLocalStorage() {
         appState.user = user;
         appState.view = view;
         appState.userNull = userNull;
+        appState.usersStats = usersStats;
 
         if (appState.isSignedIn) {
             console.log(appState.isSignedIn)

@@ -58,7 +58,7 @@ export interface IUserStats {
     statisticState: IStatisticState;
 }
 
-export interface ILSUserStats {
+export interface IUserStatsInArr {
     [key: string]: IUserStats;
 }
 
