@@ -4,7 +4,6 @@ import {postUser, logIn, fetchWordsInTextbook} from "./api";
 import {
     appState,
     currentGame,
-    statisticState,
     TEXTBOOK_PAGE_COUNT,
     ENDPOINT,
 } from "./state";
@@ -27,7 +26,7 @@ import {GameStats} from "../view/audio-call/call/game-stats";
 import {AppView} from "../view/app-view";
 import {PagePagination} from "../view/textbook/components";
 
-// stats
+// stats one day
 
 export function isUserInUserStats(user: IUser) {
     const id = `user${user.userId}`;
@@ -79,8 +78,6 @@ function setUserStatsArr(user: IUser){
         const newUser: IUserStatsInArr = {};
         newUser[id] = (user.statsToday as IUserStats);
         appState.usersStats.push(newUser);
-    } else {
-        console.log(userInUserStats);
     }
 }
 
@@ -116,7 +113,6 @@ function setCurrentUser(data: ISignInResponse) {
         const oldDate = (userInUserStats as IUserStatsInArr)[id].statisticTimeStamp;
         if(areDaysEqual((oldDate as string), newDate)) {
             appState.user.statsToday = (userInUserStats as IUserStatsInArr)[id];
-            console.log(appState.user.statsToday)
         } else {
             appState.user.statsToday = setEmptyStatistic(newDate);
         }
@@ -358,9 +354,7 @@ export function getLocalStorage() {
         appState.userNull = userNull;
         appState.usersStats = usersStats;
 
-        if (appState.isSignedIn) {
-            console.log(appState.isSignedIn)
-        } else {
+        if (!appState.isSignedIn) {
             if (!JSON.parse(localStorage.appState).userNull.statisticTimeStamp) {
                 appState.userNull = setEmptyStatistic(newDate);
                 return;
@@ -603,8 +597,6 @@ export function choseAnswerHandler(e: Event, answer: string) {
     statsOld.replaceChildren();
     const statsNew = appendGameStats(statsOld);
     statsCurrentContainer.replaceChild(statsOld, statsNew);
-    statisticState.audioCall.correctAnswers = (currentGame.game as AudioCall).state.answers.true.length;
-    statisticState.audioCall.correctAnswersStrick = (currentGame.game as AudioCall).state.maxStrick;
 }
 
 
