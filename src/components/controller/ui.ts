@@ -13,7 +13,7 @@ import {
     isHTMLDivElement,
     isHTMLInputElement,
 } from "../../typings/utils/utils";
-import {ISignInResponse, WordsData, IUser, IUserStats, IUserStatsInArr} from "../../typings/typings";
+import {ISignInResponse, WordsData, IUser, IUserStats, IUserStatsInArr, IWordLearningState} from "../../typings/typings";
 import {GamePopUp} from "../view/audio-call/game-page";
 import {
     getRandomInRange,
@@ -38,16 +38,19 @@ export function setEmptyStatistic(str: string){
         statisticTimeStamp: str,
         statisticState: {
             total: {
+                wordsLearntArr: [],
                 wordsLearnt: 0,
                 correctAnswers: 0,
                 correctAnswersStrick: 0,
             },
             audioCall: {
+                wordsLearntArr: [],
                 wordsLearnt: 0,
                 correctAnswers: 0,
                 correctAnswersStrick: 0,
             },
             sprint: {
+                wordsLearntArr: [],
                 wordsLearnt: 0,
                 correctAnswers: 0,
                 correctAnswersStrick: 0
@@ -81,15 +84,49 @@ function setUserStatsArr(user: IUser){
     }
 }
 
+export function isWordInWordsLearnt(wordId: string, user: IUserStats, game: string) {
+    return user.statisticState[game as keyof typeof user.statisticState].wordsLearntArr.find((word) => Object.keys(word)[0] === wordId) || false;
+}
+
 export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в типы добавить 2ю игру, когда появится
     user.statisticState.total.correctAnswers += game.state.answers.true.length;
     user.statisticState.audioCall.correctAnswers += game.state.answers.true.length;
     if(user.statisticState.audioCall.correctAnswersStrick < game.state.maxStrick) {
         user.statisticState.audioCall.correctAnswersStrick = game.state.maxStrick;
     }
+    const AUDIO_CALL = 'audioCall';
+    (currentGame.game as AudioCall).state.answers.true.forEach(word => {
+        const wordInWordsLearnt = isWordInWordsLearnt(word, user, AUDIO_CALL);
+        if(!wordInWordsLearnt) {
+            const wordOnLearning: IWordLearningState = {};
+            wordOnLearning[word] = 1
+            user.statisticState.audioCall.wordsLearntArr.push((wordOnLearning));
+        } else {
+            wordInWordsLearnt[word] += 1;
+            if(wordInWordsLearnt[word] === 3) {
+                user.statisticState.audioCall.wordsLearnt += 1
+            }
+            if(wordInWordsLearnt[word] > 3) {
+                wordInWordsLearnt[word] = 3;
+            }
+        }
+    });
+    (currentGame.game as AudioCall).state.answers.false.forEach(word => {
+        const wordInWordsLearnt = isWordInWordsLearnt(word, user, AUDIO_CALL);
+        if(wordInWordsLearnt) {
+            wordInWordsLearnt[word] = 0;
+            if (user.statisticState.audioCall.wordsLearnt > 0) {
+                user.statisticState.audioCall.wordsLearnt -= 1
+            } else {
+                user.statisticState.audioCall.wordsLearnt = 0;
+            }
+        }
+    })
+    user.statisticState.total.wordsLearnt = user.statisticState.audioCall.wordsLearnt + user.statisticState.sprint.wordsLearnt;
     if(!appState.isSignedIn) return;
     setUserStatsArr(appState.user);
 }
+
 
 // logIn
 

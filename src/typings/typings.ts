@@ -79,16 +79,19 @@ export interface IResWordsPage {
 
 export interface IStatisticState {
     total: {
+        wordsLearntArr: IWordLearningState[];
         wordsLearnt: number;
         correctAnswers: number;
         correctAnswersStrick: number;
     };
     audioCall: {
+        wordsLearntArr: IWordLearningState[];
         wordsLearnt: number;
         correctAnswers: number;
         correctAnswersStrick: number;
     };
     sprint: {
+        wordsLearntArr: IWordLearningState[];
         wordsLearnt: number;
         correctAnswers: number;
         correctAnswersStrick: number;
@@ -106,4 +109,8 @@ export interface ITextbookViewState {
 
 export interface ITextbookState {
     words: IWord[];
+}
+
+export interface IWordLearningState {
+    [key: string]: number;
 }

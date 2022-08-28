@@ -18,16 +18,19 @@ export const appState: IAppState = {
             statisticTimeStamp: null,
             statisticState: {
                 total: {
+                    wordsLearntArr: [],
                     wordsLearnt: 0,
                     correctAnswers: 0,
                     correctAnswersStrick: 0,
                 },
                 audioCall: {
+                    wordsLearntArr: [],
                     wordsLearnt: 0,
                     correctAnswers: 0,
                     correctAnswersStrick: 0,
                 },
                 sprint: {
+                    wordsLearntArr: [],
                     wordsLearnt: 0,
                     correctAnswers: 0,
                     correctAnswersStrick: 0
@@ -46,16 +49,19 @@ export const appState: IAppState = {
         statisticTimeStamp: null,
         statisticState: {
             total: {
+                wordsLearntArr: [],
                 wordsLearnt: 0,
                 correctAnswers: 0,
                 correctAnswersStrick: 0,
             },
             audioCall: {
+                wordsLearntArr: [],
                 wordsLearnt: 0,
                 correctAnswers: 0,
                 correctAnswersStrick: 0,
             },
             sprint: {
+                wordsLearntArr: [],
                 wordsLearnt: 0,
                 correctAnswers: 0,
                 correctAnswersStrick: 0
