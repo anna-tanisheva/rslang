@@ -15,6 +15,18 @@ export interface IWord {
     wordTranslate: string;
 }
 
+export interface IAggreagtedWord extends IWord {
+    _id: string;
+    userWord?: IUserWord;
+}
+
+export interface IUserWord {
+    difficulty: string;
+    optional: {
+        rightAnswerSeries: number;
+    };
+}
+
 export interface IUser {
     userId: string;
     name: string;
@@ -69,12 +81,10 @@ export interface IWordProgress {
     page: number;
 }
 
-export type WordsData = IWord[];
+export type WordsData = IAggreagtedWord[];
 
 export interface IResWordsPage {
     words: WordsData;
-    group: number;
-    page: number;
 }
 
 export interface IStatisticState {
@@ -113,7 +123,7 @@ export interface ITextbookViewState {
 }
 
 export interface ITextbookState {
-    words: IWord[];
+    words: IAggreagtedWord[];
 }
 
 export enum KeyboardCodes {
