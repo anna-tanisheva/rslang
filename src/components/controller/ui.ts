@@ -143,14 +143,9 @@ export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в
         user.statisticState.audioCall.numberOfGames + user.statisticState.sprint.numberOfGames,
         user.statisticState.audioCall.correctAnswers + user.statisticState.sprint.correctAnswers
     )
-    console.log(user.statisticState.total.correctAnswersPercent)
     if(!appState.isSignedIn) return;
     setUserStatsArr(appState.user);
 }
-
-
-
-
 // logIn
 
 function setCurrentUser(data: ISignInResponse) {
@@ -433,7 +428,6 @@ export function getLocalStorage() {
 // games
 
 function keyboardEventsHandler(e: Event) {
-    e.preventDefault();
     const gameContainer = document.querySelector('.game-popup');
     if(!isHTMLDivElement(gameContainer)) return;
     const nextButton = gameContainer.querySelector('.next-button');
@@ -475,6 +469,14 @@ function keyboardEventsHandler(e: Event) {
     }
 }
 
+export function closeGameOnPressESC(e: Event) {
+    const closeGameButton = document.querySelector('.game-popup .close-button');
+    if(!closeGameButton) return;
+    if((e as KeyboardEvent).keyCode === 27) {
+        (closeGameButton as HTMLDivElement).click();
+    }
+}
+
 export function moveGameSlider(
     sliderContainer: HTMLElement,
     nextButton: HTMLElement
@@ -494,9 +496,7 @@ export function moveGameSlider(
             .querySelector(".game-stats-wrapper")
             ?.classList.remove("opacity-hidden");
         nextButton.setAttribute("disabled", "true");
-        // debugger;
         document.removeEventListener('keydown', keyboardEventsHandler);
-        // console.dir(document)
     }
 }
 
@@ -517,6 +517,7 @@ export function startGame(
 ) {
     const popup = new GamePopUp().create(section, game, page);
     container.append(popup);
+    document.addEventListener('keydown', closeGameOnPressESC);
     document.addEventListener('keydown', keyboardEventsHandler);
     const closeButton = container.querySelector(".close-button");
     if (!isHTMLElement(closeButton)) return;
@@ -573,6 +574,22 @@ export function startGameHandler(e: Event): void {
         const page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
         startGame(gameContainer, section, CALL_GAME, page);
     }
+}
+
+
+export function playAgainHandler(gameContainer: HTMLElement, section: number){
+    if(!appState.isSignedIn) {
+        setStats((currentGame.game as AudioCall), appState.userNull);
+      } else {
+          setStats((currentGame.game as AudioCall), (appState.user.statsToday as IUserStats));
+      }
+      currentGame.game = null;
+      const CALL_GAME = 'Audio Call';
+      const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);
+      const container = document.querySelector('.games');
+      if(!isHTMLElement(container)) return;
+      container.removeChild(gameContainer);
+      startGame(container, section, CALL_GAME, PAGE);
 }
 
 export function getGameWordsArr(arr: WordsData) {
