@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import {IWord} from "../../typings";
+import {IAggreagtedWord} from "../../typings";
 import {postUser, logIn, fetchWordsInTextbook} from "./api";
 import {
     appState,
@@ -600,7 +600,7 @@ export function playAgainHandler(gameContainer: HTMLElement, section: number){
 }
 
 export function getGameWordsArr(arr: WordsData) {
-    const output: IWord[] = [];
+    const output: IAggreagtedWord[] = [];
     while (output.length < 10) {
         const ind = getRandomInRange(arr.length);
         if (!output.includes(arr[ind])) output.push(arr[ind]);
@@ -620,7 +620,7 @@ export function getOptions(arr: string[], word: string) {
 
 function createAnswerCardInner(answer: string, container: HTMLElement) {
     const word = (currentGame.game as AudioCall).wordsInGame?.find(
-        (wordObj: IWord) => wordObj.id === answer
+        (wordObj: IAggreagtedWord) => wordObj.id === answer
     );
     const answerCard = createElementWithClassnames("div", "answer-card");
     const play = createElementWithClassnames("button", "audio-play");

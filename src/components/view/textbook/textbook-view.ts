@@ -13,10 +13,10 @@ import {
 } from "../utils";
 
 import {appState, textbookState} from "../../controller/state";
-import {IWord} from "../../../typings";
+import {IAggreagtedWord} from "../../../typings";
 
 export class TextbookView {
-    public wordsData: IWord[] = [];
+    public wordsData: IAggreagtedWord[] = [];
 
     public wordsComponent = new WordsItem(textbookState.words).create();
 

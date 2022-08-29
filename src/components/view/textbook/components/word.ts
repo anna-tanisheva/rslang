@@ -1,4 +1,4 @@
-import {IWord} from "../../../../typings";
+import {IAggreagtedWord} from "../../../../typings";
 import {
     createElementWithAttributes,
     createElementWithClassnames,
@@ -6,9 +6,9 @@ import {
 import {WordDetails} from "./word-detail";
 
 export class WordItem {
-    public data: IWord;
+    public data: IAggreagtedWord;
 
-    constructor(data: IWord) {
+    constructor(data: IAggreagtedWord) {
         this.data = data;
     }
 

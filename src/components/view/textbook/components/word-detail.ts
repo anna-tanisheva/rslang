@@ -1,10 +1,10 @@
-import {IWord} from "../../../../typings";
+import {IAggreagtedWord} from "../../../../typings";
 import {isHTMLElement} from "../../../../typings/utils/utils";
 import {audio, ENDPOINT} from "../../../controller/state";
 import {createElementWithClassnames} from "../../utils";
 
 export class WordDetails {
-    ctreate(data: IWord): HTMLElement {
+    ctreate(data: IAggreagtedWord): HTMLElement {
         const card = createElementWithClassnames("div", "card");
         const image = createElementWithClassnames("div", "card-image");
         image.setAttribute(
@@ -94,7 +94,7 @@ export class WordDetails {
         return card;
     }
 
-    static setCard(data: IWord): void {
+    static setCard(data: IAggreagtedWord): void {
         audio.pause();
         const cardDatail = document.querySelector(".card");
         if (!isHTMLElement(cardDatail)) return;

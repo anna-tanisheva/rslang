@@ -11,7 +11,7 @@ import {
 import { fetchWords } from "../../../controller/api";
 import { ENDPOINT } from '../../../controller/state';
 import { playWordInGameHandler, getGameWordsArr, getOptions, choseAnswerHandler, } from '../../../controller/ui';
-import { IWord } from '../../../../typings';
+import { IAggreagtedWord } from '../../../../typings';
 
 
 export class AudioCall {
@@ -34,7 +34,7 @@ export class AudioCall {
 
   currentSlide: number;
 
-  wordsInGame: IWord[] | null;
+  wordsInGame: IAggreagtedWord[] | null;
 
   constructor(sec: number, page: number, gameName: string, currentSlide = 0) {
     this.gameName = gameName;

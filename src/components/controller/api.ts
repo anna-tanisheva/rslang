@@ -5,7 +5,7 @@ import {
     IUser,
     IUserSignIn,
     ISignInResponse,
-    IWord,
+    IAggreagtedWord,
     IResWordsPage,
 } from "../../typings/typings";
 import {AppView} from "../view/app-view";
@@ -28,6 +28,25 @@ const TOKENS = `${USERS_ID}/tokens`;
 const SETTINGS = `${USERS_ID}/settings`;
 const STATISTICS = `${USERS_ID}/statistics`;
 const AGGREGATED_WORDS = `${USERS_ID}/aggregatedWords`;
+
+const URLs = {
+    signIn: `${BASE_URL}/signin`,
+    users: `${BASE_URL}/users`,
+    words: `${BASE_URL}/words`,
+    wordsID: (id: string) => `${BASE_URL}/words/${id}`,
+    usersID: () => `${BASE_URL}/users/${appState.user.userId}`,
+    usersIDSettings: () => `${BASE_URL}/users/${appState.user.userId}/settings`,
+    usersIDStatistics: () =>
+        `${BASE_URL}/users/${appState.user.userId}/statistics`,
+    usersIDWords: () => `${BASE_URL}/users/${appState.user.userId}/words`,
+    usersIDTokens: () => `${BASE_URL}/users/${appState.user.userId}/tokens`,
+    usersIDWordsWordID: (id: string) =>
+        `${BASE_URL}/users/${appState.user.userId}/words/${id}`,
+    usersIDaggregatedWords: () =>
+        `${BASE_URL}/users/${appState.user.userId}/aggregatedWords`,
+    usersIDaggregatedWordsID: (id: string) =>
+        `${BASE_URL}/users/${appState.user.userId}/aggregatedWords/${id}`,
+};
 
 export async function postUser(body: IUserSignUp): Promise<IUser> {
     const res = await fetch(`${ENDPOINT}/users`, {
@@ -78,16 +97,49 @@ export async function getUser(id: string, token: string) {
 export async function fetchWords({
     group,
     page,
+    wordsPerPage,
 }: {
-    group: number;
-    page: number;
+    group?: number;
+    page?: number;
+    wordsPerPage?: number;
 }): Promise<IResWordsPage> {
-    const res = await fetch(`${WORDS}?group=${group}&page=${page}`);
-    const words = await res.json();
+    let url = "";
+    let urlParams = "";
+    const options = {
+        headers: {
+            accept: "application/json",
+            authorization: "",
+        },
+        method: "GET",
+    };
+    if (!appState.isSignedIn) {
+        urlParams = `?group=${group}&page=${page}`;
+        url = URLs.words + urlParams;
+    } else {
+        options.headers.authorization = `Bearer ${appState.user.token}`;
+        urlParams = `?${group !== undefined ? `&group=${group}` : ""}${
+            page !== undefined ? `&page=${page}` : ""
+        }${wordsPerPage !== undefined ? `&wordsPerPage=${wordsPerPage}` : ""}`;
+        url = URLs.usersIDaggregatedWords() + urlParams;
+    }
+    const res = await fetch(url, options);
+    const respData = await res.json();
+    const words: IAggreagtedWord[] = [];
+    if (!appState.isSignedIn) {
+        words.push(...(respData as IAggreagtedWord[]));
+    } else {
+        let {
+            paginatedResults,
+        }: {paginatedResults: IAggreagtedWord[]} = respData[0];
+        paginatedResults = paginatedResults.map((item) => {
+            // eslint-disable-next-line no-underscore-dangle
+            const obj = {id: !item.id ? item._id : item.id};
+            return Object.assign(item, obj);
+        });
+        words.push(...paginatedResults);
+    }
     return {
         words,
-        group,
-        page,
     };
 }
 
@@ -99,7 +151,7 @@ export async function fetchWordsInTextbook({
     page: number;
 }): Promise<void> {
     const res = await fetch(`${WORDS}?group=${group}&page=${page}`);
-    const words = (await res.json()) as IWord[];
+    const words = (await res.json()) as IAggreagtedWord[];
     textbookState.words = words;
     //    AppView.redrawView(appState.view);
     // PagePagination.setDisabled();
@@ -116,7 +168,7 @@ export async function fetchWordsInPage({
     page: number;
 }): Promise<void> {
     const res = await fetch(`${WORDS}?group=${group}&page=${page}`);
-    const words = (await res.json()) as IWord[];
+    const words = (await res.json()) as IAggreagtedWord[];
     textbookState.words = words;
     PagePagination.setDisabled();
     WordsItem.drawNewWordsItem(words);
