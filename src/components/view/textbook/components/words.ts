@@ -1,13 +1,13 @@
 import {WordItem} from "./word";
-import {IWord} from "../../../../typings";
+import {IAggreagtedWord} from "../../../../typings";
 import {createElementWithClassnames} from "../../utils";
 import {appState} from "../../../controller/state";
 import {isHTMLElement} from "../../../../typings/utils/utils";
 
 export class WordsItem {
-    public wordsData: IWord[];
+    public wordsData: IAggreagtedWord[];
 
-    constructor(wordsData: IWord[]) {
+    constructor(wordsData: IAggreagtedWord[]) {
         this.wordsData = wordsData;
     }
 
@@ -24,7 +24,7 @@ export class WordsItem {
         return wordsContainer;
     }
 
-    static drawNewWordsItem(wordsData: IWord[]) {
+    static drawNewWordsItem(wordsData: IAggreagtedWord[]) {
         const wordsContainer = document.querySelector(".words-page");
         if (!isHTMLElement(wordsContainer)) return;
         const newWordsContainer = new WordsItem(wordsData).create();
