@@ -1,14 +1,15 @@
 import {
   createElementWithClassnames,
   createElementWithAttributes,
-  getRandomInRange
+  // getRandomInRange
 } from "../utils";
-import { isHTMLElement,
-  //  isHTMLDivElement
-  } from "../../../typings/utils/utils";
+// import { isHTMLElement,
+//   //  isHTMLDivElement
+//   } from "../../../typings/utils/utils";
 import { AudioCall } from "./call/audio-call";
-import { currentGame, TEXTBOOK_PAGE_COUNT } from "../../controller/state";
-import { startGame, playWordInGameHandler, appendGameStats } from '../../controller/ui';
+import { currentGame } from "../../controller/state";
+import { playWordInGameHandler, appendGameStats, playAgainHandler } from '../../controller/ui';
+// import { IUserStats } from "../../../typings";
 
 
 
@@ -47,11 +48,13 @@ export class GamePopUp {
     }
     const wrongSoundAttr = {
       src: `./sounds/wrong.mp3`,
-      type: 'audio/mpeg'
+      type: 'audio/mpeg',
+      tabindex: '-1'
     }
     const correctSoundAttr = {
       src: `./sounds/correct.mp3`,
-      type: 'audio/mpeg'
+      type: 'audio/mpeg',
+      tabindex: '-1'
     }
     const wrongSound = createElementWithAttributes('audio', wrongSoundAttr);
     wrongSound.classList.add('wrong-sound');
@@ -65,13 +68,14 @@ export class GamePopUp {
     const playAgain = createElementWithClassnames('button', 'play-again-btn', 'button');
     playAgain.textContent = 'Играть еще раз';
     playAgain.addEventListener('click', () => {
-      currentGame.game = null;
-      const CALL_GAME = 'Audio Call';
-      const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);
-      const container = document.querySelector('.games');
-      if(!isHTMLElement(container)) return;
-      container.removeChild(gameContainer);
-      startGame(container, section, CALL_GAME, PAGE);
+      playAgainHandler(gameContainer, section);
+    });
+    playAgain.addEventListener('keydown', (e) => {
+      console.log(e);
+      e.preventDefault();
+      if (e.keyCode === 13) {
+        playAgainHandler(gameContainer, section);
+      }
     })
     const wrapper = createElementWithClassnames('div', 'game-stats');
     gameStatsWrapper.append(playAgain, wrapper);

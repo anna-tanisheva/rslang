@@ -1,11 +1,12 @@
+/* eslint-disable no-param-reassign */
 import {IWord} from "../../typings";
 import {postUser, logIn, fetchWordsInTextbook} from "./api";
 import {
     appState,
     currentGame,
-    statisticState,
     TEXTBOOK_PAGE_COUNT,
     ENDPOINT,
+    WORDS_IN_GAME
 } from "./state";
 import {
     isHTMLButtonElement,
@@ -13,7 +14,7 @@ import {
     isHTMLDivElement,
     isHTMLInputElement,
 } from "../../typings/utils/utils";
-import {ISignInResponse, WordsData} from "../../typings/typings";
+import {ISignInResponse, WordsData, IUser, IUserStats, IUserStatsInArr, IWordLearningState, KeyboardCodes} from "../../typings/typings";
 import {GamePopUp} from "../view/audio-call/game-page";
 import {
     getRandomInRange,
@@ -26,11 +27,134 @@ import {GameStats} from "../view/audio-call/call/game-stats";
 import {AppView} from "../view/app-view";
 import {PagePagination} from "../view/textbook/components";
 
+// stats one day
+
+export function isUserInUserStats(user: IUser) {
+    const id = `user${user.userId}`;
+    return appState.usersStats.find((elem) => Object.keys(elem as IUserStats)[0] === id) || false;
+}
+
+export function setEmptyStatistic(str: string){
+    return {
+        statisticTimeStamp: str,
+        statisticState: {
+            total: {
+                correctAnswersPercent: 0,
+                wordsLearntArr: [],
+                wordsLearnt: 0,
+                correctAnswers: 0,
+                correctAnswersStrick: 0,
+            },
+            audioCall: {
+                correctAnswersPercent: 0,
+                numberOfGames: 0,
+                wordsLearntArr: [],
+                wordsLearnt: 0,
+                correctAnswers: 0,
+                correctAnswersStrick: 0,
+            },
+            sprint: {
+                correctAnswersPercent: 0,
+                numberOfGames: 0,
+                wordsLearntArr: [],
+                wordsLearnt: 0,
+                correctAnswers: 0,
+                correctAnswersStrick: 0
+            },
+        }
+    }
+}
+
+export function areDaysEqual(oldDate: string, newDate :string) {
+    [oldDate] = oldDate.split('T');
+    [newDate] = newDate.split('T');
+    oldDate = oldDate.slice(oldDate.length - 2);
+    newDate = newDate.slice(newDate.length - 2);
+    if(Number(oldDate) !== Number(newDate)) {
+        return false;
+    }
+    return true;
+}
+
+function setNewDate() {
+    return new Date().toJSON();
+}
+
+function setUserStatsArr(user: IUser){
+    const userInUserStats = isUserInUserStats(user);
+    if(!userInUserStats) {
+        const id = `user${user.userId}`
+        const newUser: IUserStatsInArr = {};
+        newUser[id] = (user.statsToday as IUserStats);
+        appState.usersStats.push(newUser);
+    }
+}
+
+export function isWordInWordsLearnt(wordId: string, user: IUserStats, game: string) {
+    return user.statisticState[game as keyof typeof user.statisticState].wordsLearntArr.find((word) => Object.keys(word)[0] === wordId) || false;
+}
+
+export function calcCorrectAnswersPercent(numberOfGames: number, answers: number) {
+    return Math.floor((Number(answers) * 100) / (Number(numberOfGames) * WORDS_IN_GAME));
+}
+
+
+export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в типы добавить 2ю игру, когда появится
+    user.statisticState.total.correctAnswers += game.state.answers.true.length;
+    user.statisticState.audioCall.correctAnswers += game.state.answers.true.length;
+    if(user.statisticState.audioCall.correctAnswersStrick < game.state.maxStrick) {
+        user.statisticState.audioCall.correctAnswersStrick = game.state.maxStrick;
+    }
+    const AUDIO_CALL = 'audioCall';
+    (currentGame.game as AudioCall).state.answers.true.forEach(word => {
+        const wordInWordsLearnt = isWordInWordsLearnt(word, user, AUDIO_CALL);
+        if(!wordInWordsLearnt) {
+            const wordOnLearning: IWordLearningState = {};
+            wordOnLearning[word] = 1
+            user.statisticState.audioCall.wordsLearntArr.push((wordOnLearning));
+        } else {
+            wordInWordsLearnt[word] += 1;
+            if(wordInWordsLearnt[word] === 3) {
+                user.statisticState.audioCall.wordsLearnt += 1
+            }
+            if(wordInWordsLearnt[word] > 3) {
+                wordInWordsLearnt[word] = 3;
+            }
+        }
+    });
+    (currentGame.game as AudioCall).state.answers.false.forEach(word => {
+        const wordInWordsLearnt = isWordInWordsLearnt(word, user, AUDIO_CALL);
+        if(wordInWordsLearnt) {
+            wordInWordsLearnt[word] = 0;
+            if (user.statisticState.audioCall.wordsLearnt > 0) {
+                user.statisticState.audioCall.wordsLearnt -= 1
+            } else {
+                user.statisticState.audioCall.wordsLearnt = 0;
+            }
+        }
+    })
+    user.statisticState.total.wordsLearnt = user.statisticState.audioCall.wordsLearnt + user.statisticState.sprint.wordsLearnt;
+    user.statisticState.audioCall.numberOfGames += 1;
+    user.statisticState.audioCall.correctAnswersPercent = calcCorrectAnswersPercent(
+        user.statisticState.audioCall.numberOfGames,
+        user.statisticState.audioCall.correctAnswers
+    )
+    user.statisticState.total.correctAnswersPercent = calcCorrectAnswersPercent(
+        user.statisticState.audioCall.numberOfGames + user.statisticState.sprint.numberOfGames,
+        user.statisticState.audioCall.correctAnswers + user.statisticState.sprint.correctAnswers
+    )
+    if(!appState.isSignedIn) return;
+    setUserStatsArr(appState.user);
+}
+// logIn
+
 function setCurrentUser(data: ISignInResponse) {
+    const newDate = setNewDate();
     appState.user.name = data.name;
     appState.user.userId = data.userId;
     appState.user.refreshToken = data.refreshToken;
     appState.user.token = data.token;
+    const userInUserStats = isUserInUserStats(appState.user);
     const welcomeContainer = document.querySelector(".welcome-text");
     if (!isHTMLElement(welcomeContainer)) return;
     if (!data.name) {
@@ -39,6 +163,17 @@ function setCurrentUser(data: ISignInResponse) {
         welcomeContainer.innerText = `Welcome ${data.name} `;
     }
     if (!data.name) return;
+    if(userInUserStats) {
+        const id = `user${appState.user.userId}`
+        const oldDate = (userInUserStats as IUserStatsInArr)[id].statisticTimeStamp;
+        if(areDaysEqual((oldDate as string), newDate)) {
+            appState.user.statsToday = (userInUserStats as IUserStatsInArr)[id];
+        } else {
+            appState.user.statsToday = setEmptyStatistic(newDate);
+        }
+    } else {
+        appState.user.statsToday = setEmptyStatistic(newDate);
+    }
     const logOutBtn = document.querySelector(".logout-submit");
     if (!isHTMLButtonElement(logOutBtn)) return;
     logOutBtn.removeAttribute("disabled");
@@ -226,6 +361,7 @@ export function logOutHandler(): void {
     Object.keys(appState.user).forEach((key) => {
         appState.user[key as keyof typeof appState.user] = "";
     });
+    appState.user.statsToday = setEmptyStatistic('');
     appState.isSignedIn = false;
     localStorage.setItem("appState", JSON.stringify(appState));
     const welcomeContainer = document.querySelector(".welcome-text");
@@ -262,17 +398,84 @@ export function setLocalStorage() {
 
 export function getLocalStorage() {
     if (localStorage.getItem("appState")) {
-        const {isSignedIn, user, view, viewsStates} = JSON.parse(
+        const newDate = new Date().toJSON();
+        const {isSignedIn, user, view, viewsStates, userNull, usersStats} = JSON.parse(
             localStorage.appState
         );
         appState.isSignedIn = isSignedIn;
         appState.viewsStates = viewsStates;
         appState.user = user;
         appState.view = view;
+        appState.userNull = userNull;
+        appState.usersStats = usersStats;
+
+        if (!appState.isSignedIn) {
+            if (!JSON.parse(localStorage.appState).userNull.statisticTimeStamp) {
+                appState.userNull = setEmptyStatistic(newDate);
+                return;
+            }
+            const oldDate = JSON.parse(localStorage.appState).userNull.statisticTimeStamp;
+            if (!areDaysEqual(oldDate, newDate)) {
+                appState.userNull = setEmptyStatistic(newDate);
+            } else {
+                appState.userNull.statisticTimeStamp = oldDate;
+                appState.userNull.statisticState = JSON.parse(localStorage.appState).userNull.statisticState;
+            }
+        }
     }
 }
 
 // games
+
+function keyboardEventsHandler(e: Event) {
+    const gameContainer = document.querySelector('.game-popup');
+    if(!isHTMLDivElement(gameContainer)) return;
+    const nextButton = gameContainer.querySelector('.next-button');
+    if(!isHTMLElement(nextButton)) return;
+    const currentSlide = gameContainer.querySelector((`.audio-call>div:nth-child(${(currentGame.game as AudioCall).currentSlide + 1})`));
+    if(!isHTMLDivElement(currentSlide)) return;
+    const buttonsContainer = currentSlide.querySelector('.answers-container');
+    if(!isHTMLDivElement(buttonsContainer)) return;
+    const playButton = currentSlide.querySelector('.play-button');
+    if(!isHTMLButtonElement(playButton)) return;
+    const answerOne = (buttonsContainer?.querySelector('button:nth-child(1)'));
+    const answerTwo = (buttonsContainer?.querySelector('button:nth-child(2)'));
+    const answerThree = (buttonsContainer?.querySelector('button:nth-child(3)'));
+    const answerFour = (buttonsContainer?.querySelector('button:nth-child(4)'));
+    if(!isHTMLButtonElement(answerOne) ||
+     !isHTMLButtonElement(answerTwo) ||
+     !isHTMLButtonElement(answerThree) ||
+     !isHTMLButtonElement(answerFour) ) return;
+    switch ((e as KeyboardEvent).key) {
+        case String(KeyboardCodes.one):
+            answerOne.click();
+            break;
+        case String(KeyboardCodes.two):
+            answerTwo.click();
+            break;
+        case String(KeyboardCodes.three):
+            answerThree.click();
+            break;
+        case String(KeyboardCodes.four):
+            answerFour.click();
+            break;
+        case String(KeyboardCodes.enter):
+            playButton.click();
+            break;
+        case String(KeyboardCodes.arrowRight):
+            nextButton.click();
+            break;
+        default: break;
+    }
+}
+
+export function closeGameOnPressESC(e: Event) {
+    const closeGameButton = document.querySelector('.game-popup .close-button');
+    if(!closeGameButton) return;
+    if((e as KeyboardEvent).keyCode === 27) {
+        (closeGameButton as HTMLDivElement).click();
+    }
+}
 
 export function moveGameSlider(
     sliderContainer: HTMLElement,
@@ -293,6 +496,7 @@ export function moveGameSlider(
             .querySelector(".game-stats-wrapper")
             ?.classList.remove("opacity-hidden");
         nextButton.setAttribute("disabled", "true");
+        document.removeEventListener('keydown', keyboardEventsHandler);
     }
 }
 
@@ -304,19 +508,35 @@ function stopPlayingWordHandler(audio: HTMLAudioElement) {
     audio.pause();
 }
 
+
 export function startGame(
     container: HTMLElement,
     section: number,
     game: string,
     page: number
 ) {
+    const startButtons = document.querySelectorAll('.start-button');
+    startButtons.forEach(button=> {
+        button.setAttribute('disabled', 'true');
+    })
     const popup = new GamePopUp().create(section, game, page);
     container.append(popup);
+    document.addEventListener('keydown', closeGameOnPressESC);
+    document.addEventListener('keydown', keyboardEventsHandler);
     const closeButton = container.querySelector(".close-button");
     if (!isHTMLElement(closeButton)) return;
     closeButton.addEventListener("click", () => {
+        if(!appState.isSignedIn) {
+            setStats((currentGame.game as AudioCall), appState.userNull);
+        } else {
+            setStats((currentGame.game as AudioCall), (appState.user.statsToday as IUserStats));
+        }
+
         currentGame.game = null;
         container.removeChild(popup);
+        startButtons.forEach(button=> {
+            button.removeAttribute('disabled');
+        })
     });
     const nextButton = container.querySelector(".next-button");
     if (!isHTMLElement(nextButton)) return;
@@ -361,6 +581,22 @@ export function startGameHandler(e: Event): void {
         const page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
         startGame(gameContainer, section, CALL_GAME, page);
     }
+}
+
+
+export function playAgainHandler(gameContainer: HTMLElement, section: number){
+    if(!appState.isSignedIn) {
+        setStats((currentGame.game as AudioCall), appState.userNull);
+      } else {
+          setStats((currentGame.game as AudioCall), (appState.user.statsToday as IUserStats));
+      }
+      currentGame.game = null;
+      const CALL_GAME = 'Audio Call';
+      const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);
+      const container = document.querySelector('.games');
+      if(!isHTMLElement(container)) return;
+      container.removeChild(gameContainer);
+      startGame(container, section, CALL_GAME, PAGE);
 }
 
 export function getGameWordsArr(arr: WordsData) {
@@ -493,6 +729,7 @@ export function choseAnswerHandler(e: Event, answer: string) {
     statsOld.replaceChildren();
     const statsNew = appendGameStats(statsOld);
     statsCurrentContainer.replaceChild(statsOld, statsNew);
-    statisticState.audioCall.correctAnswers = (currentGame.game as AudioCall).state.answers.true.length;
-    statisticState.audioCall.correctAnswersStrick = (currentGame.game as AudioCall).state.maxStrick;
 }
+
+
+

@@ -2,8 +2,6 @@ import './game-stats.scss'
 import { createElementWithClassnames, createElementWithContent } from "../../utils";
 import { currentGame } from "../../../controller/state";
 import { AudioCall } from "./audio-call";
-// import { IWord } from "../../../../typings";
-// import { playWordInGameHandler } from "../../../controller/ui";
 import { createAnswersCards } from "../../../controller/ui";
 
 export class GameStats {
