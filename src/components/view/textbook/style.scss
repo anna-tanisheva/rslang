@@ -70,7 +70,8 @@ $colorGroup6:lighten(blue,
 
 input[name="textbook-mode"],
 input[name="group-radio"],
-input[name="words-item-radio"] {
+input[name="words-item-radio"],
+input[name="difficulty-radio"] {
     width: 0;
     height: 0;
     opacity: 0;
@@ -170,7 +171,7 @@ input[name="textbook-mode"]:checked+.textbook-mode {
 
 .words-wrapper {
     background-color: $colorActiveBg;
-    padding: calc($sides-padding/2) 0;
+    padding: calc($sides-padding/2);
     border-radius: 0 0 1rem 1rem;
     color: $colorActive;
     .words-heading {
@@ -199,6 +200,7 @@ input[name="textbook-mode"]:checked+.textbook-mode {
         .words-page {
             padding: calc($sides-padding/2);
             display: flex;
+            align-content: start;
             flex-wrap: wrap;
             gap: 1rem;
             width: calc(100% - 250px);
@@ -304,12 +306,39 @@ input[name="textbook-mode"]:checked+.textbook-mode {
 
 .card-wrapper {
     position: relative;
-    padding: calc($sides-padding/2);
     .card {
         top: calc($sides-padding/2);
         position: sticky;
         font-family: "Rubik", sans-serif;
         min-height: 700px;
+        .card-controls-wrapper {
+            display: flex;
+            padding: $sides-padding;
+            padding-bottom: 0;
+            .difficulty-label {
+                color: lightgrey;
+                border: 1px dashed currentColor;
+                margin: 0 calc($sides-padding/2) 0 0;
+                padding: calc($sides-padding/4);
+                border-radius: $sides-padding;
+                transition: 0.2s;
+                &:hover {
+                    color: $colorActive;
+                    border: 1px solid currentColor;
+                    cursor: pointer;
+                }
+            }
+            input[name="difficulty-radio"]:checked+.difficulty-label {
+                color: $colorActive;
+                border: 1px solid currentColor;
+                box-shadow: 1px 1px 0px 0px currentColor;
+            }
+            input[name="difficulty-radio"]:disabled+.difficulty-label:hover {
+                color: lightgrey;
+                cursor: auto;
+                pointer-events: none;
+            }
+        }
         .card-content {
             padding: $sides-padding;
             .card-heading {
