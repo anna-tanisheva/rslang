@@ -20,6 +20,7 @@ export interface IUser {
     name: string;
     token?: string;
     refreshToken?: string;
+    statsToday?: unknown;
 }
 
 export interface IUserSignUp {
@@ -48,6 +49,17 @@ export interface IAppState {
         textbook: ITextbookViewState;
     };
     view: string;
+    userNull: IUserStats;
+    usersStats: unknown[];
+}
+
+export interface IUserStats {
+    statisticTimeStamp: string | null;
+    statisticState: IStatisticState;
+}
+
+export interface IUserStatsInArr {
+    [key: string]: IUserStats;
 }
 
 export interface IWordProgress {
@@ -67,16 +79,24 @@ export interface IResWordsPage {
 
 export interface IStatisticState {
     total: {
+        correctAnswersPercent: number;
+        wordsLearntArr: IWordLearningState[];
         wordsLearnt: number;
         correctAnswers: number;
         correctAnswersStrick: number;
     };
     audioCall: {
+        correctAnswersPercent: number;
+        numberOfGames: number;
+        wordsLearntArr: IWordLearningState[];
         wordsLearnt: number;
         correctAnswers: number;
         correctAnswersStrick: number;
     };
     sprint: {
+        correctAnswersPercent: number;
+        numberOfGames: number;
+        wordsLearntArr: IWordLearningState[];
         wordsLearnt: number;
         correctAnswers: number;
         correctAnswersStrick: number;
@@ -94,4 +114,8 @@ export interface ITextbookViewState {
 
 export interface ITextbookState {
     words: IWord[];
+}
+
+export interface IWordLearningState {
+    [key: string]: number;
 }
