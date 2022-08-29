@@ -116,6 +116,15 @@ export interface ITextbookState {
     words: IWord[];
 }
 
+export enum KeyboardCodes {
+    'one' = 1,
+    'two',
+    'three',
+    'four',
+    'enter' = 'Enter',
+    'arrowRight' = 'ArrowRight'
+}
+
 export interface IWordLearningState {
     [key: string]: number;
 }

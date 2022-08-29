@@ -14,7 +14,7 @@ import {
     isHTMLDivElement,
     isHTMLInputElement,
 } from "../../typings/utils/utils";
-import {ISignInResponse, WordsData, IUser, IUserStats, IUserStatsInArr, IWordLearningState} from "../../typings/typings";
+import {ISignInResponse, WordsData, IUser, IUserStats, IUserStatsInArr, IWordLearningState, KeyboardCodes} from "../../typings/typings";
 import {GamePopUp} from "../view/audio-call/game-page";
 import {
     getRandomInRange,
@@ -143,14 +143,9 @@ export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в
         user.statisticState.audioCall.numberOfGames + user.statisticState.sprint.numberOfGames,
         user.statisticState.audioCall.correctAnswers + user.statisticState.sprint.correctAnswers
     )
-    console.log(user.statisticState.total.correctAnswersPercent)
     if(!appState.isSignedIn) return;
     setUserStatsArr(appState.user);
 }
-
-
-
-
 // logIn
 
 function setCurrentUser(data: ISignInResponse) {
@@ -432,6 +427,56 @@ export function getLocalStorage() {
 
 // games
 
+function keyboardEventsHandler(e: Event) {
+    const gameContainer = document.querySelector('.game-popup');
+    if(!isHTMLDivElement(gameContainer)) return;
+    const nextButton = gameContainer.querySelector('.next-button');
+    if(!isHTMLElement(nextButton)) return;
+    const currentSlide = gameContainer.querySelector((`.audio-call>div:nth-child(${(currentGame.game as AudioCall).currentSlide + 1})`));
+    if(!isHTMLDivElement(currentSlide)) return;
+    const buttonsContainer = currentSlide.querySelector('.answers-container');
+    if(!isHTMLDivElement(buttonsContainer)) return;
+    const playButton = currentSlide.querySelector('.play-button');
+    if(!isHTMLButtonElement(playButton)) return;
+    const answerOne = (buttonsContainer?.querySelector('button:nth-child(1)'));
+    const answerTwo = (buttonsContainer?.querySelector('button:nth-child(2)'));
+    const answerThree = (buttonsContainer?.querySelector('button:nth-child(3)'));
+    const answerFour = (buttonsContainer?.querySelector('button:nth-child(4)'));
+    if(!isHTMLButtonElement(answerOne) ||
+     !isHTMLButtonElement(answerTwo) ||
+     !isHTMLButtonElement(answerThree) ||
+     !isHTMLButtonElement(answerFour) ) return;
+    switch ((e as KeyboardEvent).key) {
+        case String(KeyboardCodes.one):
+            answerOne.click();
+            break;
+        case String(KeyboardCodes.two):
+            answerTwo.click();
+            break;
+        case String(KeyboardCodes.three):
+            answerThree.click();
+            break;
+        case String(KeyboardCodes.four):
+            answerFour.click();
+            break;
+        case String(KeyboardCodes.enter):
+            playButton.click();
+            break;
+        case String(KeyboardCodes.arrowRight):
+            nextButton.click();
+            break;
+        default: break;
+    }
+}
+
+export function closeGameOnPressESC(e: Event) {
+    const closeGameButton = document.querySelector('.game-popup .close-button');
+    if(!closeGameButton) return;
+    if((e as KeyboardEvent).keyCode === 27) {
+        (closeGameButton as HTMLDivElement).click();
+    }
+}
+
 export function moveGameSlider(
     sliderContainer: HTMLElement,
     nextButton: HTMLElement
@@ -451,6 +496,7 @@ export function moveGameSlider(
             .querySelector(".game-stats-wrapper")
             ?.classList.remove("opacity-hidden");
         nextButton.setAttribute("disabled", "true");
+        document.removeEventListener('keydown', keyboardEventsHandler);
     }
 }
 
@@ -462,14 +508,21 @@ function stopPlayingWordHandler(audio: HTMLAudioElement) {
     audio.pause();
 }
 
+
 export function startGame(
     container: HTMLElement,
     section: number,
     game: string,
     page: number
 ) {
+    const startButtons = document.querySelectorAll('.start-button');
+    startButtons.forEach(button=> {
+        button.setAttribute('disabled', 'true');
+    })
     const popup = new GamePopUp().create(section, game, page);
     container.append(popup);
+    document.addEventListener('keydown', closeGameOnPressESC);
+    document.addEventListener('keydown', keyboardEventsHandler);
     const closeButton = container.querySelector(".close-button");
     if (!isHTMLElement(closeButton)) return;
     closeButton.addEventListener("click", () => {
@@ -481,6 +534,9 @@ export function startGame(
 
         currentGame.game = null;
         container.removeChild(popup);
+        startButtons.forEach(button=> {
+            button.removeAttribute('disabled');
+        })
     });
     const nextButton = container.querySelector(".next-button");
     if (!isHTMLElement(nextButton)) return;
@@ -525,6 +581,22 @@ export function startGameHandler(e: Event): void {
         const page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
         startGame(gameContainer, section, CALL_GAME, page);
     }
+}
+
+
+export function playAgainHandler(gameContainer: HTMLElement, section: number){
+    if(!appState.isSignedIn) {
+        setStats((currentGame.game as AudioCall), appState.userNull);
+      } else {
+          setStats((currentGame.game as AudioCall), (appState.user.statsToday as IUserStats));
+      }
+      currentGame.game = null;
+      const CALL_GAME = 'Audio Call';
+      const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);
+      const container = document.querySelector('.games');
+      if(!isHTMLElement(container)) return;
+      container.removeChild(gameContainer);
+      startGame(container, section, CALL_GAME, PAGE);
 }
 
 export function getGameWordsArr(arr: WordsData) {
