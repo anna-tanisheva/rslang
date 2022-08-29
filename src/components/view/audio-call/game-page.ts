@@ -48,11 +48,13 @@ export class GamePopUp {
     }
     const wrongSoundAttr = {
       src: `./sounds/wrong.mp3`,
-      type: 'audio/mpeg'
+      type: 'audio/mpeg',
+      tabindex: '-1'
     }
     const correctSoundAttr = {
       src: `./sounds/correct.mp3`,
-      type: 'audio/mpeg'
+      type: 'audio/mpeg',
+      tabindex: '-1'
     }
     const wrongSound = createElementWithAttributes('audio', wrongSoundAttr);
     wrongSound.classList.add('wrong-sound');

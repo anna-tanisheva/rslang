@@ -494,7 +494,9 @@ export function moveGameSlider(
             .querySelector(".game-stats-wrapper")
             ?.classList.remove("opacity-hidden");
         nextButton.setAttribute("disabled", "true");
-        document.removeEventListener('keydown', keyboardEventsHandler)
+        // debugger;
+        document.removeEventListener('keydown', keyboardEventsHandler);
+        // console.dir(document)
     }
 }
 
@@ -505,6 +507,7 @@ export function playWordInGameHandler(audio: HTMLAudioElement) {
 function stopPlayingWordHandler(audio: HTMLAudioElement) {
     audio.pause();
 }
+
 
 export function startGame(
     container: HTMLElement,
