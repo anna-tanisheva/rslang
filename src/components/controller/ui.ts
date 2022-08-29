@@ -515,6 +515,10 @@ export function startGame(
     game: string,
     page: number
 ) {
+    const startButtons = document.querySelectorAll('.start-button');
+    startButtons.forEach(button=> {
+        button.setAttribute('disabled', 'true');
+    })
     const popup = new GamePopUp().create(section, game, page);
     container.append(popup);
     document.addEventListener('keydown', closeGameOnPressESC);
@@ -530,6 +534,9 @@ export function startGame(
 
         currentGame.game = null;
         container.removeChild(popup);
+        startButtons.forEach(button=> {
+            button.removeAttribute('disabled');
+        })
     });
     const nextButton = container.querySelector(".next-button");
     if (!isHTMLElement(nextButton)) return;
