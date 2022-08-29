@@ -54,3 +54,5 @@ export const statisticState: IStatisticState = {
 export const currentGame: ICurrentGame = {game: null};
 
 export const audio = new Audio();
+
+export const KEYBOARD_CODES = ['1', '2', '3', '4', 'Enter', 'ArrowRight'];

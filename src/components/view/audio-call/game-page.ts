@@ -64,7 +64,8 @@ export class GamePopUp {
     gameStatsWrapper.append(appendGameStats(stats));
     const playAgain = createElementWithClassnames('button', 'play-again-btn', 'button');
     playAgain.textContent = 'Играть еще раз';
-    playAgain.addEventListener('click', () => {
+    playAgain.addEventListener('click', (e: Event) => {
+      e.preventDefault();
       currentGame.game = null;
       const CALL_GAME = 'Audio Call';
       const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);

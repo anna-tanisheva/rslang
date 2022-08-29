@@ -13,7 +13,7 @@ import {
     isHTMLDivElement,
     isHTMLInputElement,
 } from "../../typings/utils/utils";
-import {ISignInResponse, WordsData} from "../../typings/typings";
+import {ISignInResponse, WordsData, KeyboardCodes} from "../../typings/typings";
 import {GamePopUp} from "../view/audio-call/game-page";
 import {
     getRandomInRange,
@@ -274,6 +274,49 @@ export function getLocalStorage() {
 
 // games
 
+function keyboardEventsHandler(e: Event) {
+    e.preventDefault();
+    const gameContainer = document.querySelector('.game-popup');
+    if(!isHTMLDivElement(gameContainer)) return;
+    const nextButton = gameContainer.querySelector('.next-button');
+    if(!isHTMLElement(nextButton)) return;
+    const currentSlide = gameContainer.querySelector((`.audio-call>div:nth-child(${(currentGame.game as AudioCall).currentSlide + 1})`));
+    if(!isHTMLDivElement(currentSlide)) return;
+    const buttonsContainer = currentSlide.querySelector('.answers-container');
+    if(!isHTMLDivElement(buttonsContainer)) return;
+    const playButton = currentSlide.querySelector('.play-button');
+    if(!isHTMLButtonElement(playButton)) return;
+    const answerOne = (buttonsContainer?.querySelector('button:nth-child(1)'));
+    const answerTwo = (buttonsContainer?.querySelector('button:nth-child(2)'));
+    const answerThree = (buttonsContainer?.querySelector('button:nth-child(3)'));
+    const answerFour = (buttonsContainer?.querySelector('button:nth-child(4)'));
+    if(!isHTMLButtonElement(answerOne) ||
+     !isHTMLButtonElement(answerTwo) ||
+     !isHTMLButtonElement(answerThree) ||
+     !isHTMLButtonElement(answerFour) ) return;
+    switch ((e as KeyboardEvent).key) {
+        case String(KeyboardCodes.one):
+            answerOne.click();
+            break;
+        case String(KeyboardCodes.two):
+            answerTwo.click();
+            break;
+        case String(KeyboardCodes.three):
+            answerThree.click();
+            break;
+        case String(KeyboardCodes.four):
+            answerFour.click();
+            break;
+        case String(KeyboardCodes.enter):
+            playButton.click();
+            break;
+        case String(KeyboardCodes.arrowRight):
+            nextButton.click();
+            break;
+        default: break;
+    }
+}
+
 export function moveGameSlider(
     sliderContainer: HTMLElement,
     nextButton: HTMLElement
@@ -293,6 +336,7 @@ export function moveGameSlider(
             .querySelector(".game-stats-wrapper")
             ?.classList.remove("opacity-hidden");
         nextButton.setAttribute("disabled", "true");
+        document.removeEventListener('keydown', keyboardEventsHandler)
     }
 }
 
@@ -312,6 +356,7 @@ export function startGame(
 ) {
     const popup = new GamePopUp().create(section, game, page);
     container.append(popup);
+    document.addEventListener('keydown', keyboardEventsHandler);
     const closeButton = container.querySelector(".close-button");
     if (!isHTMLElement(closeButton)) return;
     closeButton.addEventListener("click", () => {
