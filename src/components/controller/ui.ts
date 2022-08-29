@@ -6,6 +6,7 @@ import {
     currentGame,
     TEXTBOOK_PAGE_COUNT,
     ENDPOINT,
+    WORDS_IN_GAME
 } from "./state";
 import {
     isHTMLButtonElement,
@@ -38,18 +39,23 @@ export function setEmptyStatistic(str: string){
         statisticTimeStamp: str,
         statisticState: {
             total: {
+                correctAnswersPercent: 0,
                 wordsLearntArr: [],
                 wordsLearnt: 0,
                 correctAnswers: 0,
                 correctAnswersStrick: 0,
             },
             audioCall: {
+                correctAnswersPercent: 0,
+                numberOfGames: 0,
                 wordsLearntArr: [],
                 wordsLearnt: 0,
                 correctAnswers: 0,
                 correctAnswersStrick: 0,
             },
             sprint: {
+                correctAnswersPercent: 0,
+                numberOfGames: 0,
                 wordsLearntArr: [],
                 wordsLearnt: 0,
                 correctAnswers: 0,
@@ -88,6 +94,11 @@ export function isWordInWordsLearnt(wordId: string, user: IUserStats, game: stri
     return user.statisticState[game as keyof typeof user.statisticState].wordsLearntArr.find((word) => Object.keys(word)[0] === wordId) || false;
 }
 
+export function calcCorrectAnswersPercent(numberOfGames: number, answers: number) {
+    return Math.floor((Number(answers) * 100) / (Number(numberOfGames) * WORDS_IN_GAME));
+}
+
+
 export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в типы добавить 2ю игру, когда появится
     user.statisticState.total.correctAnswers += game.state.answers.true.length;
     user.statisticState.audioCall.correctAnswers += game.state.answers.true.length;
@@ -123,9 +134,21 @@ export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в
         }
     })
     user.statisticState.total.wordsLearnt = user.statisticState.audioCall.wordsLearnt + user.statisticState.sprint.wordsLearnt;
+    user.statisticState.audioCall.numberOfGames += 1;
+    user.statisticState.audioCall.correctAnswersPercent = calcCorrectAnswersPercent(
+        user.statisticState.audioCall.numberOfGames,
+        user.statisticState.audioCall.correctAnswers
+    )
+    user.statisticState.total.correctAnswersPercent = calcCorrectAnswersPercent(
+        user.statisticState.audioCall.numberOfGames + user.statisticState.sprint.numberOfGames,
+        user.statisticState.audioCall.correctAnswers + user.statisticState.sprint.correctAnswers
+    )
+    console.log(user.statisticState.total.correctAnswersPercent)
     if(!appState.isSignedIn) return;
     setUserStatsArr(appState.user);
 }
+
+
 
 
 // logIn

@@ -79,18 +79,23 @@ export interface IResWordsPage {
 
 export interface IStatisticState {
     total: {
+        correctAnswersPercent: number;
         wordsLearntArr: IWordLearningState[];
         wordsLearnt: number;
         correctAnswers: number;
         correctAnswersStrick: number;
     };
     audioCall: {
+        correctAnswersPercent: number;
+        numberOfGames: number;
         wordsLearntArr: IWordLearningState[];
         wordsLearnt: number;
         correctAnswers: number;
         correctAnswersStrick: number;
     };
     sprint: {
+        correctAnswersPercent: number;
+        numberOfGames: number;
         wordsLearntArr: IWordLearningState[];
         wordsLearnt: number;
         correctAnswers: number;
