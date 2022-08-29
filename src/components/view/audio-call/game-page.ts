@@ -7,8 +7,9 @@ import { isHTMLElement,
   //  isHTMLDivElement
   } from "../../../typings/utils/utils";
 import { AudioCall } from "./call/audio-call";
-import { currentGame, TEXTBOOK_PAGE_COUNT } from "../../controller/state";
-import { startGame, playWordInGameHandler, appendGameStats } from '../../controller/ui';
+import { currentGame, TEXTBOOK_PAGE_COUNT, appState } from "../../controller/state";
+import { startGame, playWordInGameHandler, appendGameStats, setStats } from '../../controller/ui';
+import { IUserStats } from "../../../typings";
 
 
 
@@ -64,8 +65,12 @@ export class GamePopUp {
     gameStatsWrapper.append(appendGameStats(stats));
     const playAgain = createElementWithClassnames('button', 'play-again-btn', 'button');
     playAgain.textContent = 'Играть еще раз';
-    playAgain.addEventListener('click', (e: Event) => {
-      e.preventDefault();
+    playAgain.addEventListener('click', () => {
+      if(!appState.isSignedIn) {
+        setStats((currentGame.game as AudioCall), appState.userNull);
+    } else {
+        setStats((currentGame.game as AudioCall), (appState.user.statsToday as IUserStats));
+    }
       currentGame.game = null;
       const CALL_GAME = 'Audio Call';
       const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);
