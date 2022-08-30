@@ -17,6 +17,10 @@ import {
     WordDetails,
     WordsItem,
 } from "../view/textbook/components";
+import {
+    getUserWord
+} from "./ui";
+
 
 export const BASE_URL = "http://localhost:3000";
 const ID = "";
@@ -124,7 +128,7 @@ export async function fetchWords({
     } else {
         options.headers.authorization = `Bearer ${appState.user.token}`;
         urlParams = `?${group !== undefined ? `&group=${group}` : ""}${
-            page !== undefined ? `&page=${page}` : ""
+            page !== undefined ? `&page=${group}` : ""
         }${wordsPerPage !== undefined ? `&wordsPerPage=${wordsPerPage}` : ""}${
             filter !== undefined ? `&filter=${filter}` : ""
         }`;
@@ -214,43 +218,14 @@ export async function putUserStatistic(body: IUserStatisticToDB): Promise<void> 
     })
 }
 
-export async function getUserAggregatedWords() {
-    //! константы на вход,
-    const filter = `{"$or":[{"userWord.difficulty":"easy"},{"userWord":null}]}`;
-    const group = 1;
-    const wordsPerPage = 100;
-    const res = await fetch(`${URLs.usersIDaggregatedWords()}?group=${group}&wordsPerPage=${wordsPerPage}&filter=${filter}`, {
-        method: "GET",
-        headers: {
-            Authorization: `Bearer ${appState.user.token}`,
-            Accept: "application/json",
-            "Content-Type": "application/json"
-        },
-    })
-    const aggregatedWords = await res.json();
-    console.log(aggregatedWords)
-}
-
-
-export async function getUserAggregatedWordsID() {
-    //! константы на вход,
-    const wordID = `5e9f5ee35eb9e72bc21af4fb`
-    const res = await fetch(`${URLs.usersIDaggregatedWordsID(wordID)}`, {
-        method: "GET",
-        headers: {
-            Authorization: `Bearer ${appState.user.token}`,
-            Accept: "application/json",
-            "Content-Type": "application/json"
-        },
-    })
-    const aggregatedWordsWord = await res.json();
-    console.log(aggregatedWordsWord)
-/*
+/**
  * Функция отправки POST или PUT запроса для приходящего слова userWord
  * @augments {word} - приходящее пользовательское слово
  * @augments {modifyedUserWord} - полностью модифицированный userWord, который нужно установить. Использовать если нужно поменять ещё что-то кроме сложности
  * @augments {difficulty} - сложность, которую нужно установить. Использовать если не нужно ничего менять кроме сложности
- */
+ * */
+
+
 export async function fetchPostOrPutUserWord({
     word,
     difficulty,
@@ -271,29 +246,33 @@ export async function fetchPostOrPutUserWord({
         },
         method,
         body: "",
-    };
-    let body: IUserWord = !word.userWord
-        ? {
-              difficulty: "norm",
-              optional: {
-                  audiocall: {
-                      countGames: 0,
-                      rightAnswer: 0,
-                      rightAnswerSeries: 0,
-                  },
-                  sprint: {
-                      countGames: 0,
-                      rightAnswer: 0,
-                      rightAnswerSeries: 0,
-                  },
-              },
-          }
-        : word.userWord;
+    }
+    // let body: IUserWord = !word.userWord
+    //     ? {
+    //           difficulty: "norm",
+    //           optional: {
+    //               audiocall: {
+    //                   countGames: 0,
+    //                   rightAnswer: 0,
+    //                   rightAnswerSeries: 0,
+    //               },
+    //               sprint: {
+    //                   countGames: 0,
+    //                   rightAnswer: 0,
+    //                   rightAnswerSeries: 0,
+    //               },
+    //           },
+    //       }
+    //     : word.userWord;
+    let body: IUserWord = getUserWord(word)
     if (difficulty) {
         body.difficulty = difficulty;
     }
+    // if (modifyedUserWord) {
+    //     body = {...modifyedUserWord};
+    // }
     if (modifyedUserWord) {
-        body = {...modifyedUserWord};
+        body = JSON.parse(JSON.stringify(modifyedUserWord));
     }
     options.body = JSON.stringify(body);
     let respData: IUserWordResponse | void;

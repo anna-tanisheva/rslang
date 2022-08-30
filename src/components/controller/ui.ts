@@ -5,8 +5,7 @@ import {postUser,
     fetchWordsInTextbook,
     putUserStatistic,
     // fetchUserStatistic,
-    // getUserAggregatedWords,
-    // getUserAggregatedWordsID
+    fetchPostOrPutUserWord
 } from "./api";
 import {
     appState,
@@ -21,7 +20,10 @@ import {
     isHTMLDivElement,
     isHTMLInputElement,
 } from "../../typings/utils/utils";
-import {ISignInResponse, WordsData, IUser, IUserStats, IUserStatsInArr, IWordLearningState, KeyboardCodes} from "../../typings/typings";
+import {ISignInResponse, WordsData, IUser, IUserStats, IUserStatsInArr, IWordLearningState, KeyboardCodes, IUserWord,
+    // IUserStatisticToDB
+} from "../../typings/typings";
+
 import {GamePopUp} from "../view/audio-call/game-page";
 import {
     getRandomInRange,
@@ -106,7 +108,12 @@ export function calcCorrectAnswersPercent(numberOfGames: number, answers: number
 }
 
 
-export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в типы добавить 2ю игру, когда появится
+export async function setStats(
+    game: AudioCall,
+    user: IUserStats,
+    // stats?: IUserStatisticToDB
+    ) { // !TODO тут в типы добавить 2ю игру, когда появится
+
     user.statisticState.total.correctAnswers += game.state.answers.true.length;
     user.statisticState.audioCall.correctAnswers += game.state.answers.true.length;
     if(user.statisticState.audioCall.correctAnswersStrick < game.state.maxStrick) {
@@ -123,11 +130,11 @@ export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в
             wordInWordsLearnt[word] += 1;
             if(wordInWordsLearnt[word] === 3) {
                 user.statisticState.audioCall.wordsLearnt += 1;
-                const statstObj = {
+                const statsObj = {
                     learnedWords: user.statisticState.audioCall.wordsLearnt,
                     optional: {}
                 }
-                putUserStatistic(statstObj);
+                putUserStatistic(statsObj);
             }
             if(wordInWordsLearnt[word] > 3) {
                 wordInWordsLearnt[word] = 3;
@@ -186,6 +193,10 @@ function setCurrentUser(data: ISignInResponse) {
         if(areDaysEqual((oldDate as string), newDate)) {
             appState.user.statsToday = (userInUserStats as IUserStatsInArr)[id];
         } else {
+            // const body: IUserStatisticToDB = JSON.parse(JSON.stringify(stats));
+            // body.learnedWords += user.statisticState.audioCall.wordsLearnt;
+            // body.optional?
+            // putUserStatistic(body);
             appState.user.statsToday = setEmptyStatistic(newDate);
         }
     } else {
@@ -525,6 +536,55 @@ function stopPlayingWordHandler(audio: HTMLAudioElement) {
     audio.pause();
 }
 
+export function getUserWord(word: IAggreagtedWord): IUserWord {
+    if(word.userWord) {
+        return word.userWord
+    }
+    return {
+        difficulty: "norm",
+        optional: {
+            audiocall: {
+                countGames: 0,
+                rightAnswer: 0,
+                rightAnswerSeries: 0,
+            },
+            sprint: {
+                countGames: 0,
+                rightAnswer: 0,
+                rightAnswerSeries: 0,
+            },
+        },
+    }
+}
+
+export async function modifyWord(game: AudioCall, word: IAggreagtedWord)  {
+    const body: IUserWord = getUserWord(word);
+    if(!body) return;
+    body.optional.audiocall.countGames += 1;
+    if(game.state.answers.true.find(id => id === word.id)) {
+        body.optional.audiocall.rightAnswer += 1;
+        body.optional.audiocall.rightAnswerSeries += 1;
+        if (body.difficulty === 'hard') {
+            if(body.optional.audiocall.rightAnswerSeries >= 5) {
+                body.difficulty = 'easy';
+            }
+        }
+        if (body.difficulty === 'norm') {
+            if(body.optional.audiocall.rightAnswerSeries >= 3) {
+                body.difficulty = 'easy';
+            }
+        }
+    } else if(game.state.answers.false.find(id => id === word.id)) {
+        body.optional.audiocall.rightAnswerSeries = 0;
+        body.difficulty = 'hard';
+    } else {
+        return;
+    }
+    await fetchPostOrPutUserWord({
+        word,
+        modifyedUserWord: body
+    })
+}
 
 export function startGame(
     container: HTMLElement,
@@ -542,25 +602,31 @@ export function startGame(
     document.addEventListener('keydown', keyboardEventsHandler);
     const closeButton = container.querySelector(".close-button");
     if (!isHTMLElement(closeButton)) return;
-    closeButton.addEventListener("click", () => {
+    closeButton.addEventListener("click", async () => {
         if(!appState.isSignedIn) {
             setStats((currentGame.game as AudioCall), appState.userNull);
         } else {
+            // const newDate = setNewDate();
+            // const usersStats = await fetchUserStatistic();
+            // if(!usersStats.optional) usersStats.optional = {};
+            // console.log(usersStats)
+            // Object.keys((await usersStats.optional as IUserStatsInArr)).forEach(key => {
+            //     if(!areDaysEqual(newDate, key)) {
+            //         if(!usersStats.optional) return;
+            //         usersStats.optional[newDate] = setEmptyStatistic(newDate);
+            //         appState.user.statsToday = usersStats.optional[newDate];
+            //     } else {
+            //         if(!usersStats.optional) return;
+            //         if(!usersStats.optional) usersStats.optional = {};
+            //         appState.user.statsToday = usersStats.optional[key];
+            //     }
+            // })
+            // console.log(usersStats)
             setStats((currentGame.game as AudioCall), (appState.user.statsToday as IUserStats));
         }
-
-        // !Добавление статистики и получение статистики из DB
-        // const statstObj = {
-        //     learnedWords: 4,
-        //     optional: {}
-        // }
-        // putUserStatistic(statstObj)
-        // .then(()=>fetchUserStatistic())
-        // .then(res=>{console.log(res)});
-
-        // !Получение agregated words из DB
-        // getUserAggregatedWords();
-        // getUserAggregatedWordsID();
+        (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
+            modifyWord((currentGame.game as AudioCall), word)
+        })
 
         currentGame.game = null;
         container.removeChild(popup);
@@ -692,7 +758,7 @@ export function createAnswersCards(key: boolean, container: HTMLElement) {
     }
 }
 
-function addToCurrentGameState(guess: boolean, wordId: string) {
+function addToCurrentGameState(guess: boolean, wordID: string) {
     if (guess) {
         // (currentGame.game as AudioCall).state.correctGuesses += 1;
         (currentGame.game as AudioCall).state.currentStrick += 1;
@@ -702,10 +768,10 @@ function addToCurrentGameState(guess: boolean, wordId: string) {
         ) {
             (currentGame.game as AudioCall).state.maxStrick = (currentGame.game as AudioCall).state.currentStrick;
         }
-        (currentGame.game as AudioCall).state.answers.true.push(wordId);
+        (currentGame.game as AudioCall).state.answers.true.push(wordID);
     } else {
         (currentGame.game as AudioCall).state.currentStrick = 0;
-        (currentGame.game as AudioCall).state.answers.false.push(wordId);
+        (currentGame.game as AudioCall).state.answers.false.push(wordID);
     }
 }
 
