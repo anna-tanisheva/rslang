@@ -7,6 +7,8 @@ import {
     ISignInResponse,
     IAggreagtedWord,
     IResWordsPage,
+    IUserWord,
+    IUserWordResponse,
 } from "../../typings/typings";
 import {AppView} from "../view/app-view";
 import {
@@ -98,11 +100,14 @@ export async function fetchWords({
     group,
     page,
     wordsPerPage,
+    filter,
 }: {
     group?: number;
     page?: number;
     wordsPerPage?: number;
+    filter?: string;
 }): Promise<IResWordsPage> {
+    console.log(group, page, wordsPerPage, filter);
     let url = "";
     let urlParams = "";
     const options = {
@@ -119,24 +124,30 @@ export async function fetchWords({
         options.headers.authorization = `Bearer ${appState.user.token}`;
         urlParams = `?${group !== undefined ? `&group=${group}` : ""}${
             page !== undefined ? `&page=${page}` : ""
-        }${wordsPerPage !== undefined ? `&wordsPerPage=${wordsPerPage}` : ""}`;
+        }${wordsPerPage !== undefined ? `&wordsPerPage=${wordsPerPage}` : ""}${
+            filter !== undefined ? `&filter=${filter}` : ""
+        }`;
         url = URLs.usersIDaggregatedWords() + urlParams;
     }
-    const res = await fetch(url, options);
-    const respData = await res.json();
     const words: IAggreagtedWord[] = [];
-    if (!appState.isSignedIn) {
-        words.push(...(respData as IAggreagtedWord[]));
-    } else {
-        let {
-            paginatedResults,
-        }: {paginatedResults: IAggreagtedWord[]} = respData[0];
-        paginatedResults = paginatedResults.map((item) => {
-            // eslint-disable-next-line no-underscore-dangle
-            const obj = {id: !item.id ? item._id : item.id};
-            return Object.assign(item, obj);
-        });
-        words.push(...paginatedResults);
+    try {
+        const res = await fetch(url, options);
+        const respData = await res.json();
+        if (!appState.isSignedIn) {
+            words.push(...(respData as IAggreagtedWord[]));
+        } else {
+            let {
+                paginatedResults,
+            }: {paginatedResults: IAggreagtedWord[]} = respData[0];
+            paginatedResults = paginatedResults.map((item) => {
+                // eslint-disable-next-line no-underscore-dangle
+                const obj = {id: !item.id ? item._id : item.id};
+                return Object.assign(item, obj);
+            });
+            words.push(...paginatedResults);
+        }
+    } catch (error: unknown) {
+        throw new Error((error as Error).message);
     }
     return {
         words,
@@ -174,4 +185,65 @@ export async function fetchWordsInPage({
     WordsItem.drawNewWordsItem(words);
     WordDetails.setCard(words[0]);
     PagePagination.moveSlider();
+}
+
+/**
+ * Функция отправки POST или PUT запроса для приходящего слова userWord
+ * @augments {word} - приходящее пользовательское слово
+ * @augments {modifyedUserWord} - полностью модифицированный userWord, который нужно установить. Использовать если нужно поменять ещё что-то кроме сложности
+ * @augments {difficulty} - сложность, которую нужно установить. Использовать если не нужно ничего менять кроме сложности
+ */
+export async function fetchPostOrPutUserWord({
+    word,
+    difficulty,
+    modifyedUserWord,
+}: {
+    word: IAggreagtedWord;
+    difficulty?: string;
+    modifyedUserWord?: IUserWord;
+}): Promise<IUserWordResponse> {
+    const wordID = word.id;
+    const url = URLs.usersIDWordsWordID(wordID);
+    const method = !word.userWord ? "POST" : "PUT";
+    const options = {
+        headers: {
+            accept: "application/json",
+            authorization: `Bearer ${appState.user.token}`,
+            "Content-Type": "application/json",
+        },
+        method,
+        body: "",
+    };
+    let body: IUserWord = !word.userWord
+        ? {
+              difficulty: "norm",
+              optional: {
+                  audiocall: {
+                      countGames: 0,
+                      rightAnswer: 0,
+                      rightAnswerSeries: 0,
+                  },
+                  sprint: {
+                      countGames: 0,
+                      rightAnswer: 0,
+                      rightAnswerSeries: 0,
+                  },
+              },
+          }
+        : word.userWord;
+    if (difficulty) {
+        body.difficulty = difficulty;
+    }
+    if (modifyedUserWord) {
+        body = {...modifyedUserWord};
+    }
+    options.body = JSON.stringify(body);
+    let respData: IUserWordResponse | void;
+    try {
+        const resp = await fetch(url, options);
+        respData = (await resp.json()) as IUserWordResponse;
+    } catch (error: unknown) {
+        throw new Error((error as Error).message);
+    }
+    return respData;
 }
