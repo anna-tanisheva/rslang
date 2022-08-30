@@ -188,9 +188,12 @@ function validationHandler(nodeList: Node[]): boolean | undefined {
     if (!isHTMLElement(invalidPassword)) return undefined;
     const invalidName = document.querySelector(".invalid-name");
     if (!isHTMLElement(invalidName)) return undefined;
+    const invalidPasswordRepeat = document.querySelector(".invalid-password-repeat");
+    if (!isHTMLElement(invalidPasswordRepeat)) return undefined;
     invalidEmail.classList.add("hidden");
     invalidPassword.classList.add("hidden");
     invalidName.classList.add("hidden");
+    invalidPasswordRepeat.classList.add('hidden');
     if (nodeList[0]) {
         if (
             !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(.\w{2,3})+$/.test(
@@ -213,10 +216,18 @@ function validationHandler(nodeList: Node[]): boolean | undefined {
             invalidName.classList.remove("hidden");
         }
     }
+    if(nodeList[3]) {
+        if ((nodeList[3] as HTMLInputElement).value !== (nodeList[2] as HTMLInputElement).value) {
+            valid = false;
+            invalidPasswordRepeat.classList.remove('hidden');
+        }
+    }
+
     if (valid) {
         invalidEmail.classList.add("hidden");
         invalidPassword.classList.add("hidden");
         invalidName.classList.add("hidden");
+        invalidPasswordRepeat.classList.add('hidden');
     }
     return valid;
 }
@@ -225,6 +236,7 @@ function validateForm(form: string): boolean | undefined {
     let nameInput;
     let emailInput;
     let passwordInput;
+    let repeatPasswordInput;
     let isValid: boolean | undefined = true;
     switch (form) {
         case "registration":
@@ -234,7 +246,9 @@ function validateForm(form: string): boolean | undefined {
             if (!isHTMLInputElement(passwordInput)) return undefined;
             emailInput = document.querySelector(".registration-email");
             if (!isHTMLInputElement(emailInput)) return undefined;
-            isValid = validationHandler([emailInput, passwordInput, nameInput]);
+            repeatPasswordInput = document.querySelector(".registration-password-repeat");
+            if (!isHTMLInputElement(repeatPasswordInput)) return undefined;
+            isValid = validationHandler([emailInput, passwordInput, nameInput, repeatPasswordInput]);
             break;
         case "login":
             emailInput = document.querySelector(".login-email");
@@ -254,13 +268,13 @@ function serverErrorsHandler(message: string) {
     if (!isHTMLElement(messageContainer)) return;
     if (message === "403") {
         messageContainer.innerText =
-            "Access denied, probably password was incorrect";
+            "Отказано в доступе, проверьте пароль.";
     } else if (message === "404") {
-        messageContainer.innerText = "We couldn't find this user, check email";
+        messageContainer.innerText = "Мы не нашли такого пользователя, проверьте email";
     } else if (message === "417") {
-        messageContainer.innerText = "This email is already used";
+        messageContainer.innerText = "Этот email уже используется";
     } else if (message === "422") {
-        messageContainer.innerText = "Incorrect email or password";
+        messageContainer.innerText = "Некорректный email или пароль";
     }
 }
 

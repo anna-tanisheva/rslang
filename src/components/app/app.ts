@@ -37,6 +37,8 @@ export class App {
         if (!isHTMLButtonElement(submitLogOutBtn)) return;
         const showForm = document.querySelector(".show-form");
         if (!isHTMLButtonElement(showForm)) return;
+        const closeFormButton = document.querySelector(".close-form-button");
+        if (!isHTMLButtonElement(closeFormButton)) return;
         const navigation = document.querySelector(".nav");
         if (!isHTMLElement(navigation)) return;
 
@@ -49,7 +51,7 @@ export class App {
         submitRegistrationBtn.addEventListener("click", addNewUserHandler);
         submitLogInBtn.addEventListener("click", signInHandler);
         submitLogOutBtn.addEventListener("click", logOutHandler);
-        showForm.addEventListener("click", showFormHandler);
+        [showForm, closeFormButton].forEach(elem=>elem.addEventListener("click", showFormHandler));
 
         // routing
         navigation.addEventListener("click", getRouteHandler);
