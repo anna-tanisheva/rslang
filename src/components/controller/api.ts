@@ -7,6 +7,7 @@ import {
     ISignInResponse,
     IAggreagtedWord,
     IResWordsPage,
+    IUserStatisticToDB
 } from "../../typings/typings";
 import {AppView} from "../view/app-view";
 import {
@@ -118,7 +119,7 @@ export async function fetchWords({
     } else {
         options.headers.authorization = `Bearer ${appState.user.token}`;
         urlParams = `?${group !== undefined ? `&group=${group}` : ""}${
-            page !== undefined ? `&page=${page}` : ""
+            page !== undefined ? `&page=${0}` : ""
         }${wordsPerPage !== undefined ? `&wordsPerPage=${wordsPerPage}` : ""}`;
         url = URLs.usersIDaggregatedWords() + urlParams;
     }
@@ -174,4 +175,63 @@ export async function fetchWordsInPage({
     WordsItem.drawNewWordsItem(words);
     WordDetails.setCard(words[0]);
     PagePagination.moveSlider();
+}
+
+export async function fetchUserStatistic(): Promise<IUserStatisticToDB> {
+    const res = await fetch(`${URLs.usersIDStatistics()}`, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${appState.user.token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        },
+    })
+    const stats = await res.json();
+    return stats;
+    console.log(stats)
+}
+
+export async function putUserStatistic(body: IUserStatisticToDB): Promise<void> {
+    const res = await fetch(`${URLs.usersIDStatistics()}`, {
+        method: "PUT",
+        body: JSON.stringify(body),
+        headers: {
+            Authorization: `Bearer ${appState.user.token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        },
+    })
+}
+
+export async function getUserAggregatedWords() {
+    //! константы на вход,
+    const filter = `{"$or":[{"userWord.difficulty":"easy"},{"userWord":null}]}`;
+    const group = 1;
+    const wordsPerPage = 100;
+    const res = await fetch(`${URLs.usersIDaggregatedWords()}?group=${group}&wordsPerPage=${wordsPerPage}&filter=${filter}`, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${appState.user.token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        },
+    })
+    const aggregatedWords = await res.json();
+    console.log(aggregatedWords)
+}
+
+
+export async function getUserAggregatedWordsID() {
+    //! константы на вход,
+    const wordID = `5e9f5ee35eb9e72bc21af4fb`
+    const res = await fetch(`${URLs.usersIDaggregatedWordsID(wordID)}`, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${appState.user.token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        },
+    })
+    const aggregatedWordsWord = await res.json();
+    console.log(aggregatedWordsWord)
 }

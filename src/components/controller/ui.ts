@@ -1,6 +1,13 @@
 /* eslint-disable no-param-reassign */
 import {IAggreagtedWord} from "../../typings";
-import {postUser, logIn, fetchWordsInTextbook} from "./api";
+import {postUser,
+    logIn,
+    fetchWordsInTextbook,
+    putUserStatistic,
+    // fetchUserStatistic,
+    // getUserAggregatedWords,
+    // getUserAggregatedWordsID
+} from "./api";
 import {
     appState,
     currentGame,
@@ -115,7 +122,12 @@ export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в
         } else {
             wordInWordsLearnt[word] += 1;
             if(wordInWordsLearnt[word] === 3) {
-                user.statisticState.audioCall.wordsLearnt += 1
+                user.statisticState.audioCall.wordsLearnt += 1;
+                const statstObj = {
+                    learnedWords: user.statisticState.audioCall.wordsLearnt,
+                    optional: {}
+                }
+                putUserStatistic(statstObj);
             }
             if(wordInWordsLearnt[word] > 3) {
                 wordInWordsLearnt[word] = 3;
@@ -131,6 +143,11 @@ export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в
             } else {
                 user.statisticState.audioCall.wordsLearnt = 0;
             }
+            const statstObj = {
+                learnedWords: user.statisticState.audioCall.wordsLearnt,
+                optional: {}
+            }
+            putUserStatistic(statstObj);
         }
     })
     user.statisticState.total.wordsLearnt = user.statisticState.audioCall.wordsLearnt + user.statisticState.sprint.wordsLearnt;
@@ -531,6 +548,19 @@ export function startGame(
         } else {
             setStats((currentGame.game as AudioCall), (appState.user.statsToday as IUserStats));
         }
+
+        // !Добавление статистики и получение статистики из DB
+        // const statstObj = {
+        //     learnedWords: 4,
+        //     optional: {}
+        // }
+        // putUserStatistic(statstObj)
+        // .then(()=>fetchUserStatistic())
+        // .then(res=>{console.log(res)});
+
+        // !Получение agregated words из DB
+        // getUserAggregatedWords();
+        // getUserAggregatedWordsID();
 
         currentGame.game = null;
         container.removeChild(popup);

@@ -54,7 +54,6 @@ export class AudioCall {
   }
 
   async create(): Promise<HTMLElement> {
-
     const words = await fetchWords({
       group: this.section,
       page: this.page

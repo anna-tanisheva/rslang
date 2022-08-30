@@ -138,3 +138,8 @@ export enum KeyboardCodes {
 export interface IWordLearningState {
     [key: string]: number;
 }
+
+export interface IUserStatisticToDB {
+    learnedWords: number,
+    optional?: Record<string, unknown>
+}
