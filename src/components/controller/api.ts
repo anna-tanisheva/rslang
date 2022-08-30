@@ -7,12 +7,9 @@ import {
     ISignInResponse,
     IAggreagtedWord,
     IResWordsPage,
-<<<<<<< HEAD
-    IUserStatisticToDB
-=======
+    IUserStatisticToDB,
     IUserWord,
     IUserWordResponse,
->>>>>>> develop
 } from "../../typings/typings";
 import {AppView} from "../view/app-view";
 import {
@@ -127,15 +124,10 @@ export async function fetchWords({
     } else {
         options.headers.authorization = `Bearer ${appState.user.token}`;
         urlParams = `?${group !== undefined ? `&group=${group}` : ""}${
-<<<<<<< HEAD
-            page !== undefined ? `&page=${0}` : ""
-        }${wordsPerPage !== undefined ? `&wordsPerPage=${wordsPerPage}` : ""}`;
-=======
             page !== undefined ? `&page=${page}` : ""
         }${wordsPerPage !== undefined ? `&wordsPerPage=${wordsPerPage}` : ""}${
             filter !== undefined ? `&filter=${filter}` : ""
         }`;
->>>>>>> develop
         url = URLs.usersIDaggregatedWords() + urlParams;
     }
     const words: IAggreagtedWord[] = [];
@@ -196,7 +188,6 @@ export async function fetchWordsInPage({
     PagePagination.moveSlider();
 }
 
-<<<<<<< HEAD
 export async function fetchUserStatistic(): Promise<IUserStatisticToDB> {
     const res = await fetch(`${URLs.usersIDStatistics()}`, {
         method: "GET",
@@ -254,8 +245,7 @@ export async function getUserAggregatedWordsID() {
     })
     const aggregatedWordsWord = await res.json();
     console.log(aggregatedWordsWord)
-=======
-/**
+/*
  * Функция отправки POST или PUT запроса для приходящего слова userWord
  * @augments {word} - приходящее пользовательское слово
  * @augments {modifyedUserWord} - полностью модифицированный userWord, который нужно установить. Использовать если нужно поменять ещё что-то кроме сложности
@@ -314,5 +304,4 @@ export async function fetchPostOrPutUserWord({
         throw new Error((error as Error).message);
     }
     return respData;
->>>>>>> develop
 }
