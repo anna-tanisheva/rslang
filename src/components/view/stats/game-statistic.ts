@@ -6,6 +6,7 @@ import {
 } from "../utils";
 // import { calcCorrectAnswersPercent } from "../../controller/ui";
 // import { AudioCall } from "../audio-call/call/audio-call";
+import { SPRINT } from "../../controller/state";
 
 
 export class GameStatistic {
@@ -17,7 +18,7 @@ export class GameStatistic {
 
 
   constructor(statisticState: IStatisticState, gameName: string) {
-    if(gameName === 'sprint') {
+    if(gameName === SPRINT) {
       this.gameNameRu = 'Спринт';
       this.gameName = gameName;
     } else {

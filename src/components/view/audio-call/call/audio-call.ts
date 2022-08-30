@@ -16,12 +16,13 @@ import { IAggreagtedWord } from '../../../../typings';
 
 export class AudioCall {
 
+  gameName: string;
+
   section: number;
 
   page: number;
 
   state: {
-    // correctGuesses: number,
     currentStrick: number,
     maxStrick: number,
     answers: {
@@ -30,18 +31,17 @@ export class AudioCall {
     }
   };
 
-  gameName: string;
+  game: string;
 
   currentSlide: number;
 
   wordsInGame: IAggreagtedWord[] | null;
 
-  constructor(sec: number, page: number, gameName: string, currentSlide = 0) {
-    this.gameName = gameName;
+  constructor(sec: number, page: number, game: string, currentSlide = 0) {
+    this.gameName = 'Audio Call';
     this.section = sec;
     this.page = page;
     this.state = {
-      // correctGuesses: 0,
       currentStrick: 0,
       maxStrick: 0,
       answers: {
@@ -49,6 +49,7 @@ export class AudioCall {
         false: []
       }
     };
+    this.game = game;
     this.currentSlide = currentSlide;
     this.wordsInGame = null;
   }

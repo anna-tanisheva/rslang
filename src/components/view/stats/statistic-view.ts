@@ -5,6 +5,7 @@ import {
   createElementWithClassnames,
   createElementWithContent,
 } from "../utils";
+import { SPRINT, AUDIO_CALL } from '../../controller/state';
 
 export class StatisticView {
 
@@ -20,14 +21,14 @@ export class StatisticView {
       wordsLearntContent = createElementWithContent('p', `Изучено слов: ${String((userStats as IUserStats).statisticState.total.wordsLearnt)}`);
       correctAnswersPercentContent = createElementWithContent('p', `Вы ответили правильно на ${String((userStats as IUserStats).statisticState.total.correctAnswersPercent)} % вопросов`);
       correctAnswersContent = createElementWithContent('p', `Правильные ответы: ${String((userStats as IUserStats).statisticState.total.correctAnswers)}`);
-      sprintStatistic = new GameStatistic((userStats as IUserStats).statisticState, 'sprint');
-      callStatistic = new GameStatistic((userStats as IUserStats).statisticState, 'audioCall');
+      sprintStatistic = new GameStatistic((userStats as IUserStats).statisticState, SPRINT);
+      callStatistic = new GameStatistic((userStats as IUserStats).statisticState, AUDIO_CALL);
     } else {
       userStats = appState.userNull;
       wordsLearntContent = createElementWithContent('p', `Изучено слов: ${String(userStats.statisticState.total.wordsLearnt)}`);
       correctAnswersContent = createElementWithContent('p', `Правильные ответы: ${String(userStats.statisticState.total.correctAnswers)}`);
-      sprintStatistic = new GameStatistic(userStats.statisticState, 'sprint');
-      callStatistic = new GameStatistic(userStats.statisticState, 'audioCall');
+      sprintStatistic = new GameStatistic(userStats.statisticState, SPRINT);
+      callStatistic = new GameStatistic(userStats.statisticState, AUDIO_CALL);
       correctAnswersPercentContent = createElementWithContent('p', `Вы ответили правильно на ${String((userStats as IUserStats).statisticState.total.correctAnswersPercent)} % вопросов`);
     }
     const statisticContainer = createElementWithClassnames("section", "statistic-container");

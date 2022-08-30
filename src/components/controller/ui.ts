@@ -6,7 +6,9 @@ import {
     currentGame,
     TEXTBOOK_PAGE_COUNT,
     ENDPOINT,
-    WORDS_IN_GAME
+    WORDS_IN_GAME,
+    AUDIO_CALL,
+    SPRINT
 } from "./state";
 import {
     isHTMLButtonElement,
@@ -105,7 +107,6 @@ export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в
     if(user.statisticState.audioCall.correctAnswersStrick < game.state.maxStrick) {
         user.statisticState.audioCall.correctAnswersStrick = game.state.maxStrick;
     }
-    const AUDIO_CALL = 'audioCall';
     (currentGame.game as AudioCall).state.answers.true.forEach(word => {
         const wordInWordsLearnt = isWordInWordsLearnt(word, user, AUDIO_CALL);
         if(!wordInWordsLearnt) {
@@ -562,7 +563,7 @@ export function startGame(
 }
 
 export function startGameHandler(e: Event): void {
-    const CALL_GAME = "Audio Call";
+    // const CALL_GAME = "Audio Call";
     // const SPRINT = 'Sprint';
     const {target} = e;
     const gameContainer = document.querySelector(".games");
@@ -570,7 +571,7 @@ export function startGameHandler(e: Event): void {
     if (!isHTMLButtonElement(target)) return;
     if (!target.classList.contains("start-button")) return;
     if (target.classList.contains("sprint-button")) {
-        console.log("sprint");
+        console.log(SPRINT);
         // логика по созданию экземпляра игры
         // const section = Number(target.closest('.game-container')?.querySelector('select')?.value);
         // startGame(gameContainer, section, SPRINT);
@@ -579,7 +580,7 @@ export function startGameHandler(e: Event): void {
             target.closest(".game-container")?.querySelector("select")?.value
         );
         const page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
-        startGame(gameContainer, section, CALL_GAME, page);
+        startGame(gameContainer, section, AUDIO_CALL, page);
     }
 }
 

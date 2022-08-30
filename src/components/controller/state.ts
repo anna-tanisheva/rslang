@@ -90,8 +90,13 @@ export const TEXTBOOK_GROUP_SIZE = 600;
 export const TEXTBOOK_PAGE_COUNT = 30;
 export const WORDS_IN_GAME = 10;
 
+export const AUDIO_CALL = 'audioCall';
+export const SPRINT = 'sprint';
+
+
+
 export const currentGame: ICurrentGame = {game: null};
 
 export const audio = new Audio();
 
-export const KEYBOARD_CODES = ['1', '2', '3', '4', 'Enter', 'ArrowRight'];
+// export const KEYBOARD_CODES = ['1', '2', '3', '4', 'Enter', 'ArrowRight'];
