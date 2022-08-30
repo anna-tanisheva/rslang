@@ -23,8 +23,22 @@ export interface IAggreagtedWord extends IWord {
 export interface IUserWord {
     difficulty: string;
     optional: {
-        rightAnswerSeries: number;
+        audiocall: {
+            countGames: number;
+            rightAnswer: number;
+            rightAnswerSeries: number;
+        };
+        sprint: {
+            countGames: number;
+            rightAnswer: number;
+            rightAnswerSeries: number;
+        };
     };
+}
+
+export interface IUserWordResponse extends IUserWord {
+    id: string;
+    wordId: string;
 }
 
 export interface IUser {
