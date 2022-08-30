@@ -10,6 +10,7 @@ import {
     getLocalStorage,
     setLocalStorage,
     getActiveView,
+    addFormHandlerToMainPage
 } from "../controller/ui";
 import {getRouteHandler} from "../controller/routing";
 import {appState} from "../controller/state";
@@ -41,6 +42,8 @@ export class App {
         if (!isHTMLButtonElement(closeFormButton)) return;
         const navigation = document.querySelector(".nav");
         if (!isHTMLElement(navigation)) return;
+        const startScreenButtons = document.querySelector(".start-screen-buttons");
+        if (!isHTMLElement(startScreenButtons)) return;
 
 
         window.addEventListener("DOMContentLoaded", () => {
@@ -52,6 +55,7 @@ export class App {
         submitLogInBtn.addEventListener("click", signInHandler);
         submitLogOutBtn.addEventListener("click", logOutHandler);
         [showForm, closeFormButton].forEach(elem=>elem.addEventListener("click", showFormHandler));
+        startScreenButtons.addEventListener('click', addFormHandlerToMainPage)
 
         // routing
         navigation.addEventListener("click", getRouteHandler);

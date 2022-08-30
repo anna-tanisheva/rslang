@@ -389,6 +389,59 @@ export function logOutHandler(): void {
 
 export function showFormHandler() {
     document.querySelector(".form-container")?.classList.toggle("hidden");
+    const mainPageFormButtons = document.querySelector('.start-screen-buttons');
+    if(!isHTMLDivElement(mainPageFormButtons)) return;
+    [...mainPageFormButtons.children].forEach(elem=>{
+        if(!document.querySelector(".form-container")?.classList.contains("hidden")) {
+            elem.setAttribute('disabled', 'true');
+        } else {
+            elem.removeAttribute('disabled');
+        };
+    })
+}
+
+export function addFormHandlerToMainPage(e: Event){
+    if (!isHTMLButtonElement(e.target)) return;
+    e.target.setAttribute('disabled', 'true');
+    const signIn = document.querySelector(".sign-in");
+    if (!isHTMLElement(signIn)) return;
+    const signUp = document.querySelector(".sign-up");
+    if (!isHTMLElement(signUp)) return;
+    const showSignInButton = document.querySelector('.show-sign-in');
+    if (!isHTMLElement(showSignInButton)) return;
+    const showSignUpButton = document.querySelector('.show-sign-up');
+    if (!isHTMLElement(showSignUpButton)) return;
+    if((e.target as HTMLButtonElement).classList.contains('sign-in-button')) {
+        showFormHandler();
+        showSignInButton.classList.add("active-form");
+        showSignUpButton.classList.remove("active-form");
+        signIn.classList.remove("hidden");
+        signUp.classList.add("hidden");
+        // if (!isHTMLButtonElement(e.target.nextElementSibling)) return;
+        // e.target.nextElementSibling.setAttribute('disabled', 'true');
+    } else if((e.target as HTMLButtonElement).classList.contains('registration-button')) {
+        showFormHandler();
+        showSignUpButton.classList.add("active-form");
+        showSignInButton.classList.remove("active-form");
+        signIn.classList.add("hidden");
+        signUp.classList.remove("hidden");
+    }
+
+
+
+    if (e.target.classList.contains("show-sign-in")) {
+        e.target.classList.add("active-form");
+        if (!isHTMLButtonElement(e.target.nextElementSibling)) return;
+        e.target.nextElementSibling.classList.remove("active-form");
+        signIn.classList.remove("hidden");
+        signUp.classList.add("hidden");
+    } else if (e.target.classList.contains("show-sign-up")) {
+        e.target.classList.add("active-form");
+        if (!isHTMLButtonElement(e.target.previousElementSibling)) return;
+        e.target.previousElementSibling.classList.remove("active-form");
+        signIn.classList.add("hidden");
+        signUp.classList.remove("hidden");
+    }
 }
 
 export async function getActiveView() {
