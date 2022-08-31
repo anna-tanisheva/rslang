@@ -128,7 +128,7 @@ export async function fetchWords({
     } else {
         options.headers.authorization = `Bearer ${appState.user.token}`;
         urlParams = `?${group !== undefined ? `&group=${group}` : ""}${
-            page !== undefined ? `&page=${group}` : ""
+            page !== undefined ? `&page=${page}` : ""
         }${wordsPerPage !== undefined ? `&wordsPerPage=${wordsPerPage}` : ""}${
             filter !== undefined ? `&filter=${filter}` : ""
         }`;
@@ -247,30 +247,11 @@ export async function fetchPostOrPutUserWord({
         method,
         body: "",
     }
-    // let body: IUserWord = !word.userWord
-    //     ? {
-    //           difficulty: "norm",
-    //           optional: {
-    //               audiocall: {
-    //                   countGames: 0,
-    //                   rightAnswer: 0,
-    //                   rightAnswerSeries: 0,
-    //               },
-    //               sprint: {
-    //                   countGames: 0,
-    //                   rightAnswer: 0,
-    //                   rightAnswerSeries: 0,
-    //               },
-    //           },
-    //       }
-    //     : word.userWord;
+
     let body: IUserWord = getUserWord(word)
     if (difficulty) {
         body.difficulty = difficulty;
     }
-    // if (modifyedUserWord) {
-    //     body = {...modifyedUserWord};
-    // }
     if (modifyedUserWord) {
         body = JSON.parse(JSON.stringify(modifyedUserWord));
     }

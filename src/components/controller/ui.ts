@@ -5,7 +5,8 @@ import {postUser,
     fetchWordsInTextbook,
     putUserStatistic,
     // fetchUserStatistic,
-    fetchPostOrPutUserWord
+    fetchPostOrPutUserWord,
+    fetchUserStatistic
 } from "./api";
 import {
     appState,
@@ -21,7 +22,7 @@ import {
     isHTMLInputElement,
 } from "../../typings/utils/utils";
 import {ISignInResponse, WordsData, IUser, IUserStats, IUserStatsInArr, IWordLearningState, KeyboardCodes, IUserWord,
-    // IUserStatisticToDB
+    IUserStatisticToDB
 } from "../../typings/typings";
 
 import {GamePopUp} from "../view/audio-call/game-page";
@@ -111,7 +112,6 @@ export function calcCorrectAnswersPercent(numberOfGames: number, answers: number
 export async function setStats(
     game: AudioCall,
     user: IUserStats,
-    // stats?: IUserStatisticToDB
     ) { // !TODO тут в типы добавить 2ю игру, когда появится
 
     user.statisticState.total.correctAnswers += game.state.answers.true.length;
@@ -172,7 +172,7 @@ export async function setStats(
 }
 // logIn
 
-function setCurrentUser(data: ISignInResponse) {
+async function setCurrentUser(data: ISignInResponse) {
     const newDate = setNewDate();
     appState.user.name = data.name;
     appState.user.userId = data.userId;
@@ -193,11 +193,15 @@ function setCurrentUser(data: ISignInResponse) {
         if(areDaysEqual((oldDate as string), newDate)) {
             appState.user.statsToday = (userInUserStats as IUserStatsInArr)[id];
         } else {
-            // const body: IUserStatisticToDB = JSON.parse(JSON.stringify(stats));
-            // body.learnedWords += user.statisticState.audioCall.wordsLearnt;
-            // body.optional?
-            // putUserStatistic(body);
+            const statsObj = await fetchUserStatistic();
+            if(!statsObj.optional) statsObj.optional = {};
+            statsObj.optional[((userInUserStats as IUserStatsInArr)[id].statisticTimeStamp as string)] = (userInUserStats as IUserStatsInArr)[id].statisticState
+            const body: IUserStatisticToDB = JSON.parse(JSON.stringify(statsObj));
+            console.log(`обновление статистики в БД: `, body)
+            putUserStatistic(body);
+            appState.usersStats.splice(appState.usersStats.indexOf(userInUserStats), 1);
             appState.user.statsToday = setEmptyStatistic(newDate);
+            setUserStatsArr(appState.user);
         }
     } else {
         appState.user.statsToday = setEmptyStatistic(newDate);
@@ -606,22 +610,6 @@ export function startGame(
         if(!appState.isSignedIn) {
             setStats((currentGame.game as AudioCall), appState.userNull);
         } else {
-            // const newDate = setNewDate();
-            // const usersStats = await fetchUserStatistic();
-            // if(!usersStats.optional) usersStats.optional = {};
-            // console.log(usersStats)
-            // Object.keys((await usersStats.optional as IUserStatsInArr)).forEach(key => {
-            //     if(!areDaysEqual(newDate, key)) {
-            //         if(!usersStats.optional) return;
-            //         usersStats.optional[newDate] = setEmptyStatistic(newDate);
-            //         appState.user.statsToday = usersStats.optional[newDate];
-            //     } else {
-            //         if(!usersStats.optional) return;
-            //         if(!usersStats.optional) usersStats.optional = {};
-            //         appState.user.statsToday = usersStats.optional[key];
-            //     }
-            // })
-            // console.log(usersStats)
             setStats((currentGame.game as AudioCall), (appState.user.statsToday as IUserStats));
         }
         (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
@@ -674,8 +662,8 @@ export function startGameHandler(e: Event): void {
         const section = Number(
             target.closest(".game-container")?.querySelector("select")?.value
         );
-        const page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
-        startGame(gameContainer, section, CALL_GAME, page);
+        const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);
+        startGame(gameContainer, section, CALL_GAME, PAGE);
     }
 }
 
@@ -685,6 +673,9 @@ export function playAgainHandler(gameContainer: HTMLElement, section: number){
         setStats((currentGame.game as AudioCall), appState.userNull);
       } else {
           setStats((currentGame.game as AudioCall), (appState.user.statsToday as IUserStats));
+          (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
+            modifyWord((currentGame.game as AudioCall), word)
+        })
       }
       currentGame.game = null;
       const CALL_GAME = 'Audio Call';

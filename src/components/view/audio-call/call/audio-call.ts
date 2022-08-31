@@ -6,7 +6,6 @@ import {
   createElementWithAttributes,
   createElementWithClassnames,
   createElementWithContent,
-  // getRandomInRange,
 } from "../../utils";
 import { fetchWords } from "../../../controller/api";
 import { ENDPOINT } from '../../../controller/state';
@@ -21,7 +20,6 @@ export class AudioCall {
   page: number;
 
   state: {
-    // correctGuesses: number,
     currentStrick: number,
     maxStrick: number,
     answers: {
@@ -41,7 +39,6 @@ export class AudioCall {
     this.section = sec;
     this.page = page;
     this.state = {
-      // correctGuesses: 0,
       currentStrick: 0,
       maxStrick: 0,
       answers: {
@@ -56,7 +53,8 @@ export class AudioCall {
   async create(): Promise<HTMLElement> {
     const words = await fetchWords({
       group: this.section,
-      page: this.page
+      page: this.page,
+      wordsPerPage: 20
     })
     const game = createElementWithClassnames("div", "audio-call");
     const arrOfTranslations: string[] = [];
