@@ -64,11 +64,10 @@ export class AudioCall {
     } else {
       words = this.arrOfWords;
     }
-    console.log(await words)
     const game = createElementWithClassnames("div", "audio-call");
     const arrOfTranslations: string[] = [];
     if(!words) {
-      game.innerHTML += `<div>Не удалось получить слова, попробуйте перезапустить игру</div>`
+      game.innerHTML += `<div class="error-game-message">Не удалось получить слова, попробуйте перезапустить игру</div>`
       return game;
     };
     words.words.forEach(word => {

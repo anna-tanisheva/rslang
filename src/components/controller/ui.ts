@@ -132,11 +132,6 @@ export async function setStats(
             wordInWordsLearnt[word] += 1;
             if(wordInWordsLearnt[word] === 3) {
                 user.statisticState.audioCall.wordsLearnt += 1;
-                const statsObj = {
-                    learnedWords: user.statisticState.audioCall.wordsLearnt,
-                    optional: {}
-                }
-                putUserStatistic(statsObj);
             }
             if(wordInWordsLearnt[word] > 3) {
                 wordInWordsLearnt[word] = 3;
@@ -152,11 +147,6 @@ export async function setStats(
             } else {
                 user.statisticState.audioCall.wordsLearnt = 0;
             }
-            const statstObj = {
-                learnedWords: user.statisticState.audioCall.wordsLearnt,
-                optional: {}
-            }
-            putUserStatistic(statstObj);
         }
     })
     user.statisticState.total.wordsLearnt = user.statisticState.audioCall.wordsLearnt + user.statisticState.sprint.wordsLearnt;
@@ -196,9 +186,10 @@ async function setCurrentUser(data: ISignInResponse) {
             appState.user.statsToday = (userInUserStats as IUserStatsInArr)[id];
         } else {
             const statsObj = await fetchUserStatistic();
-            if(!statsObj.optional) statsObj.optional = {};
-            statsObj.optional[((userInUserStats as IUserStatsInArr)[id].statisticTimeStamp as string)] = (userInUserStats as IUserStatsInArr)[id].statisticState
-            const body: IUserStatisticToDB = JSON.parse(JSON.stringify(statsObj));
+            const modifiedObj = JSON.parse(JSON.stringify(statsObj));
+            if(!modifiedObj.optional) modifiedObj.optional = {};
+            modifiedObj.optional[((userInUserStats as IUserStatsInArr)[id].statisticTimeStamp as string)] = (userInUserStats as IUserStatsInArr)[id].statisticState
+            const body: IUserStatisticToDB = JSON.parse(JSON.stringify(modifiedObj));
             console.log(`обновление статистики в БД: `, body)
             putUserStatistic(body);
             appState.usersStats.splice(appState.usersStats.indexOf(userInUserStats), 1);
@@ -599,10 +590,6 @@ export function startGame(
     page: number,
     arrOfWords?: IResWordsPage,
 ) {
-    const startButtons = document.querySelectorAll('.start-button');
-    startButtons.forEach(button=> {
-        button.setAttribute('disabled', 'true');
-    })
     let popup: HTMLElement;
     if(!arrOfWords) {
         popup = new GamePopUp().create(section, page, game);
@@ -620,15 +607,16 @@ export function startGame(
         } else {
             setStats((currentGame.game as AudioCall), (appState.user.statsToday as IUserStats));
         }
-        (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
-            modifyWord((currentGame.game as AudioCall), word)
-        })
+        if(appState.isSignedIn) {
+            (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
+                modifyWord((currentGame.game as AudioCall), word)
+            })
+        }
 
         currentGame.game = null;
         container.removeChild(popup);
-        startButtons.forEach(button=> {
-            button.removeAttribute('disabled');
-        })
+        const overlay = document.querySelector('.overlay');
+        overlay?.classList.add('hidden');
     });
     const nextButton = container.querySelector(".next-button");
     if (!isHTMLElement(nextButton)) return;
@@ -651,6 +639,8 @@ export function startGame(
         if (!audio) return;
         playWordInGameHandler(audio as HTMLAudioElement);
     });
+    const overlay = document.querySelector('.overlay');
+    overlay?.classList.remove('hidden');
 }
 
 export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {

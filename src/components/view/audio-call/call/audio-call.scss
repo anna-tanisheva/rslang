@@ -12,6 +12,7 @@
   border: 1px solid blueviolet;
   overflow: hidden;
   border-radius: 20px;
+  z-index: 1;
 }
 .close-button {
   width: 40px;
@@ -156,4 +157,8 @@
   .button {
     flex-basis: 40%;
   }
+}
+
+.error-game-message {
+  color: red;
 }
