@@ -4,6 +4,8 @@ import {
   createElementWithClassnames, createElementWithContent,
   // createElementWithContent,
 } from "../utils";
+// import { calcCorrectAnswersPercent } from "../../controller/ui";
+// import { AudioCall } from "../audio-call/call/audio-call";
 
 
 export class GameStatistic {
@@ -33,12 +35,15 @@ export class GameStatistic {
     const wordsLearntContent = createElementWithContent('p', `Изучено слов: ${statisticState[this.gameName as keyof typeof statisticState].wordsLearnt}`);
     const correctAnswersWrapper = createElementWithClassnames('div', 'correct-answers-wrapper');
     const correctAnswersContent = createElementWithContent('p', `Правильные ответы: ${String(statisticState[this.gameName as keyof typeof statisticState].correctAnswers)}`);
+    const correctAnswersPercentWrapper = createElementWithClassnames('div', 'correct-answers-percent-wrapper');
+    const correctAnswersPercentContent = createElementWithContent('p', `Вы ответили правильно на ${String(statisticState[this.gameName as keyof typeof statisticState].correctAnswersPercent)} % вопросов`);
     const correctAnswersStrickWrapper = createElementWithClassnames('div', 'correct-answers-wrapper');
     const correctAnswersStrickContent = createElementWithContent('p', `Самая длинная серия: ${String(statisticState[this.gameName as keyof typeof statisticState].correctAnswersStrick)}`);
     wordsLearntWrapper.append(wordsLearntContent);
     correctAnswersWrapper.append(correctAnswersContent);
-    correctAnswersStrickWrapper.append(correctAnswersStrickContent)
-    statisticContainer.append(statisticHeader, wordsLearntWrapper, correctAnswersWrapper, correctAnswersStrickWrapper);
+    correctAnswersStrickWrapper.append(correctAnswersStrickContent);
+    correctAnswersPercentWrapper.append(correctAnswersPercentContent);
+    statisticContainer.append(statisticHeader, wordsLearntWrapper, correctAnswersWrapper, correctAnswersPercentWrapper, correctAnswersStrickWrapper);
 
     return statisticContainer;
   }

@@ -11,7 +11,7 @@ import {
 import { fetchWords } from "../../../controller/api";
 import { ENDPOINT } from '../../../controller/state';
 import { playWordInGameHandler, getGameWordsArr, getOptions, choseAnswerHandler, } from '../../../controller/ui';
-import { IWord } from '../../../../typings';
+import { IAggreagtedWord } from '../../../../typings';
 
 
 export class AudioCall {
@@ -34,7 +34,7 @@ export class AudioCall {
 
   currentSlide: number;
 
-  wordsInGame: IWord[] | null;
+  wordsInGame: IAggreagtedWord[] | null;
 
   constructor(sec: number, page: number, gameName: string, currentSlide = 0) {
     this.gameName = gameName;
@@ -70,7 +70,8 @@ export class AudioCall {
       card.setAttribute('data-id', word.id);
       const audioAttr = {
         src: `${ENDPOINT}/${word.audio}`,
-        type: 'audio/mpeg'
+        type: 'audio/mpeg',
+        tabindex: '-1'
       };
       const imgAttr = {
         src: `${ENDPOINT}/${word.image}`,
@@ -82,6 +83,7 @@ export class AudioCall {
       const flipper = createElementWithClassnames('div', 'flipper');
 
       const button = createElementWithClassnames('button', 'play-button');
+      button.setAttribute('tabindex', '-1');
       const img = createElementWithAttributes('img', imgAttr);
       const answer = createElementWithContent('p', `${word.word} ${word.transcription}`);
       answer.classList.add('opacity-hidden');
@@ -93,6 +95,7 @@ export class AudioCall {
       options.forEach(option=>{
         const tag = createElementWithClassnames('button', 'option');
         tag.setAttribute('data-option', option);
+        tag.setAttribute('tabindex', '-1');
         tag.addEventListener('click', (e) => {choseAnswerHandler(e, word.wordTranslate)})
         tag.innerText += option;
         answersContainer.append(tag);

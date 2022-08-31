@@ -247,11 +247,11 @@ export class WordDetails {
             audiocallHeading.textContent = "Спринт";
             sprintHeading.textContent = "Аудиовызов";
             const audiocallValue = createElementWithClassnames(
-                "h4",
+                "h5",
                 "card-translate"
             );
             const sprintValue = createElementWithClassnames(
-                "h4",
+                "h5",
                 "card-translate"
             );
             audiocallValue.textContent = `${
@@ -260,12 +260,28 @@ export class WordDetails {
                     : data.userWord.optional.audiocall.rightAnswer
             } из ${
                 !data.userWord ? 0 : data.userWord.optional.audiocall.countGames
-            }`;
+            } (${
+                !data.userWord || !data.userWord.optional.audiocall.countGames
+                    ? 0
+                    : Math.round(
+                          (data.userWord.optional.audiocall.rightAnswer /
+                              data.userWord.optional.audiocall.countGames) *
+                              100
+                      )
+            }%)`;
             sprintValue.textContent = `${
                 !data.userWord ? 0 : data.userWord.optional.sprint.rightAnswer
             } из ${
                 !data.userWord ? 0 : data.userWord.optional.sprint.countGames
-            }`;
+            } (${
+                !data.userWord || !data.userWord.optional.sprint.countGames
+                    ? 0
+                    : Math.round(
+                          (data.userWord.optional.sprint.rightAnswer /
+                              data.userWord.optional.sprint.countGames) *
+                              100
+                      )
+            }%)`;
             statisticAudiocall.append(audiocallHeading, audiocallValue);
             statisticSprint.append(sprintHeading, sprintValue);
             statistic.append(
