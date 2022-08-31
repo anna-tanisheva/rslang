@@ -1,5 +1,5 @@
 import {isHTMLButtonElement} from "../../../../typings/utils/utils";
-import {fetchWordsInPage} from "../../../controller/api";
+import {redrawTextbookWordsPage} from "../../../controller/api";
 import {appState, TEXTBOOK_PAGE_COUNT} from "../../../controller/state";
 import {
     createElementWithAttributes,
@@ -142,6 +142,7 @@ export class PagePagination {
             lastButton,
             nextButton
         );
+
         pagesContainer.addEventListener("click", (e) => {
             if (!isHTMLButtonElement(e.target)) return;
             const button = e.target as HTMLButtonElement;
@@ -164,8 +165,9 @@ export class PagePagination {
             }
             appState.viewsStates.textbook.page = page;
             const {group} = appState.viewsStates.textbook;
-            fetchWordsInPage({group, page});
+            redrawTextbookWordsPage({group, page});
         });
+
         return pagesContainer;
     }
 }

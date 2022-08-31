@@ -38,13 +38,15 @@ export const appState: IAppState = {
                     wordsLearntArr: [],
                     wordsLearnt: 0,
                     correctAnswers: 0,
-                    correctAnswersStrick: 0
+                    correctAnswersStrick: 0,
                 },
-            }
-        }
+            },
+        },
     },
     viewsStates: {
         textbook: {
+            mode: "textbook",
+            dictionaryMode: "hard",
             group: 0,
             page: 0,
         },
@@ -74,11 +76,11 @@ export const appState: IAppState = {
                 wordsLearntArr: [],
                 wordsLearnt: 0,
                 correctAnswers: 0,
-                correctAnswersStrick: 0
+                correctAnswersStrick: 0,
             },
-        }
+        },
     },
-    usersStats: []
+    usersStats: [],
 };
 
 export const textbookState: ITextbookState = {
@@ -94,4 +96,13 @@ export const currentGame: ICurrentGame = {game: null};
 
 export const audio = new Audio();
 
-export const KEYBOARD_CODES = ['1', '2', '3', '4', 'Enter', 'ArrowRight'];
+export const KEYBOARD_CODES = ["1", "2", "3", "4", "Enter", "ArrowRight"];
+
+export const COLORS = [
+    "#00cc87",
+    "#ffae1a",
+    "#ff8da1",
+    "#ff6666",
+    "#87cefa",
+    "#8080ff",
+];

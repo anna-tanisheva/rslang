@@ -132,6 +132,8 @@ export interface ICurrentGame {
 }
 
 export interface ITextbookViewState {
+    dictionaryMode: string;
+    mode: string;
     group: number;
     page: number;
 }
@@ -141,12 +143,12 @@ export interface ITextbookState {
 }
 
 export enum KeyboardCodes {
-    'one' = 1,
-    'two',
-    'three',
-    'four',
-    'enter' = 'Enter',
-    'arrowRight' = 'ArrowRight'
+    "one" = 1,
+    "two",
+    "three",
+    "four",
+    "enter" = "Enter",
+    "arrowRight" = "ArrowRight",
 }
 
 export interface IWordLearningState {
