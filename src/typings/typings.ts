@@ -15,6 +15,32 @@ export interface IWord {
     wordTranslate: string;
 }
 
+export interface IAggreagtedWord extends IWord {
+    _id: string;
+    userWord?: IUserWord;
+}
+
+export interface IUserWord {
+    difficulty: string;
+    optional: {
+        audiocall: {
+            countGames: number;
+            rightAnswer: number;
+            rightAnswerSeries: number;
+        };
+        sprint: {
+            countGames: number;
+            rightAnswer: number;
+            rightAnswerSeries: number;
+        };
+    };
+}
+
+export interface IUserWordResponse extends IUserWord {
+    id: string;
+    wordId: string;
+}
+
 export interface IUser {
     userId: string;
     name: string;
@@ -57,12 +83,10 @@ export interface IWordProgress {
     page: number;
 }
 
-export type WordsData = IWord[];
+export type WordsData = IAggreagtedWord[];
 
 export interface IResWordsPage {
     words: WordsData;
-    group: number;
-    page: number;
 }
 
 export interface IStatisticState {
@@ -88,11 +112,12 @@ export interface ICurrentGame {
 }
 
 export interface ITextbookViewState {
+    dictionaryMode: string;
     mode: string;
     group: number;
     page: number;
 }
 
 export interface ITextbookState {
-    words: IWord[];
+    words: IAggreagtedWord[];
 }

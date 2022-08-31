@@ -18,6 +18,7 @@ export const appState: IAppState = {
     viewsStates: {
         textbook: {
             mode: "textbook",
+            dictionaryMode: "hard",
             group: 0,
             page: 0,
         },

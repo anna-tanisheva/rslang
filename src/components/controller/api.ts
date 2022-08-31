@@ -6,7 +6,10 @@ import {
     IUserSignIn,
     ISignInResponse,
     IWord,
+    IAggreagtedWord,
     IResWordsPage,
+    IUserWord,
+    IUserWordResponse,
 } from "../../typings/typings";
 import {AppView} from "../view/app-view";
 import {
@@ -14,6 +17,8 @@ import {
     WordDetails,
     WordsItem,
 } from "../view/textbook/components";
+import {getActiveViewData} from "./ui";
+import {WordItem} from "../view/textbook/components/word";
 
 export const BASE_URL = "http://localhost:3000";
 const ID = "";
@@ -21,13 +26,33 @@ const ID = "";
 const SIGNIN = `${BASE_URL}/signin`;
 const USERS = `${BASE_URL}/users`;
 const USERS_ID = `${BASE_URL}/users/${ID}`;
-const WORDS = `${BASE_URL}${
-    appState.user.userId ? `/${appState.user.userId}` : ""
-}/words`;
+const WORDS = () =>
+    `${BASE_URL}${
+        appState.user.userId?.length ? `/${appState.user.userId}` : ""
+    }/words`;
 const TOKENS = `${USERS_ID}/tokens`;
 const SETTINGS = `${USERS_ID}/settings`;
 const STATISTICS = `${USERS_ID}/statistics`;
 const AGGREGATED_WORDS = `${USERS_ID}/aggregatedWords`;
+
+const URLs = {
+    signIn: `${BASE_URL}/signin`,
+    users: `${BASE_URL}/users`,
+    words: `${BASE_URL}/words`,
+    wordsID: (id: string) => `${BASE_URL}/words/${id}`,
+    usersID: () => `${BASE_URL}/users/${appState.user.userId}`,
+    usersIDSettings: () => `${BASE_URL}/users/${appState.user.userId}/settings`,
+    usersIDStatistics: () =>
+        `${BASE_URL}/users/${appState.user.userId}/statistics`,
+    usersIDWords: () => `${BASE_URL}/users/${appState.user.userId}/words`,
+    usersIDTokens: () => `${BASE_URL}/users/${appState.user.userId}/tokens`,
+    usersIDWordsWordID: (id: string) =>
+        `${BASE_URL}/users/${appState.user.userId}/words/${id}`,
+    usersIDaggregatedWords: () =>
+        `${BASE_URL}/users/${appState.user.userId}/aggregatedWords`,
+    usersIDaggregatedWordsID: (id: string) =>
+        `${BASE_URL}/users/${appState.user.userId}/aggregatedWords/${id}`,
+};
 
 export async function postUser(body: IUserSignUp): Promise<IUser> {
     const res = await fetch(`${ENDPOINT}/users`, {
@@ -78,48 +103,186 @@ export async function getUser(id: string, token: string) {
 export async function fetchWords({
     group,
     page,
+    wordsPerPage,
+    filter,
 }: {
-    group: number;
-    page: number;
+    group?: number;
+    page?: number;
+    wordsPerPage?: number;
+    filter?: string;
 }): Promise<IResWordsPage> {
-    const res = await fetch(`${WORDS}?group=${group}&page=${page}`);
-    const words = await res.json();
+    let url = "";
+    let urlParams = "";
+    const options = {
+        headers: {
+            accept: "application/json",
+            authorization: "",
+        },
+        method: "GET",
+    };
+    if (!appState.isSignedIn) {
+        urlParams = `?group=${group}&page=${page}`;
+        url = URLs.words + urlParams;
+    } else {
+        options.headers.authorization = `Bearer ${appState.user.token}`;
+        urlParams = `?${group !== undefined ? `&group=${group}` : ""}${
+            page !== undefined ? `&page=${page}` : ""
+        }${wordsPerPage !== undefined ? `&wordsPerPage=${wordsPerPage}` : ""}${
+            filter !== undefined ? `&filter=${filter}` : ""
+        }`;
+        url = URLs.usersIDaggregatedWords() + urlParams;
+    }
+    const words: IAggreagtedWord[] = [];
+    try {
+        const res = await fetch(url, options);
+        const respData = await res.json();
+        if (!appState.isSignedIn) {
+            words.push(...(respData as IAggreagtedWord[]));
+        } else {
+            let {
+                paginatedResults,
+            }: {paginatedResults: IAggreagtedWord[]} = respData[0];
+            paginatedResults = paginatedResults.map((item) => {
+                // eslint-disable-next-line no-underscore-dangle
+                const obj = {id: !item.id ? item._id : item.id};
+                return Object.assign(item, obj);
+            });
+            words.push(...paginatedResults);
+        }
+    } catch (error) {
+        console.log(error);
+    }
     return {
         words,
-        group,
-        page,
     };
 }
 
-export async function fetchWordsInTextbook({
+export async function setTexbookStateWords({
     group,
     page,
+    wordsPerPage,
+    filter,
 }: {
-    group: number;
-    page: number;
+    group?: number;
+    page?: number;
+    wordsPerPage?: number;
+    filter?: string;
 }): Promise<void> {
-    const res = await fetch(`${WORDS}?group=${group}&page=${page}`);
-    const words = (await res.json()) as IWord[];
-    textbookState.words = words;
-    //    AppView.redrawView(appState.view);
-    // PagePagination.setDisabled();
-    /* WordsItem.drawNewWordsItem(words);
-    WordDetails.setCard(words[0]); */
-    // PagePagination.moveSlider();
+    textbookState.words = (
+        await fetchWords({group, page, wordsPerPage, filter})
+    ).words;
 }
 
-export async function fetchWordsInPage({
+export async function redrawTextbookWordsPage({
     group,
     page,
 }: {
     group: number;
     page: number;
 }): Promise<void> {
-    const res = await fetch(`${WORDS}?group=${group}&page=${page}`);
-    const words = (await res.json()) as IWord[];
-    textbookState.words = words;
+    await setTexbookStateWords({group, page, wordsPerPage: 20});
     PagePagination.setDisabled();
+    const {words} = textbookState;
     WordsItem.drawNewWordsItem(words);
     WordDetails.setCard(words[0]);
     PagePagination.moveSlider();
+}
+
+export function getUserWord(word: IAggreagtedWord) {
+    return !word.userWord
+        ? {
+              difficulty: "norm",
+              optional: {
+                  audiocall: {
+                      countGames: 0,
+                      rightAnswer: 0,
+                      rightAnswerSeries: 0,
+                  },
+                  sprint: {
+                      countGames: 0,
+                      rightAnswer: 0,
+                      rightAnswerSeries: 0,
+                  },
+              },
+          }
+        : word.userWord;
+}
+
+/**
+ * Функция отправки POST или PUT запроса для приходящего слова userWord
+ * @augments {word} - приходящее пользовательское слово
+ * @augments {modifyedUserWord} - полностью модифицированный userWord, который нужно установить. Использовать если нужно поменять ещё что-то кроме сложности
+ * @augments {difficulty} - сложность, которую нужно установить. Использовать если не нужно ничего менять кроме сложности
+ */
+export async function fetchPostOrPutUserWord({
+    word,
+    modifyedUserWord,
+    difficulty,
+}: {
+    word: IAggreagtedWord;
+    modifyedUserWord?: IUserWord;
+    difficulty?: string;
+}): Promise<IUserWordResponse> {
+    const wordID = word.id;
+    const url = URLs.usersIDWordsWordID(wordID);
+    const method = !word.userWord ? "POST" : "PUT";
+    const options = {
+        headers: {
+            accept: "application/json",
+            authorization: `Bearer ${appState.user.token}`,
+            "Content-Type": "application/json",
+        },
+        method,
+        body: "",
+    };
+    let body: IUserWord = getUserWord(word);
+    if (difficulty) {
+        body.difficulty = difficulty;
+    }
+    if (modifyedUserWord) {
+        body = {...modifyedUserWord};
+    }
+    options.body = JSON.stringify(body);
+    let respData: IUserWordResponse;
+    try {
+        const resp = await fetch(url, options);
+        respData = (await resp.json()) as IUserWordResponse;
+    } catch (error) {
+        console.log(error);
+        respData = {
+            wordId: word.id,
+            id: appState.user.userId,
+            difficulty: body.difficulty,
+            optional: body.optional,
+        };
+    }
+    return respData;
+}
+
+export async function setUserWord({
+    word,
+    difficulty,
+}: {
+    word: IAggreagtedWord;
+    difficulty?: string;
+}) {
+    if (!appState.isSignedIn) return;
+    try {
+        const respData = await fetchPostOrPutUserWord({word, difficulty});
+        const body: IUserWord = {
+            difficulty: respData.difficulty,
+            optional: respData.optional,
+        };
+        if (appState.viewsStates.textbook.mode === "dictionary") {
+            getActiveViewData();
+        }
+        if (appState.viewsStates.textbook.mode === "textbook") {
+            const newWord = {...word};
+            newWord.userWord = body;
+            WordItem.setCard(newWord);
+            WordDetails.setCard(newWord);
+        }
+    } catch (error) {
+        console.error(error);
+    }
 }

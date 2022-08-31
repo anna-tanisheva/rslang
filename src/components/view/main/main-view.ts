@@ -5,14 +5,10 @@ import {createElementWithClassnames} from "../utils";
 import {ErrorView} from "./error-view";
 import { GamesPage } from "../games-start-page/games-page";
 import { StatisticView } from "../stats/statistic-view";
-import { statisticState } from "../../controller/state";
+import {appState, statisticState} from "../../controller/state";
 
 export class MainView {
-    public activeViewName: string | undefined;
-
-    constructor(activeViewName: string | undefined) {
-        this.activeViewName = activeViewName;
-    }
+    public activeViewName: string = appState.view;
 
     private index = new MainPageView().create();
 
@@ -23,6 +19,7 @@ export class MainView {
     private stats = new StatisticView().create(statisticState);
 
     create() {
+        this.activeViewName = appState.view;
         const main = createElementWithClassnames("main", "main");
         if (
             this.activeViewName !== "index" &&

@@ -39,6 +39,42 @@ $colorGroup6:lighten(blue,
 .textbook-controls {
     display: flex;
     gap: 0.5em;
+    height: 40px;
+    position: relative;
+    .modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: $sides-padding;
+        border: 0;
+        border-radius: 1rem;
+        box-shadow: 2px 2px 5px #0007;
+        background-color: lighten(lightgrey, 11%);
+        font-family: "Rubik", sans-serif;
+        .modal-buttons {
+            display: flex;
+            padding: $sides-padding;
+            flex-direction: column;
+            gap: $sides-padding;
+            button {
+                color: $colorActive;
+                border: 1px dashed currentColor;
+                border-radius: 1rem;
+                cursor: pointer;
+                color: lightgrey;
+                border: 1px dashed currentColor;
+                margin: 0 0.5rem 0 0;
+                padding: 0.25rem;
+                border-radius: 1rem;
+                transition: 0.2s;
+                &:hover {
+                    color: $colorActive;
+                    border: 1px solid currentColor;
+                }
+            }
+        }
+    }
 }
 
 .group-label,
@@ -171,7 +207,6 @@ input[name="textbook-mode"]:checked+.textbook-mode {
 
 .words-wrapper {
     background-color: $colorActiveBg;
-    padding: calc($sides-padding/2);
     border-radius: 0 0 1rem 1rem;
     color: $colorActive;
     .words-heading {
@@ -183,7 +218,6 @@ input[name="textbook-mode"]:checked+.textbook-mode {
     flex-direction: column;
     .words-group {
         display: flex;
-        gap: 1rem;
         color: $colorActive;
         .card {
             width: 250px;
@@ -205,6 +239,9 @@ input[name="textbook-mode"]:checked+.textbook-mode {
             gap: 1rem;
             width: calc(100% - 250px);
             pointer-events: none;
+            .message {
+                font-family: "Rubik", sans-serif;
+            }
             .words-item-wrapper {
                 min-width: 210px;
                 flex: 1;
@@ -215,6 +252,7 @@ input[name="textbook-mode"]:checked+.textbook-mode {
                     box-shadow: 2px 2px 0px 0px currentColor;
                 }
                 .words-item {
+                    position: relative;
                     background-color: lighten(lightgrey, 11%);
                     cursor: pointer;
                     padding: 1rem 1rem 0 1rem;
@@ -233,6 +271,19 @@ input[name="textbook-mode"]:checked+.textbook-mode {
                     .item-word,
                     .item-translate {
                         pointer-events: none;
+                    }
+                    .item-status {
+                        position: absolute;
+                        right: 0;
+                        bottom: 0;
+                        color: $colorActiveBg;
+                        background-color: $colorActive;
+                        padding: calc($sides-padding/3);
+                        width: calc($sides-padding*2);
+                        height: calc($sides-padding*2);
+                        text-align: center;
+                        font-family: "Rubik Mono One", sans-serif;
+                        border-radius: $sides-padding 0 0 0;
                     }
                 }
             }
@@ -311,6 +362,26 @@ input[name="textbook-mode"]:checked+.textbook-mode {
         position: sticky;
         font-family: "Rubik", sans-serif;
         min-height: 700px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        .games-statictic-wrapper {
+            position: absolute;
+            bottom: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            justify-self: flex-end;
+            width: 100%;
+            padding: $sides-padding;
+            background-color: $colorActive;
+            opacity: 0.8;
+            color: $colorActiveBg;
+            border-radius: 0 0 $sides-padding $sides-padding;
+            .card-word {
+                width: 100%;
+            }
+        }
         .card-controls-wrapper {
             display: flex;
             padding: $sides-padding;
@@ -341,6 +412,7 @@ input[name="textbook-mode"]:checked+.textbook-mode {
         }
         .card-content {
             padding: $sides-padding;
+            padding-bottom: 100px;
             .card-heading {
                 display: flex;
                 flex-wrap: wrap;
