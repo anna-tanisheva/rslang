@@ -642,7 +642,7 @@ export function startGame(
     const overlay = document.querySelector('.overlay');
     overlay?.classList.remove('hidden');
 }
-
+// для запуска игры из учебника
 export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
     const CALL_GAME = "Audio Call";
     // const SPRINT = 'Sprint';
