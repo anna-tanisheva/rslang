@@ -13,7 +13,8 @@ import {
     currentGame,
     TEXTBOOK_PAGE_COUNT,
     ENDPOINT,
-    WORDS_IN_GAME
+    WORDS_IN_GAME,
+    // ARR_OF_WORDS_FOR_TEST
 } from "./state";
 import {
     isHTMLButtonElement,
@@ -22,7 +23,8 @@ import {
     isHTMLInputElement,
 } from "../../typings/utils/utils";
 import {ISignInResponse, WordsData, IUser, IUserStats, IUserStatsInArr, IWordLearningState, KeyboardCodes, IUserWord,
-    IUserStatisticToDB
+    IUserStatisticToDB,
+    IResWordsPage
 } from "../../typings/typings";
 
 import {GamePopUp} from "../view/audio-call/game-page";
@@ -594,13 +596,19 @@ export function startGame(
     container: HTMLElement,
     section: number,
     game: string,
-    page: number
+    page: number,
+    arrOfWords?: IResWordsPage,
 ) {
     const startButtons = document.querySelectorAll('.start-button');
     startButtons.forEach(button=> {
         button.setAttribute('disabled', 'true');
     })
-    const popup = new GamePopUp().create(section, game, page);
+    let popup: HTMLElement;
+    if(!arrOfWords) {
+        popup = new GamePopUp().create(section, page, game);
+    } else {
+        popup = new GamePopUp().create(section, page, game, arrOfWords);
+    }
     container.append(popup);
     document.addEventListener('keydown', closeGameOnPressESC);
     document.addEventListener('keydown', keyboardEventsHandler);
@@ -645,7 +653,7 @@ export function startGame(
     });
 }
 
-export function startGameHandler(e: Event): void {
+export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
     const CALL_GAME = "Audio Call";
     // const SPRINT = 'Sprint';
     const {target} = e;
@@ -663,7 +671,11 @@ export function startGameHandler(e: Event): void {
             target.closest(".game-container")?.querySelector("select")?.value
         );
         const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);
-        startGame(gameContainer, section, CALL_GAME, PAGE);
+        if(!arrOfWords) {
+            startGame(gameContainer, section, CALL_GAME, PAGE);
+        } else {
+            startGame(gameContainer, section, CALL_GAME, PAGE, arrOfWords);
+        }
     }
 }
 
