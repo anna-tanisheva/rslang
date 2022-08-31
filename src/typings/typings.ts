@@ -154,3 +154,12 @@ export enum KeyboardCodes {
 export interface IWordLearningState {
     [key: string]: number;
 }
+
+export interface IWordsForSplit {
+    id: string,
+    word: string,
+    originalTranslate:string,
+    audio:string,
+    randomTranslate: string,
+    outcome: boolean,
+  }

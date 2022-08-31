@@ -1,0 +1,257 @@
+$primary-color: #d12121;
+$backgroung-button-color: #8ab7f5;
+$color-correct-answer: #26850e;
+$color-answer: black;
+$backgroung-active-button: #f0f08e;
+
+
+.sprint-section {
+    width: 10%;
+    height: 100%;
+    background-image: url(../../../../assets/images/london5.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+
+.sprint-game {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+    width: 1000%;
+    height: 100%;
+    transition: all 1s ease;
+    background-color: honeydew;
+}
+
+sprint-container {
+    display: none;
+}
+
+.sprint-playing-field {
+    margin: 5px auto;
+    height: 298px;
+    max-width: 412px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 20px;
+    background: url(../../../../assets/images/envelop.jpg);
+    background-size: contain;
+    background-repeat: no-repeat;
+
+
+    p {
+        font-size: 2rem;
+    }
+}
+
+.sprint-stamps-container {
+    display: flex;
+    align-self: end;
+    margin: 44px 50px 0 0px;
+    height: 50px;
+}
+
+.sprint-stamps-item {
+    margin: 0 5px;
+}
+
+.item-1 {
+    scale: 1.5;
+    transform: rotate(340deg);
+}
+
+.item-2 {
+    scale: 1.2;
+    transform: rotate(15deg)
+}
+
+.item-3 {
+    scale: 1.7;
+    transform: rotate(20deg)
+}
+
+.sprint-enlish-word {
+    margin-top: 30px;
+    color: $primary-color;
+}
+
+.sprint-translate {
+    margin-top: 10px;  
+}
+
+.sprint-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.sprint-button {
+    margin: 0 5px; 
+    padding: 0 10px;
+    height: 30px;
+    font-size: 1rem;
+    border: 3px solid $primary-color;
+    background-color: $backgroung-button-color;
+}
+
+.sprint-counters {
+    display: flex;
+    justify-content: space-evenly;
+    font-size: 2.5rem;
+    font-weight: 400;
+}
+
+
+.sprint-answer {
+    display: none;
+    text-align: center;       
+    font-weight: 500;
+    font-size: 1.8rem;
+}
+
+.sprint-results-wrapper {
+    margin: 0 auto;
+    padding: 20px;
+    height: 436px;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    border-radius: 20px;
+    background: url(../../../../assets/images/frame.png);
+    background-size: contain;
+    background-repeat: no-repeat;  
+
+}
+
+.sprint-results {
+    padding-top: 50px;    
+    display: none;
+}
+
+.sprint-results-discription {
+    overflow-y: scroll;
+    width: 90%;
+
+    &::-webkit-scrollbar {
+        width:  5px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        width: 5px;
+        background-color: $primary-color;
+        background-image: -webkit-linear-gradient(45deg,rgba(255, 255, 255, .25) 25%,
+                    transparent 25%,
+                    transparent 50%,
+                    rgba(255, 255, 255, .25) 50%,
+                    rgba(255, 255, 255, .25) 75%,
+                    transparent 75%,
+                    transparent);
+    }
+
+    h2,
+    h3 {
+        margin: 5px auto;
+        text-align: center;
+    }
+}
+
+.result-answers-item {
+    margin: 5px auto;
+    display: flex;
+    align-items: center;
+    color: $color-answer;
+}
+
+.result-answers-audio {    
+    width: 36px;
+    height: 36px;
+    margin-right: 5px;
+    border: transparent;
+    background: url(../../../../assets/images/icons8-динамик-100.png);
+    background-size: contain;
+    background-repeat: no-repeat; 
+}
+
+.result-answers-audio:hover {
+    scale: 1.2;
+}
+
+
+.sprint-scores {
+    padding-top: 35px;
+    width: 100px;
+    height: 118px;
+    text-align: center;
+    background-image: url("../../../../assets/images/stamp5.png");
+    background-size: contain;
+}
+  
+.sprint-timer {
+    padding-top: 35px;
+    width: 160px;
+    height: 114px;
+    text-align: center;
+    background-image: url("../../../../assets/images/stamp7.png");
+    background-size: contain;
+}
+
+button {
+    cursor: pointer;
+}
+
+.active {
+ background-color: $backgroung-active-button;
+}
+
+.timing {
+    padding-top: 150px;
+    text-align: center;
+    font-size: 4.5rem;
+}
+
+.game-lavel {
+    margin: 32px;
+
+    span {
+        margin: 0 5px; 
+        padding: 0 10px;
+        height: 30px;
+        font-size: 1rem;
+        border: 3px solid $primary-color;
+        background-color: $backgroung-button-color; 
+        cursor: pointer;
+    }
+}
+
+.sprint-start-game {
+    text-align: center;
+}
+
+.level-selection {
+    p {
+        margin: 20px 0 10px;
+        font-size: 1.2rem;
+    }
+}
+
+.start-game-description {
+    max-width: 700px;
+    margin: 10px auto;
+    font-size: 1rem;
+}
+
+.results-wrong-answer {
+    color: $primary-color;
+}
+
+.results-wrong-answer {
+    color: $primary-color;
+}
+
+.results-right-answer {
+    color: $color-correct-answer;
+}
