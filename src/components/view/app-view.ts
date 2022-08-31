@@ -35,10 +35,10 @@ export class AppView {
         this.drawForm();
     }
 
-    static redrawView(view: string): void {
+    static redrawView(): void {
         const root = document.querySelector(".main");
         if (!isHTMLElement(root)) return;
-        AppView.mainView = new MainView(view).create();
+        AppView.mainView = new MainView().create();
         root.replaceChildren();
         root.append(...this.mainView.children);
     }

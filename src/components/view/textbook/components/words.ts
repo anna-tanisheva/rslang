@@ -3,6 +3,7 @@ import {IAggreagtedWord} from "../../../../typings";
 import {createElementWithClassnames} from "../../utils";
 import {appState} from "../../../controller/state";
 import {isHTMLElement} from "../../../../typings/utils/utils";
+import {getColor} from "../../../controller/ui";
 
 export class WordsItem {
     public wordsData: IAggreagtedWord[];
@@ -17,9 +18,38 @@ export class WordsItem {
             "words-page",
             `words-page-${appState.viewsStates.textbook.page}`
         );
-        this.wordsData.forEach((data) => {
-            const wordsItem = new WordItem(data).create();
-            wordsContainer.append(wordsItem);
+
+        if (this.wordsData.length) {
+            this.wordsData.forEach((data, i) => {
+                const wordsItem = new WordItem(data).create();
+                if (i === 0) {
+                    const input = wordsItem.querySelector(
+                        "input"
+                    ) as HTMLInputElement;
+                    input.checked = true;
+                    const label = wordsItem.querySelector(
+                        "label"
+                    ) as HTMLElement;
+                    label.setAttribute("style", `color: ${getColor()}`);
+                }
+                wordsContainer.append(wordsItem);
+            });
+        } else {
+            const message = createElementWithClassnames("h3", "message");
+            message.textContent = "В этом разделе ещё нет слов";
+            wordsContainer.append(message);
+        }
+        wordsContainer.addEventListener("change", (e) => {
+            const labels = wordsContainer.querySelectorAll(".words-item");
+            labels.forEach((label) => {
+                label.removeAttribute("style");
+            });
+            const input = e.target as HTMLInputElement;
+            if (input.labels?.length)
+                (input.labels[0] as HTMLElement).setAttribute(
+                    "style",
+                    `color: ${getColor()}`
+                );
         });
         return wordsContainer;
     }

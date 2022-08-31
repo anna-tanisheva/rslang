@@ -1,5 +1,5 @@
 import {isHTMLInputElement} from "../../../../typings/utils/utils";
-import {fetchWordsInPage} from "../../../controller/api";
+import {redrawTextbookWordsPage} from "../../../controller/api";
 import {
     appState,
     TEXTBOOK_GROUP_COUNT,
@@ -53,17 +53,20 @@ export class GroupPagination {
                 (inputRadio as HTMLInputElement).checked = true;
             }
             inputLabel.append(groupName, groupRange, groupStatus);
+
             (inputRadio as HTMLInputElement).addEventListener("input", (e) => {
                 if (!isHTMLInputElement(e.target)) return;
                 const group = Number((e.target as HTMLInputElement).value);
                 const page = 0;
                 appState.viewsStates.textbook.group = group;
                 appState.viewsStates.textbook.page = page;
-                fetchWordsInPage({group, page});
+                redrawTextbookWordsPage({group, page});
             });
+
             groupItem.append(inputRadio, inputLabel);
             groupsContainer.append(groupItem);
         }
+
         return groupsContainer;
     }
 }

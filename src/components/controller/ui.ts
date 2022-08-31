@@ -1,12 +1,13 @@
 /* eslint-disable no-param-reassign */
 import {IAggreagtedWord} from "../../typings";
-import {postUser, logIn, fetchWordsInTextbook} from "./api";
+import {postUser, logIn, setTexbookStateWords} from "./api";
 import {
     appState,
     currentGame,
     TEXTBOOK_PAGE_COUNT,
     ENDPOINT,
-    WORDS_IN_GAME
+    WORDS_IN_GAME,
+    COLORS,
 } from "./state";
 import {
     isHTMLButtonElement,
@@ -26,6 +27,42 @@ import {AudioCall} from "../view/audio-call/call/audio-call";
 import {GameStats} from "../view/audio-call/call/game-stats";
 import {AppView} from "../view/app-view";
 import {PagePagination} from "../view/textbook/components";
+
+export async function getActiveViewData() {
+  switch (appState.view) {
+      case "textbook": {
+          let wordsPerPage;
+          let filter;
+          let page;
+          let group;
+          if (!appState.isSignedIn) {
+              group = appState.viewsStates.textbook.group;
+              page = appState.viewsStates.textbook.page;
+          } else {
+              wordsPerPage = 20;
+              if (appState.viewsStates.textbook.mode === "textbook") {
+                  group = appState.viewsStates.textbook.group;
+                  page = appState.viewsStates.textbook.page;
+              } else if (
+                  appState.viewsStates.textbook.mode === "dictionary"
+              ) {
+                  filter = `{"userWord.difficulty":"${appState.viewsStates.textbook.dictionaryMode}"}`;
+                  wordsPerPage = 3600;
+              }
+          }
+          await setTexbookStateWords({
+              group,
+              page,
+              filter,
+              wordsPerPage,
+          });
+          break;
+      }
+      default:
+  }
+  AppView.redrawView();
+  if (appState.view === "textbook") PagePagination.moveSlider();
+}
 
 // stats one day
 
@@ -177,6 +214,7 @@ function setCurrentUser(data: ISignInResponse) {
     const logOutBtn = document.querySelector(".logout-submit");
     if (!isHTMLButtonElement(logOutBtn)) return;
     logOutBtn.removeAttribute("disabled");
+    getActiveViewData();
 }
 
 function validationHandler(nodeList: Node[]): boolean | undefined {
@@ -318,8 +356,8 @@ export async function addNewUserHandler(e: Event): Promise<void> {
     const formContainer = document.querySelector(".form-container");
     if (!isHTMLDivElement(formContainer)) return;
     formContainer.classList.add("hidden");
-    setCurrentUser(signedIn);
     appState.isSignedIn = true;
+    setCurrentUser(signedIn);
     localStorage.setItem("appState", JSON.stringify(appState));
     passwordInput.value = "";
     emailInput.value = "";
@@ -350,8 +388,8 @@ export async function signInHandler(e: Event): Promise<void> {
     const formContainer = document.querySelector(".form-container");
     if (!isHTMLDivElement(formContainer)) return;
     formContainer.classList.add("hidden");
-    setCurrentUser(signedIn);
     appState.isSignedIn = true;
+    setCurrentUser(signedIn);
     localStorage.setItem("appState", JSON.stringify(appState));
     passwordInput.value = "";
     emailInput.value = "";
@@ -370,25 +408,11 @@ export function logOutHandler(): void {
     const logOutBtn = document.querySelector(".logout-submit");
     if (!isHTMLButtonElement(logOutBtn)) return;
     logOutBtn.setAttribute("disabled", "true");
+    getActiveViewData();
 }
 
 export function showFormHandler() {
     document.querySelector(".form-container")?.classList.toggle("hidden");
-}
-
-export async function getActiveView() {
-    switch (appState.view) {
-        case "textbook": {
-            await fetchWordsInTextbook({
-                group: appState.viewsStates.textbook.group,
-                page: appState.viewsStates.textbook.page,
-            });
-            break;
-        }
-        default:
-    }
-    AppView.redrawView(appState.view);
-    if (appState.view === "textbook") PagePagination.moveSlider();
 }
 
 export function setLocalStorage() {
@@ -731,5 +755,16 @@ export function choseAnswerHandler(e: Event, answer: string) {
     statsCurrentContainer.replaceChild(statsOld, statsNew);
 }
 
-
-
+export function getColor(): string {
+    let color = "";
+    if (appState.viewsStates.textbook.mode === "textbook") {
+        color = COLORS[appState.viewsStates.textbook.group];
+    } else if (appState.viewsStates.textbook.dictionaryMode === "hard") {
+        color = "crimson";
+    } else if (appState.viewsStates.textbook.dictionaryMode === "norm") {
+        color = "orange";
+    } else if (appState.viewsStates.textbook.dictionaryMode === "easy") {
+        color = "yellowgreen";
+    }
+    return color;
+}
