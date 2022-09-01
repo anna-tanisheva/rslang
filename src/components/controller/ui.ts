@@ -45,6 +45,62 @@ import {AppView} from "../view/app-view";
 import {PagePagination} from "../view/textbook/components";
 import { Sprint } from "../view/audio-call/sprint/sprint-model";
 
+
+export function showFormHandler() {
+    document.querySelector(".form-container")?.classList.toggle("hidden");
+    const mainPageFormButtons = document.querySelector('.start-screen-buttons');
+    if(!isHTMLDivElement(mainPageFormButtons)) return;
+    [...mainPageFormButtons.children].forEach(elem=>{
+        if(!document.querySelector(".form-container")?.classList.contains("hidden")) {
+            elem.setAttribute('disabled', 'true');
+        } else {
+            elem.removeAttribute('disabled');
+        };
+    })
+}
+
+export function addFormHandlerToMainPage(e: Event){
+    if (!isHTMLButtonElement(e.target)) return;
+    e.target.setAttribute('disabled', 'true');
+    const signIn = document.querySelector(".sign-in");
+    if (!isHTMLElement(signIn)) return;
+    const signUp = document.querySelector(".sign-up");
+    if (!isHTMLElement(signUp)) return;
+    const showSignInButton = document.querySelector('.show-sign-in');
+    if (!isHTMLElement(showSignInButton)) return;
+    const showSignUpButton = document.querySelector('.show-sign-up');
+    if (!isHTMLElement(showSignUpButton)) return;
+    if((e.target as HTMLButtonElement).classList.contains('sign-in-button')) {
+        showFormHandler();
+        showSignInButton.classList.add("active-form");
+        showSignUpButton.classList.remove("active-form");
+        signIn.classList.remove("hidden");
+        signUp.classList.add("hidden");
+        // if (!isHTMLButtonElement(e.target.nextElementSibling)) return;
+        // e.target.nextElementSibling.setAttribute('disabled', 'true');
+    } else if((e.target as HTMLButtonElement).classList.contains('registration-button')) {
+        showFormHandler();
+        showSignUpButton.classList.add("active-form");
+        showSignInButton.classList.remove("active-form");
+        signIn.classList.add("hidden");
+        signUp.classList.remove("hidden");
+    }
+    if (e.target.classList.contains("show-sign-in")) {
+        e.target.classList.add("active-form");
+        if (!isHTMLButtonElement(e.target.nextElementSibling)) return;
+        e.target.nextElementSibling.classList.remove("active-form");
+        signIn.classList.remove("hidden");
+        signUp.classList.add("hidden");
+    } else if (e.target.classList.contains("show-sign-up")) {
+        e.target.classList.add("active-form");
+        if (!isHTMLButtonElement(e.target.previousElementSibling)) return;
+        e.target.previousElementSibling.classList.remove("active-form");
+        signIn.classList.add("hidden");
+        signUp.classList.remove("hidden");
+    }
+}
+
+
 export async function getActiveViewData() {
   switch (appState.view) {
       case "textbook": {
@@ -79,6 +135,11 @@ export async function getActiveViewData() {
   }
   AppView.redrawView();
   if (appState.view === "textbook") PagePagination.moveSlider();
+  if (appState.view === "index") {
+      const startScreenButtons = document.querySelector(".start-screen-buttons");
+      if (!isHTMLElement(startScreenButtons)) return;
+      startScreenButtons.addEventListener('click', addFormHandlerToMainPage);
+  }
 }
 
 // stats one day
@@ -517,63 +578,6 @@ export function logOutHandler(): void {
     if (!isHTMLButtonElement(logOutBtn)) return;
     logOutBtn.setAttribute("disabled", "true");
     getActiveViewData();
-}
-
-export function showFormHandler() {
-    document.querySelector(".form-container")?.classList.toggle("hidden");
-    const mainPageFormButtons = document.querySelector('.start-screen-buttons');
-    if(!isHTMLDivElement(mainPageFormButtons)) return;
-    [...mainPageFormButtons.children].forEach(elem=>{
-        if(!document.querySelector(".form-container")?.classList.contains("hidden")) {
-            elem.setAttribute('disabled', 'true');
-        } else {
-            elem.removeAttribute('disabled');
-        };
-    })
-}
-
-export function addFormHandlerToMainPage(e: Event){
-    if (!isHTMLButtonElement(e.target)) return;
-    e.target.setAttribute('disabled', 'true');
-    const signIn = document.querySelector(".sign-in");
-    if (!isHTMLElement(signIn)) return;
-    const signUp = document.querySelector(".sign-up");
-    if (!isHTMLElement(signUp)) return;
-    const showSignInButton = document.querySelector('.show-sign-in');
-    if (!isHTMLElement(showSignInButton)) return;
-    const showSignUpButton = document.querySelector('.show-sign-up');
-    if (!isHTMLElement(showSignUpButton)) return;
-    if((e.target as HTMLButtonElement).classList.contains('sign-in-button')) {
-        showFormHandler();
-        showSignInButton.classList.add("active-form");
-        showSignUpButton.classList.remove("active-form");
-        signIn.classList.remove("hidden");
-        signUp.classList.add("hidden");
-        // if (!isHTMLButtonElement(e.target.nextElementSibling)) return;
-        // e.target.nextElementSibling.setAttribute('disabled', 'true');
-    } else if((e.target as HTMLButtonElement).classList.contains('registration-button')) {
-        showFormHandler();
-        showSignUpButton.classList.add("active-form");
-        showSignInButton.classList.remove("active-form");
-        signIn.classList.add("hidden");
-        signUp.classList.remove("hidden");
-    }
-
-
-
-    if (e.target.classList.contains("show-sign-in")) {
-        e.target.classList.add("active-form");
-        if (!isHTMLButtonElement(e.target.nextElementSibling)) return;
-        e.target.nextElementSibling.classList.remove("active-form");
-        signIn.classList.remove("hidden");
-        signUp.classList.add("hidden");
-    } else if (e.target.classList.contains("show-sign-up")) {
-        e.target.classList.add("active-form");
-        if (!isHTMLButtonElement(e.target.previousElementSibling)) return;
-        e.target.previousElementSibling.classList.remove("active-form");
-        signIn.classList.add("hidden");
-        signUp.classList.remove("hidden");
-    }
 }
 
 export function setLocalStorage() {
