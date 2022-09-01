@@ -162,4 +162,9 @@ export interface IWordsForSplit {
     audio:string,
     randomTranslate: string,
     outcome: boolean,
-  }
+}
+
+export interface IUserStatisticToDB {
+    learnedWords: number,
+    optional?: Record<string, unknown>
+}

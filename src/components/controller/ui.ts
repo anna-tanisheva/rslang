@@ -1,6 +1,15 @@
 /* eslint-disable no-param-reassign */
+import { Chart, ChartItem, registerables } from "chart.js";
 import {IAggreagtedWord} from "../../typings";
-import {postUser, logIn, setTexbookStateWords} from "./api";
+import {
+    postUser,
+    logIn,
+    setTexbookStateWords,
+    putUserStatistic,
+    fetchPostOrPutUserWord,
+    fetchUserStatistic,
+    getUserWord
+} from "./api";
 import {
     appState,
     currentGame,
@@ -8,6 +17,8 @@ import {
     ENDPOINT,
     WORDS_IN_GAME,
     COLORS,
+    AUDIO_CALL,
+    SPRINT
 } from "./state";
 import {
     isHTMLButtonElement,
@@ -15,7 +26,12 @@ import {
     isHTMLDivElement,
     isHTMLInputElement,
 } from "../../typings/utils/utils";
-import {ISignInResponse, WordsData, IUser, IUserStats, IUserStatsInArr, IWordLearningState, KeyboardCodes} from "../../typings/typings";
+
+import {ISignInResponse, WordsData, IUser, IUserStats, IUserStatsInArr, IWordLearningState, KeyboardCodes, IUserWord,
+    IUserStatisticToDB,
+    IResWordsPage
+} from "../../typings/typings";
+
 import {GamePopUp} from "../view/audio-call/game-page";
 import {
     getRandomInRange,
@@ -27,7 +43,7 @@ import {AudioCall} from "../view/audio-call/call/audio-call";
 import {GameStats} from "../view/audio-call/call/game-stats";
 import {AppView} from "../view/app-view";
 import {PagePagination} from "../view/textbook/components";
-import { Sprint } from "../view/audio-call/sprint/sprint-model"; 
+import { Sprint } from "../view/audio-call/sprint/sprint-model";
 
 export async function getActiveViewData() {
   switch (appState.view) {
@@ -66,7 +82,31 @@ export async function getActiveViewData() {
 }
 
 // stats one day
+Chart.register(...registerables);
 
+
+export function setDailyChart(chart: HTMLCanvasElement, data: number[]) {
+    const ctx = (chart as HTMLCanvasElement).getContext('2d');
+    const myChart = new Chart((ctx as ChartItem), {
+      type: 'doughnut',
+      data: {
+          labels: [`${data[0]} % правильных ответов за сегодня`],
+          datasets: [{
+              data,
+              backgroundColor: [
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(54, 162, 235, 0.2)',
+              ],
+              borderColor: [
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(54, 162, 235, 1)',
+              ],
+              borderWidth: 1
+          }]
+      },
+  });
+  return myChart
+}
 export function isUserInUserStats(user: IUser) {
     const id = `user${user.userId}`;
     return appState.usersStats.find((elem) => Object.keys(elem as IUserStats)[0] === id) || false;
@@ -137,13 +177,16 @@ export function calcCorrectAnswersPercent(numberOfGames: number, answers: number
 }
 
 
-export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в типы добавить 2ю игру, когда появится
+export async function setStats(
+    game: AudioCall,
+    user: IUserStats,
+    ) { // !TODO тут в типы добавить 2ю игру, когда появится
+
     user.statisticState.total.correctAnswers += game.state.answers.true.length;
     user.statisticState.audioCall.correctAnswers += game.state.answers.true.length;
     if(user.statisticState.audioCall.correctAnswersStrick < game.state.maxStrick) {
         user.statisticState.audioCall.correctAnswersStrick = game.state.maxStrick;
     }
-    const AUDIO_CALL = 'audioCall';
     (currentGame.game as AudioCall).state.answers.true.forEach(word => {
         const wordInWordsLearnt = isWordInWordsLearnt(word, user, AUDIO_CALL);
         if(!wordInWordsLearnt) {
@@ -153,7 +196,7 @@ export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в
         } else {
             wordInWordsLearnt[word] += 1;
             if(wordInWordsLearnt[word] === 3) {
-                user.statisticState.audioCall.wordsLearnt += 1
+                user.statisticState.audioCall.wordsLearnt += 1;
             }
             if(wordInWordsLearnt[word] > 3) {
                 wordInWordsLearnt[word] = 3;
@@ -184,9 +227,49 @@ export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в
     if(!appState.isSignedIn) return;
     setUserStatsArr(appState.user);
 }
+
+// export function createCharts(gameName: string): Chart<"bar", number[], string> {
+//     const ctx = (document.getElementById(`${gameName}-chart`) as HTMLCanvasElement).getContext('2d');
+//     console.log(ctx)
+//     const myChart = new Chart(ctx!, {
+//         type: 'bar',
+//         data: {
+//             labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+//             datasets: [{
+//                 label: '# of Votes',
+//                 data: [12, 19, 3, 5, 2, 3],
+//                 backgroundColor: [
+//                     'rgba(255, 99, 132, 0.2)',
+//                     'rgba(54, 162, 235, 0.2)',
+//                     'rgba(255, 206, 86, 0.2)',
+//                     'rgba(75, 192, 192, 0.2)',
+//                     'rgba(153, 102, 255, 0.2)',
+//                     'rgba(255, 159, 64, 0.2)'
+//                 ],
+//                 borderColor: [
+//                     'rgba(255, 99, 132, 1)',
+//                     'rgba(54, 162, 235, 1)',
+//                     'rgba(255, 206, 86, 1)',
+//                     'rgba(75, 192, 192, 1)',
+//                     'rgba(153, 102, 255, 1)',
+//                     'rgba(255, 159, 64, 1)'
+//                 ],
+//                 borderWidth: 1
+//             }]
+//         },
+//         options: {
+//             scales: {
+//                 y: {
+//                     beginAtZero: true
+//                 }
+//             }
+//         }
+//     });
+//     return myChart;
+// }
 // logIn
 
-function setCurrentUser(data: ISignInResponse) {
+async function setCurrentUser(data: ISignInResponse) {
     const newDate = setNewDate();
     appState.user.name = data.name;
     appState.user.userId = data.userId;
@@ -207,7 +290,17 @@ function setCurrentUser(data: ISignInResponse) {
         if(areDaysEqual((oldDate as string), newDate)) {
             appState.user.statsToday = (userInUserStats as IUserStatsInArr)[id];
         } else {
+            const statsObj = await fetchUserStatistic();
+            const modifiedObj = JSON.parse(JSON.stringify(statsObj));
+            delete modifiedObj.id;
+            if(!modifiedObj.optional) modifiedObj.optional = {};
+            modifiedObj.optional[((userInUserStats as IUserStatsInArr)[id].statisticTimeStamp as string)] = (userInUserStats as IUserStatsInArr)[id].statisticState;
+            modifiedObj.learnedWords += (userInUserStats as IUserStatsInArr)[id].statisticState.total.wordsLearnt;
+            const body: IUserStatisticToDB = JSON.parse(JSON.stringify(modifiedObj));
+            putUserStatistic(body);
+            appState.usersStats.splice(appState.usersStats.indexOf(userInUserStats), 1);
             appState.user.statsToday = setEmptyStatistic(newDate);
+            setUserStatsArr(appState.user);
         }
     } else {
         appState.user.statsToday = setEmptyStatistic(newDate);
@@ -226,9 +319,12 @@ function validationHandler(nodeList: Node[]): boolean | undefined {
     if (!isHTMLElement(invalidPassword)) return undefined;
     const invalidName = document.querySelector(".invalid-name");
     if (!isHTMLElement(invalidName)) return undefined;
+    const invalidPasswordRepeat = document.querySelector(".invalid-password-repeat");
+    if (!isHTMLElement(invalidPasswordRepeat)) return undefined;
     invalidEmail.classList.add("hidden");
     invalidPassword.classList.add("hidden");
     invalidName.classList.add("hidden");
+    invalidPasswordRepeat.classList.add('hidden');
     if (nodeList[0]) {
         if (
             !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(.\w{2,3})+$/.test(
@@ -251,10 +347,18 @@ function validationHandler(nodeList: Node[]): boolean | undefined {
             invalidName.classList.remove("hidden");
         }
     }
+    if(nodeList[3]) {
+        if ((nodeList[3] as HTMLInputElement).value !== (nodeList[2] as HTMLInputElement).value) {
+            valid = false;
+            invalidPasswordRepeat.classList.remove('hidden');
+        }
+    }
+
     if (valid) {
         invalidEmail.classList.add("hidden");
         invalidPassword.classList.add("hidden");
         invalidName.classList.add("hidden");
+        invalidPasswordRepeat.classList.add('hidden');
     }
     return valid;
 }
@@ -263,6 +367,7 @@ function validateForm(form: string): boolean | undefined {
     let nameInput;
     let emailInput;
     let passwordInput;
+    let repeatPasswordInput;
     let isValid: boolean | undefined = true;
     switch (form) {
         case "registration":
@@ -272,7 +377,9 @@ function validateForm(form: string): boolean | undefined {
             if (!isHTMLInputElement(passwordInput)) return undefined;
             emailInput = document.querySelector(".registration-email");
             if (!isHTMLInputElement(emailInput)) return undefined;
-            isValid = validationHandler([emailInput, passwordInput, nameInput]);
+            repeatPasswordInput = document.querySelector(".registration-password-repeat");
+            if (!isHTMLInputElement(repeatPasswordInput)) return undefined;
+            isValid = validationHandler([emailInput, passwordInput, nameInput, repeatPasswordInput]);
             break;
         case "login":
             emailInput = document.querySelector(".login-email");
@@ -292,13 +399,13 @@ function serverErrorsHandler(message: string) {
     if (!isHTMLElement(messageContainer)) return;
     if (message === "403") {
         messageContainer.innerText =
-            "Access denied, probably password was incorrect";
+            "Отказано в доступе, проверьте пароль.";
     } else if (message === "404") {
-        messageContainer.innerText = "We couldn't find this user, check email";
+        messageContainer.innerText = "Мы не нашли такого пользователя, проверьте email";
     } else if (message === "417") {
-        messageContainer.innerText = "This email is already used";
+        messageContainer.innerText = "Этот email уже используется";
     } else if (message === "422") {
-        messageContainer.innerText = "Incorrect email or password";
+        messageContainer.innerText = "Некорректный email или пароль";
     }
 }
 
@@ -414,6 +521,59 @@ export function logOutHandler(): void {
 
 export function showFormHandler() {
     document.querySelector(".form-container")?.classList.toggle("hidden");
+    const mainPageFormButtons = document.querySelector('.start-screen-buttons');
+    if(!isHTMLDivElement(mainPageFormButtons)) return;
+    [...mainPageFormButtons.children].forEach(elem=>{
+        if(!document.querySelector(".form-container")?.classList.contains("hidden")) {
+            elem.setAttribute('disabled', 'true');
+        } else {
+            elem.removeAttribute('disabled');
+        };
+    })
+}
+
+export function addFormHandlerToMainPage(e: Event){
+    if (!isHTMLButtonElement(e.target)) return;
+    e.target.setAttribute('disabled', 'true');
+    const signIn = document.querySelector(".sign-in");
+    if (!isHTMLElement(signIn)) return;
+    const signUp = document.querySelector(".sign-up");
+    if (!isHTMLElement(signUp)) return;
+    const showSignInButton = document.querySelector('.show-sign-in');
+    if (!isHTMLElement(showSignInButton)) return;
+    const showSignUpButton = document.querySelector('.show-sign-up');
+    if (!isHTMLElement(showSignUpButton)) return;
+    if((e.target as HTMLButtonElement).classList.contains('sign-in-button')) {
+        showFormHandler();
+        showSignInButton.classList.add("active-form");
+        showSignUpButton.classList.remove("active-form");
+        signIn.classList.remove("hidden");
+        signUp.classList.add("hidden");
+        // if (!isHTMLButtonElement(e.target.nextElementSibling)) return;
+        // e.target.nextElementSibling.setAttribute('disabled', 'true');
+    } else if((e.target as HTMLButtonElement).classList.contains('registration-button')) {
+        showFormHandler();
+        showSignUpButton.classList.add("active-form");
+        showSignInButton.classList.remove("active-form");
+        signIn.classList.add("hidden");
+        signUp.classList.remove("hidden");
+    }
+
+
+
+    if (e.target.classList.contains("show-sign-in")) {
+        e.target.classList.add("active-form");
+        if (!isHTMLButtonElement(e.target.nextElementSibling)) return;
+        e.target.nextElementSibling.classList.remove("active-form");
+        signIn.classList.remove("hidden");
+        signUp.classList.add("hidden");
+    } else if (e.target.classList.contains("show-sign-up")) {
+        e.target.classList.add("active-form");
+        if (!isHTMLButtonElement(e.target.previousElementSibling)) return;
+        e.target.previousElementSibling.classList.remove("active-form");
+        signIn.classList.add("hidden");
+        signUp.classList.remove("hidden");
+    }
 }
 
 export function setLocalStorage() {
@@ -533,35 +693,69 @@ function stopPlayingWordHandler(audio: HTMLAudioElement) {
     audio.pause();
 }
 
+export async function modifyWord(game: AudioCall, word: IAggreagtedWord)  {
+    const body: IUserWord = getUserWord(word);
+    if(!body) return;
+    body.optional.audiocall.countGames += 1;
+    if(game.state.answers.true.find(id => id === word.id)) {
+        body.optional.audiocall.rightAnswer += 1;
+        body.optional.audiocall.rightAnswerSeries += 1;
+        if (body.difficulty === 'hard') {
+            if(body.optional.audiocall.rightAnswerSeries >= 5) {
+                body.difficulty = 'easy';
+            }
+        }
+        if (body.difficulty === 'norm') {
+            if(body.optional.audiocall.rightAnswerSeries >= 3) {
+                body.difficulty = 'easy';
+            }
+        }
+    } else if(game.state.answers.false.find(id => id === word.id)) {
+        body.optional.audiocall.rightAnswerSeries = 0;
+        body.difficulty = 'hard';
+    } else {
+        return;
+    }
+    await fetchPostOrPutUserWord({
+        word,
+        modifyedUserWord: body
+    })
+}
 
 export function startGame(
     container: HTMLElement,
     section: number,
     game: string,
-    page: number
+    page: number,
+    arrOfWords?: IResWordsPage,
 ) {
-    const startButtons = document.querySelectorAll('.start-button');
-    startButtons.forEach(button=> {
-        button.setAttribute('disabled', 'true');
-    })
-    const popup = new GamePopUp().create(section, game, page);
+    let popup: HTMLElement;
+    if(!arrOfWords) {
+        popup = new GamePopUp().create(section, page, game);
+    } else {
+        popup = new GamePopUp().create(section, page, game, arrOfWords);
+    }
     container.append(popup);
     document.addEventListener('keydown', closeGameOnPressESC);
     document.addEventListener('keydown', keyboardEventsHandler);
     const closeButton = container.querySelector(".close-button");
     if (!isHTMLElement(closeButton)) return;
-    closeButton.addEventListener("click", () => {
+    closeButton.addEventListener("click", async () => {
         if(!appState.isSignedIn) {
             setStats((currentGame.game as AudioCall), appState.userNull);
         } else {
             setStats((currentGame.game as AudioCall), (appState.user.statsToday as IUserStats));
         }
+        if(appState.isSignedIn) {
+            (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
+                modifyWord((currentGame.game as AudioCall), word)
+            })
+        }
 
         currentGame.game = null;
         container.removeChild(popup);
-        startButtons.forEach(button=> {
-            button.removeAttribute('disabled');
-        })
+        const overlay = document.querySelector('.overlay');
+        overlay?.classList.add('hidden');
     });
     const nextButton = container.querySelector(".next-button");
     if (!isHTMLElement(nextButton)) return;
@@ -584,6 +778,8 @@ export function startGame(
         if (!audio) return;
         playWordInGameHandler(audio as HTMLAudioElement);
     });
+    const overlay = document.querySelector('.overlay');
+    overlay?.classList.remove('hidden');
 }
 
 // eslint-disable-next-line func-names
@@ -600,7 +796,7 @@ export const pressKey = function(event: KeyboardEvent) {
             arrayRightKey.classList.add('active');
         }
     });
-      
+
     window.addEventListener('keyup', (e) => {
         if( e.code === "ArrowLeft") {
             arrayLeftKey.classList.remove('active');
@@ -610,7 +806,7 @@ export const pressKey = function(event: KeyboardEvent) {
         }
      });
 
-    event.preventDefault();    
+    event.preventDefault();
     if( event.code === "ArrowLeft") {
         (currentGame.game as Sprint).onRightButton();
     } else if (event.code === "ArrowRight") {
@@ -618,30 +814,35 @@ export const pressKey = function(event: KeyboardEvent) {
     }
 }
 
-export function startGameHandler(e: Event): void {
-    const CALL_GAME = "Audio Call";
-    const SPRINT = "Sprint";
+export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
+    // const CALL_GAME = "Audio Call";
+    // const SPRINT = 'Sprint';
     const {target} = e;
     const gameContainer = document.querySelector(".games");
     if (!isHTMLElement(gameContainer)) return;
     if (!isHTMLButtonElement(target)) return;
     if (!target.classList.contains("start-button")) return;
     if (target.classList.contains("sprint-button")) {
-        const section = Number(target.closest('.game-container')?.querySelector('select')?.value);        
+        const section = Number(target.closest('.game-container')?.querySelector('select')?.value);
         const page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
-        startGame(gameContainer, section, SPRINT, page); 
-        const timer = setTimeout(() => {(currentGame.game as Sprint).endGame()}, 61000);      
+        startGame(gameContainer, section, SPRINT, page);
+        const timer = setTimeout(() => {(currentGame.game as Sprint).endGame()}, 61000);
+        console.log(currentGame)
         const closeButton = document.querySelector(".close-button");
         if (!isHTMLElement(closeButton)) return;
-        closeButton.addEventListener("click", () => { clearTimeout(timer) }) 
-        document.removeEventListener("keydown", pressKey, false);   
+        closeButton.addEventListener("click", () => { clearTimeout(timer) })
+        document.removeEventListener("keydown", pressKey, false);
     } else {
         const section = Number(
             target.closest(".game-container")?.querySelector("select")?.value
         );
-        const page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
-        startGame(gameContainer, section, CALL_GAME, page);
-    } 
+        const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);
+        if(!arrOfWords) {
+            startGame(gameContainer, section, AUDIO_CALL, PAGE);
+        } else {
+            startGame(gameContainer, section, AUDIO_CALL, PAGE, arrOfWords);
+        }
+    }
 }
 
 
@@ -650,6 +851,9 @@ export function playAgainHandler(gameContainer: HTMLElement, section: number){
         setStats((currentGame.game as AudioCall), appState.userNull);
       } else {
           setStats((currentGame.game as AudioCall), (appState.user.statsToday as IUserStats));
+          (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
+            modifyWord((currentGame.game as AudioCall), word)
+        })
       }
       currentGame.game = null;
       const CALL_GAME = 'Audio Call';
@@ -723,7 +927,7 @@ export function createAnswersCards(key: boolean, container: HTMLElement) {
     }
 }
 
-function addToCurrentGameState(guess: boolean, wordId: string) {
+function addToCurrentGameState(guess: boolean, wordID: string) {
     if (guess) {
         // (currentGame.game as AudioCall).state.correctGuesses += 1;
         (currentGame.game as AudioCall).state.currentStrick += 1;
@@ -733,10 +937,10 @@ function addToCurrentGameState(guess: boolean, wordId: string) {
         ) {
             (currentGame.game as AudioCall).state.maxStrick = (currentGame.game as AudioCall).state.currentStrick;
         }
-        (currentGame.game as AudioCall).state.answers.true.push(wordId);
+        (currentGame.game as AudioCall).state.answers.true.push(wordID);
     } else {
         (currentGame.game as AudioCall).state.currentStrick = 0;
-        (currentGame.game as AudioCall).state.answers.false.push(wordId);
+        (currentGame.game as AudioCall).state.answers.false.push(wordID);
     }
 }
 
@@ -791,11 +995,11 @@ export function choseAnswerHandler(e: Event, answer: string) {
     const statsNew = appendGameStats(statsOld);
     statsCurrentContainer.replaceChild(statsOld, statsNew);
 }
-export function choseSplitAnswerHandler(e: Event) {    
+export function choseSplitAnswerHandler(e: Event) {
     const {target} = e;
-    if (!isHTMLButtonElement(target)) return;     
+    if (!isHTMLButtonElement(target)) return;
     if(target.classList.contains("yes-button")) {
-        (currentGame.game as Sprint).onRightButton();       
+        (currentGame.game as Sprint).onRightButton();
     } else if (target.classList.contains("no-button")) {
         (currentGame.game as Sprint).onWrongButton();
     }

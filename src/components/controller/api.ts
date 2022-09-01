@@ -8,6 +8,7 @@ import {
     IWord,
     IAggreagtedWord,
     IResWordsPage,
+    IUserStatisticToDB,
     IUserWord,
     IUserWordResponse,
 } from "../../typings/typings";
@@ -19,6 +20,7 @@ import {
 } from "../view/textbook/components";
 import {getActiveViewData} from "./ui";
 import {WordItem} from "../view/textbook/components/word";
+
 
 export const BASE_URL = "http://localhost:3000";
 const ID = "";
@@ -208,12 +210,38 @@ export function getUserWord(word: IAggreagtedWord) {
         : word.userWord;
 }
 
+export async function fetchUserStatistic(): Promise<IUserStatisticToDB> {
+    const res = await fetch(`${URLs.usersIDStatistics()}`, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${appState.user.token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        },
+    })
+    const stats = await res.json();
+    return stats;
+}
+
+export async function putUserStatistic(body: IUserStatisticToDB): Promise<void> {
+    const res = await fetch(`${URLs.usersIDStatistics()}`, {
+        method: "PUT",
+        body: JSON.stringify(body),
+        headers: {
+            Authorization: `Bearer ${appState.user.token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        },
+    })
+}
 /**
  * Функция отправки POST или PUT запроса для приходящего слова userWord
  * @augments {word} - приходящее пользовательское слово
  * @augments {modifyedUserWord} - полностью модифицированный userWord, который нужно установить. Использовать если нужно поменять ещё что-то кроме сложности
  * @augments {difficulty} - сложность, которую нужно установить. Использовать если не нужно ничего менять кроме сложности
- */
+ * */
+
+
 export async function fetchPostOrPutUserWord({
     word,
     modifyedUserWord,
@@ -240,7 +268,7 @@ export async function fetchPostOrPutUserWord({
         body.difficulty = difficulty;
     }
     if (modifyedUserWord) {
-        body = {...modifyedUserWord};
+        body = JSON.parse(JSON.stringify(modifyedUserWord));
     }
     options.body = JSON.stringify(body);
     let respData: IUserWordResponse;

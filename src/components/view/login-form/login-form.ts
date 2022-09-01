@@ -8,39 +8,46 @@ export class Form {
         formContainer.classList.add("hidden");
         formContainer.innerHTML = `
     <div class="show-form-wrapper">
-      <button class="show-sign-in show-tab">Sign-in</button>
-      <button class="show-sign-up show-tab active-form">Sign-up</button>
+      <button class="close-form-button">+</button>
+      <button class="show-sign-in show-tab">Войти</button>
+      <button class="show-sign-up show-tab active-form">Зарегистрироваться</button>
     </div>
     <form action="" class="sign-up form">
       <label class="label-name">
-        Name:
-        <input type="text" class="registration-name" placeholder="name">
+        Имя:
+        <input type="text" class="registration-name" placeholder="Имя">
       </label>
       <label class="label-email">
-        E-mail:
-        <input type="text" class="registration-email" placeholder="email">
+        Электронная почта:
+        <input type="text" class="registration-email" placeholder="Почта">
       </label>
       <label class="label-password">
-        Password:
-        <input type="password" class="registration-password" placeholder="password" autocomplete="off">
+        Пароль:
+        <input type="password" class="registration-password" placeholder="Минимум 8 символов" autocomplete="off">
       </label>
-      <button class="registration-submit">Submit</button>
+      <label class="label-password">
+      Пароль:
+      <input type="password" class="registration-password-repeat" placeholder="Подтвердить пароль" autocomplete="off">
+    </label>
+      <button class="registration-submit">Отправить</button>
     </form>
     <form action="" class="sign-in form hidden">
       <label class="label-email">
-        E-mail:
-        <input type="text" class="login-email" placeholder="email">
+        Электронная почта:
+        <input type="text" class="login-email" placeholder="Почта">
       </label>
       <label class="label-password">
-        Password:
-        <input type="password" class="login-password" placeholder="password" autocomplete="off">
+      Пароль:
+        <input type="password" class="login-password" placeholder="Пароль" autocomplete="off">
       </label>
-      <button class="login-submit">Submit</button>
+      <button class="login-submit">Отправить</button>
     </form>
     <div class="validation-message">
-      <p class="invalid-email hidden">You should use valid email (@ and . are necessary)</p>
-      <p class="invalid-password hidden">Password length must be at least 8 symbols</p>
-      <p class="invalid-name hidden">Field name shouldn't be empty</p>
+      <p class="invalid-email hidden">Не валидный email, нужно использовать . и @, 2 знака после точки</p>
+      <p class="invalid-password hidden">Длина пароля минимум 8 символов</p>
+      <p class="invalid-name hidden">Как к вам можно обращатсья (заполните поле с именем)?</p>
+
+      <p class="invalid-password-repeat hidden">Пароли не совпадают</p>
       <p class="incorrect-data"></p>
     </div>
   `;

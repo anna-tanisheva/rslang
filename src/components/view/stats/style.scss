@@ -1,4 +1,5 @@
 .statistic-container {
+  font-family: $main-font;
   flex-basis: 100%;
   padding: 1rem;
   width: 60%;
@@ -13,11 +14,11 @@
   margin-bottom: 1.5rem;
 }
 .stats-today-wrapper {
-  flex-basis: 100%;
   display: flex;
   margin-bottom: 1.5rem;
-  border: 1px solid salmon;
+  border: 1px solid $colorGroup1;
   justify-content: space-evenly;
+  font-family: $main-font;
   p {
     flex-basis: 30%;
     display: flex;
@@ -26,7 +27,7 @@
   }
 }
 .statistic-wrapper {
-  flex-basis: 40%;
+  flex-basis: 30%;
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
@@ -40,5 +41,8 @@
     display: flex;
     justify-content: center;
     margin-bottom: 1.5rem;
+  }
+  .chart {
+    max-width: 100%;
   }
 }
