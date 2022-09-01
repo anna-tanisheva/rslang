@@ -18,6 +18,7 @@ export class App {
     private view = new AppView();
 
     public start(): void {
+
         getLocalStorage();
         this.view.drawView();
         getActiveViewData();

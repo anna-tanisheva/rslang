@@ -21,6 +21,7 @@ export class MainView {
     create() {
         this.activeViewName = appState.view;
         const main = createElementWithClassnames("main", "main");
+        const overlay = createElementWithClassnames("div", "overlay", "hidden");
         if (
             this.activeViewName !== "index" &&
             this.activeViewName !== "textbook" &&
@@ -31,7 +32,7 @@ export class MainView {
             main.append(errorView);
             return main;
         }
-        main.append(this[this.activeViewName]);
+        main.append(this[this.activeViewName], overlay);
         return main;
     }
 }

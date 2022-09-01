@@ -1,21 +1,19 @@
 import {
   createElementWithClassnames,
   createElementWithAttributes,
-  // getRandomInRange
 } from "../utils";
-// import { isHTMLElement,
-//   //  isHTMLDivElement
-//   } from "../../../typings/utils/utils";
 import { AudioCall } from "./call/audio-call";
 import { currentGame } from "../../controller/state";
 import { playWordInGameHandler, appendGameStats, playAgainHandler } from '../../controller/ui';
 // import { IUserStats } from "../../../typings";
-import { Sprint } from "./sprint/sprint-model"; 
+import { Sprint } from "./sprint/sprint-model";
+import { IResWordsPage } from "../../../typings";
+
 
 
 export class GamePopUp {
 
-  create(section: number, game: string, page: number) {
+  create(section: number, page: number, game: string, arrOfWords?: IResWordsPage) {
 
     const gameContainer = createElementWithClassnames("div", "game-popup");
     const closeButton = createElementWithClassnames('div', 'close-button');
@@ -24,7 +22,12 @@ export class GamePopUp {
     nextButton.innerHTML = '&#8594;';
     // в конструктор передаем номер раздела от пользователя или слова страницы учебника, с которой была запущена игра
     if(game === 'Audio Call') {
-      currentGame.game = new AudioCall(section, page, game);
+      const currentSlide = 0;
+      if(!arrOfWords) {
+        currentGame.game = new AudioCall(section, page, game, currentSlide);
+      } else {
+        currentGame.game = new AudioCall(section, page, game, currentSlide, arrOfWords);
+      }
       (currentGame.game as AudioCall).create()
       .then((res)=>{
         gameContainer.append(res)
@@ -47,8 +50,8 @@ export class GamePopUp {
         console.log("bfbbfbf");
         (currentGame.game as Sprint).endGame();
         console.log(JSON.stringify(err))
-      });   
-    } 
+      });
+    }
 
     const wrongSoundAttr = {
       src: `./sounds/wrong.mp3`,

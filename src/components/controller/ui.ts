@@ -1,6 +1,14 @@
 /* eslint-disable no-param-reassign */
 import {IAggreagtedWord} from "../../typings";
-import {postUser, logIn, setTexbookStateWords} from "./api";
+import {
+    postUser,
+    logIn,
+    setTexbookStateWords,
+    putUserStatistic,
+    fetchPostOrPutUserWord,
+    fetchUserStatistic,
+    getUserWord
+} from "./api";
 import {
     appState,
     currentGame,
@@ -15,7 +23,11 @@ import {
     isHTMLDivElement,
     isHTMLInputElement,
 } from "../../typings/utils/utils";
-import {ISignInResponse, WordsData, IUser, IUserStats, IUserStatsInArr, IWordLearningState, KeyboardCodes} from "../../typings/typings";
+import {ISignInResponse, WordsData, IUser, IUserStats, IUserStatsInArr, IWordLearningState, KeyboardCodes, IUserWord,
+    IUserStatisticToDB,
+    IResWordsPage
+} from "../../typings/typings";
+
 import {GamePopUp} from "../view/audio-call/game-page";
 import {
     getRandomInRange,
@@ -27,7 +39,7 @@ import {AudioCall} from "../view/audio-call/call/audio-call";
 import {GameStats} from "../view/audio-call/call/game-stats";
 import {AppView} from "../view/app-view";
 import {PagePagination} from "../view/textbook/components";
-import { Sprint } from "../view/audio-call/sprint/sprint-model"; 
+import { Sprint } from "../view/audio-call/sprint/sprint-model";
 
 export async function getActiveViewData() {
   switch (appState.view) {
@@ -137,7 +149,11 @@ export function calcCorrectAnswersPercent(numberOfGames: number, answers: number
 }
 
 
-export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в типы добавить 2ю игру, когда появится
+export async function setStats(
+    game: AudioCall,
+    user: IUserStats,
+    ) { // !TODO тут в типы добавить 2ю игру, когда появится
+
     user.statisticState.total.correctAnswers += game.state.answers.true.length;
     user.statisticState.audioCall.correctAnswers += game.state.answers.true.length;
     if(user.statisticState.audioCall.correctAnswersStrick < game.state.maxStrick) {
@@ -153,7 +169,7 @@ export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в
         } else {
             wordInWordsLearnt[word] += 1;
             if(wordInWordsLearnt[word] === 3) {
-                user.statisticState.audioCall.wordsLearnt += 1
+                user.statisticState.audioCall.wordsLearnt += 1;
             }
             if(wordInWordsLearnt[word] > 3) {
                 wordInWordsLearnt[word] = 3;
@@ -186,7 +202,7 @@ export function setStats(game: AudioCall, user: IUserStats) { // !TODO тут в
 }
 // logIn
 
-function setCurrentUser(data: ISignInResponse) {
+async function setCurrentUser(data: ISignInResponse) {
     const newDate = setNewDate();
     appState.user.name = data.name;
     appState.user.userId = data.userId;
@@ -207,7 +223,17 @@ function setCurrentUser(data: ISignInResponse) {
         if(areDaysEqual((oldDate as string), newDate)) {
             appState.user.statsToday = (userInUserStats as IUserStatsInArr)[id];
         } else {
+            const statsObj = await fetchUserStatistic();
+            const modifiedObj = JSON.parse(JSON.stringify(statsObj));
+            delete modifiedObj.id;
+            if(!modifiedObj.optional) modifiedObj.optional = {};
+            modifiedObj.optional[((userInUserStats as IUserStatsInArr)[id].statisticTimeStamp as string)] = (userInUserStats as IUserStatsInArr)[id].statisticState;
+            modifiedObj.learnedWords += (userInUserStats as IUserStatsInArr)[id].statisticState.total.wordsLearnt;
+            const body: IUserStatisticToDB = JSON.parse(JSON.stringify(modifiedObj));
+            putUserStatistic(body);
+            appState.usersStats.splice(appState.usersStats.indexOf(userInUserStats), 1);
             appState.user.statsToday = setEmptyStatistic(newDate);
+            setUserStatsArr(appState.user);
         }
     } else {
         appState.user.statsToday = setEmptyStatistic(newDate);
@@ -533,35 +559,90 @@ function stopPlayingWordHandler(audio: HTMLAudioElement) {
     audio.pause();
 }
 
+// export function getUserWord(word: IAggreagtedWord): IUserWord {
+//     if(word.userWord) {
+//         return word.userWord
+//     }
+//     return {
+//         difficulty: "norm",
+//         optional: {
+//             audiocall: {
+//                 countGames: 0,
+//                 rightAnswer: 0,
+//                 rightAnswerSeries: 0,
+//             },
+//             sprint: {
+//                 countGames: 0,
+//                 rightAnswer: 0,
+//                 rightAnswerSeries: 0,
+//             },
+//         },
+//     }
+// }
+
+export async function modifyWord(game: AudioCall, word: IAggreagtedWord)  {
+    const body: IUserWord = getUserWord(word);
+    if(!body) return;
+    body.optional.audiocall.countGames += 1;
+    if(game.state.answers.true.find(id => id === word.id)) {
+        body.optional.audiocall.rightAnswer += 1;
+        body.optional.audiocall.rightAnswerSeries += 1;
+        if (body.difficulty === 'hard') {
+            if(body.optional.audiocall.rightAnswerSeries >= 5) {
+                body.difficulty = 'easy';
+            }
+        }
+        if (body.difficulty === 'norm') {
+            if(body.optional.audiocall.rightAnswerSeries >= 3) {
+                body.difficulty = 'easy';
+            }
+        }
+    } else if(game.state.answers.false.find(id => id === word.id)) {
+        body.optional.audiocall.rightAnswerSeries = 0;
+        body.difficulty = 'hard';
+    } else {
+        return;
+    }
+    await fetchPostOrPutUserWord({
+        word,
+        modifyedUserWord: body
+    })
+}
 
 export function startGame(
     container: HTMLElement,
     section: number,
     game: string,
-    page: number
+    page: number,
+    arrOfWords?: IResWordsPage,
 ) {
-    const startButtons = document.querySelectorAll('.start-button');
-    startButtons.forEach(button=> {
-        button.setAttribute('disabled', 'true');
-    })
-    const popup = new GamePopUp().create(section, game, page);
+    let popup: HTMLElement;
+    if(!arrOfWords) {
+        popup = new GamePopUp().create(section, page, game);
+    } else {
+        popup = new GamePopUp().create(section, page, game, arrOfWords);
+    }
     container.append(popup);
     document.addEventListener('keydown', closeGameOnPressESC);
     document.addEventListener('keydown', keyboardEventsHandler);
     const closeButton = container.querySelector(".close-button");
     if (!isHTMLElement(closeButton)) return;
-    closeButton.addEventListener("click", () => {
+    closeButton.addEventListener("click", async () => {
         if(!appState.isSignedIn) {
             setStats((currentGame.game as AudioCall), appState.userNull);
         } else {
             setStats((currentGame.game as AudioCall), (appState.user.statsToday as IUserStats));
         }
+        if(appState.isSignedIn) {
+            (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
+                modifyWord((currentGame.game as AudioCall), word)
+            })
+        }
 
         currentGame.game = null;
         container.removeChild(popup);
-        startButtons.forEach(button=> {
-            button.removeAttribute('disabled');
-        })
+        const overlay = document.querySelector('.overlay');
+        overlay?.classList.add('hidden');
     });
     const nextButton = container.querySelector(".next-button");
     if (!isHTMLElement(nextButton)) return;
@@ -584,6 +665,8 @@ export function startGame(
         if (!audio) return;
         playWordInGameHandler(audio as HTMLAudioElement);
     });
+    const overlay = document.querySelector('.overlay');
+    overlay?.classList.remove('hidden');
 }
 
 // eslint-disable-next-line func-names
@@ -600,7 +683,7 @@ export const pressKey = function(event: KeyboardEvent) {
             arrayRightKey.classList.add('active');
         }
     });
-      
+
     window.addEventListener('keyup', (e) => {
         if( e.code === "ArrowLeft") {
             arrayLeftKey.classList.remove('active');
@@ -610,7 +693,7 @@ export const pressKey = function(event: KeyboardEvent) {
         }
      });
 
-    event.preventDefault();    
+    event.preventDefault();
     if( event.code === "ArrowLeft") {
         (currentGame.game as Sprint).onRightButton();
     } else if (event.code === "ArrowRight") {
@@ -619,6 +702,8 @@ export const pressKey = function(event: KeyboardEvent) {
 }
 
 export function startGameHandler(e: Event): void {
+// для запуска игры из учебника
+export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
     const CALL_GAME = "Audio Call";
     const SPRINT = "Sprint";
     const {target} = e;
@@ -627,21 +712,25 @@ export function startGameHandler(e: Event): void {
     if (!isHTMLButtonElement(target)) return;
     if (!target.classList.contains("start-button")) return;
     if (target.classList.contains("sprint-button")) {
-        const section = Number(target.closest('.game-container')?.querySelector('select')?.value);        
+        const section = Number(target.closest('.game-container')?.querySelector('select')?.value);
         const page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
-        startGame(gameContainer, section, SPRINT, page); 
-        const timer = setTimeout(() => {(currentGame.game as Sprint).endGame()}, 61000);      
+        startGame(gameContainer, section, SPRINT, page);
+        const timer = setTimeout(() => {(currentGame.game as Sprint).endGame()}, 61000);
         const closeButton = document.querySelector(".close-button");
         if (!isHTMLElement(closeButton)) return;
-        closeButton.addEventListener("click", () => { clearTimeout(timer) }) 
-        document.removeEventListener("keydown", pressKey, false);   
+        closeButton.addEventListener("click", () => { clearTimeout(timer) })
+        document.removeEventListener("keydown", pressKey, false);
     } else {
         const section = Number(
             target.closest(".game-container")?.querySelector("select")?.value
         );
-        const page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
-        startGame(gameContainer, section, CALL_GAME, page);
-    } 
+        const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);
+        if(!arrOfWords) {
+            startGame(gameContainer, section, CALL_GAME, PAGE);
+        } else {
+            startGame(gameContainer, section, CALL_GAME, PAGE, arrOfWords);
+        }
+    }
 }
 
 
@@ -650,6 +739,9 @@ export function playAgainHandler(gameContainer: HTMLElement, section: number){
         setStats((currentGame.game as AudioCall), appState.userNull);
       } else {
           setStats((currentGame.game as AudioCall), (appState.user.statsToday as IUserStats));
+          (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
+            modifyWord((currentGame.game as AudioCall), word)
+        })
       }
       currentGame.game = null;
       const CALL_GAME = 'Audio Call';
@@ -723,7 +815,7 @@ export function createAnswersCards(key: boolean, container: HTMLElement) {
     }
 }
 
-function addToCurrentGameState(guess: boolean, wordId: string) {
+function addToCurrentGameState(guess: boolean, wordID: string) {
     if (guess) {
         // (currentGame.game as AudioCall).state.correctGuesses += 1;
         (currentGame.game as AudioCall).state.currentStrick += 1;
@@ -733,10 +825,10 @@ function addToCurrentGameState(guess: boolean, wordId: string) {
         ) {
             (currentGame.game as AudioCall).state.maxStrick = (currentGame.game as AudioCall).state.currentStrick;
         }
-        (currentGame.game as AudioCall).state.answers.true.push(wordId);
+        (currentGame.game as AudioCall).state.answers.true.push(wordID);
     } else {
         (currentGame.game as AudioCall).state.currentStrick = 0;
-        (currentGame.game as AudioCall).state.answers.false.push(wordId);
+        (currentGame.game as AudioCall).state.answers.false.push(wordID);
     }
 }
 
@@ -791,11 +883,11 @@ export function choseAnswerHandler(e: Event, answer: string) {
     const statsNew = appendGameStats(statsOld);
     statsCurrentContainer.replaceChild(statsOld, statsNew);
 }
-export function choseSplitAnswerHandler(e: Event) {    
+export function choseSplitAnswerHandler(e: Event) {
     const {target} = e;
-    if (!isHTMLButtonElement(target)) return;     
+    if (!isHTMLButtonElement(target)) return;
     if(target.classList.contains("yes-button")) {
-        (currentGame.game as Sprint).onRightButton();       
+        (currentGame.game as Sprint).onRightButton();
     } else if (target.classList.contains("no-button")) {
         (currentGame.game as Sprint).onWrongButton();
     }

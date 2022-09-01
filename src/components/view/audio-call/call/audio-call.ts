@@ -6,12 +6,11 @@ import {
   createElementWithAttributes,
   createElementWithClassnames,
   createElementWithContent,
-  // getRandomInRange,
 } from "../../utils";
 import { fetchWords } from "../../../controller/api";
 import { ENDPOINT } from '../../../controller/state';
 import { playWordInGameHandler, getGameWordsArr, getOptions, choseAnswerHandler, } from '../../../controller/ui';
-import { IAggreagtedWord } from '../../../../typings';
+import { IAggreagtedWord, IResWordsPage } from '../../../../typings';
 
 
 export class AudioCall {
@@ -21,7 +20,6 @@ export class AudioCall {
   page: number;
 
   state: {
-    // correctGuesses: number,
     currentStrick: number,
     maxStrick: number,
     answers: {
@@ -36,12 +34,13 @@ export class AudioCall {
 
   wordsInGame: IAggreagtedWord[] | null;
 
-  constructor(sec: number, page: number, gameName: string, currentSlide = 0) {
+  arrOfWords: IResWordsPage | undefined;
+
+  constructor(sec: number, page: number, gameName: string, currentSlide = 0, arrOfWords?: IResWordsPage) {
     this.gameName = gameName;
     this.section = sec;
     this.page = page;
     this.state = {
-      // correctGuesses: 0,
       currentStrick: 0,
       maxStrick: 0,
       answers: {
@@ -51,16 +50,26 @@ export class AudioCall {
     };
     this.currentSlide = currentSlide;
     this.wordsInGame = null;
+    this.arrOfWords = arrOfWords;
   }
 
   async create(): Promise<HTMLElement> {
-
-    const words = await fetchWords({
-      group: this.section,
-      page: this.page
-    })
+    let words;
+    if(this.arrOfWords === undefined) {
+      words = await fetchWords({
+        group: this.section,
+        page: this.page,
+        wordsPerPage: 20
+      })
+    } else {
+      words = this.arrOfWords;
+    }
     const game = createElementWithClassnames("div", "audio-call");
     const arrOfTranslations: string[] = [];
+    if(!words) {
+      game.innerHTML += `<div class="error-game-message">Не удалось получить слова, попробуйте перезапустить игру</div>`
+      return game;
+    };
     words.words.forEach(word => {
       arrOfTranslations.push(word.wordTranslate)
     })
