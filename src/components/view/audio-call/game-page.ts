@@ -21,36 +21,51 @@ export class GamePopUp {
     const nextButton = createElementWithClassnames('button', 'next-button');
     nextButton.innerHTML = '&#8594;';
     // в конструктор передаем номер раздела от пользователя или слова страницы учебника, с которой была запущена игра
-    if(game === AUDIO_CALL) {
-      const currentSlide = 0;
-      if(!arrOfWords) {
-        currentGame.game = new AudioCall(section, page, game, currentSlide);
-      } else {
-        currentGame.game = new AudioCall(section, page, game, currentSlide, arrOfWords);
-      }
-      (currentGame.game as AudioCall).create()
-      .then((res)=>{
-        gameContainer.append(res)
-      })
-      .catch((err)=>{
-        console.log(JSON.stringify(err))
-      })
-      .finally(()=>{
-        const audio = gameContainer?.querySelector('.audio-call>.word-card:first-child>audio');
-        playWordInGameHandler(audio as HTMLAudioElement);
-      });
+    if (game === AUDIO_CALL) {
+        const currentSlide = 0;
+        if (!arrOfWords) {
+            currentGame.game = new AudioCall(section, page, game, currentSlide);
+        } else {
+            currentGame.game = new AudioCall(
+                section,
+                page,
+                game,
+                currentSlide,
+                arrOfWords
+            );
+        }
+        (currentGame.game as AudioCall)
+            .create()
+            .then((res) => {
+                gameContainer.append(res);
+            })
+            .catch((err) => {
+                console.log(JSON.stringify(err));
+            })
+            .finally(() => {
+                const audio = gameContainer?.querySelector(
+                    ".audio-call>.word-card:first-child>audio"
+                );
+                playWordInGameHandler(audio as HTMLAudioElement);
+            });
+    } else if (game === SPRINT) {
+        if (!arrOfWords) {
+            currentGame.game = new Sprint(section, page, game);
+        } else {
+            currentGame.game = new Sprint(section, page, game, arrOfWords);
+        }
 
-    } else if(game === SPRINT){
-      currentGame.game = new Sprint(section, page, game);
-      (currentGame.game as Sprint).create()
-      .then((res)=>{
-        gameContainer.append(res)
-      })
-      .catch((err)=>{
-        console.log("bfbbfbf");
-        (currentGame.game as Sprint).endGame();
-        console.log(JSON.stringify(err))
-      });
+        // currentGame.game = new Sprint(section, page, game);
+        (currentGame.game as Sprint)
+            .create()
+            .then((res) => {
+                gameContainer.append(res);
+            })
+            .catch((err) => {
+                console.log("bfbbfbf");
+                (currentGame.game as Sprint).endGame();
+                console.log(JSON.stringify(err));
+            });
     }
 
     const wrongSoundAttr = {
