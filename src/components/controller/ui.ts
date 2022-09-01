@@ -15,7 +15,6 @@ import {
     currentGame,
     TEXTBOOK_PAGE_COUNT,
     ENDPOINT,
-    WORDS_IN_GAME,
     COLORS,
     AUDIO_CALL,
     SPRINT
@@ -118,10 +117,12 @@ export function setEmptyStatistic(str: string){
         statisticState: {
             total: {
                 correctAnswersPercent: 0,
+                numberOfGames: 0,
                 wordsLearntArr: [],
                 wordsLearnt: 0,
                 correctAnswers: 0,
                 correctAnswersStrick: 0,
+                totalAnswers: 0
             },
             audioCall: {
                 correctAnswersPercent: 0,
@@ -130,6 +131,7 @@ export function setEmptyStatistic(str: string){
                 wordsLearnt: 0,
                 correctAnswers: 0,
                 correctAnswersStrick: 0,
+                totalAnswers: 0
             },
             sprint: {
                 correctAnswersPercent: 0,
@@ -137,7 +139,8 @@ export function setEmptyStatistic(str: string){
                 wordsLearntArr: [],
                 wordsLearnt: 0,
                 correctAnswers: 0,
-                correctAnswersStrick: 0
+                correctAnswersStrick: 0,
+                totalAnswers: 0
             },
         }
     }
@@ -172,101 +175,75 @@ export function isWordInWordsLearnt(wordId: string, user: IUserStats, game: stri
     return user.statisticState[game as keyof typeof user.statisticState].wordsLearntArr.find((word) => Object.keys(word)[0] === wordId) || false;
 }
 
-export function calcCorrectAnswersPercent(numberOfGames: number, answers: number) {
-    return Math.floor((Number(answers) * 100) / (Number(numberOfGames) * WORDS_IN_GAME));
+export function calcCorrectAnswersPercent(answers: number, wordsInGames: number) {
+
+    return Math.floor((Number(answers) * 100) / wordsInGames);
+}
+
+function setGameStatisticToStats(
+    game: AudioCall | Sprint,
+    user: IUserStats,
+    gameState: AudioCall["state"] | Sprint["state"],
+    usersStats: IUserStats["statisticState"],
+    gameName: string
+    ) {
+        usersStats[gameName as keyof typeof usersStats].correctAnswers += gameState.answers.true.length;
+        if(usersStats[gameName as keyof typeof usersStats].correctAnswersStrick < gameState.maxStrick) {
+            usersStats[gameName as keyof typeof usersStats].correctAnswersStrick = gameState.maxStrick;
+        }
+        gameState.answers.true.forEach(word => {
+            const wordInWordsLearnt = isWordInWordsLearnt(word, user, AUDIO_CALL);
+            if(!wordInWordsLearnt) {
+                const wordOnLearning: IWordLearningState = {};
+                wordOnLearning[word] = 1
+                usersStats[gameName as keyof typeof usersStats].wordsLearntArr.push((wordOnLearning));
+            } else {
+                wordInWordsLearnt[word] += 1;
+                if(wordInWordsLearnt[word] === 3) {
+                    usersStats[gameName as keyof typeof usersStats].wordsLearnt += 1;
+                }
+                if(wordInWordsLearnt[word] > 3) {
+                    wordInWordsLearnt[word] = 3;
+                }
+            }
+        });
+        gameState.answers.false.forEach(word => {
+            const wordInWordsLearnt = isWordInWordsLearnt(word, user, AUDIO_CALL);
+            if(wordInWordsLearnt) {
+                wordInWordsLearnt[word] = 0;
+                if (usersStats[gameName as keyof typeof usersStats].wordsLearnt > 0) {
+                    usersStats[gameName as keyof typeof usersStats].wordsLearnt -= 1
+                } else {
+                    usersStats[gameName as keyof typeof usersStats].wordsLearnt = 0;
+                }
+            }
+        });
+        usersStats[gameName as keyof typeof usersStats].numberOfGames += 1;
+        const totalWordsInGames = game.state.answers.false.length + game.state.answers.true.length;
+        usersStats[gameName as keyof typeof usersStats].totalAnswers += totalWordsInGames
+        usersStats[gameName as keyof typeof usersStats].correctAnswersPercent = calcCorrectAnswersPercent(
+            usersStats[gameName as keyof typeof usersStats].correctAnswers, usersStats[gameName as keyof typeof usersStats].totalAnswers
+        );
 }
 
 
 export async function setStats(
-    game: AudioCall,
+    game: AudioCall | Sprint,
     user: IUserStats,
-    ) { // !TODO тут в типы добавить 2ю игру, когда появится
-
-    user.statisticState.total.correctAnswers += game.state.answers.true.length;
-    user.statisticState.audioCall.correctAnswers += game.state.answers.true.length;
-    if(user.statisticState.audioCall.correctAnswersStrick < game.state.maxStrick) {
-        user.statisticState.audioCall.correctAnswersStrick = game.state.maxStrick;
+    ) {
+    if(game instanceof AudioCall) {
+        setGameStatisticToStats(game, user, game.state, user.statisticState, AUDIO_CALL);
+    } else {
+        setGameStatisticToStats(game, user, game.state, user.statisticState, SPRINT);
     }
-    (currentGame.game as AudioCall).state.answers.true.forEach(word => {
-        const wordInWordsLearnt = isWordInWordsLearnt(word, user, AUDIO_CALL);
-        if(!wordInWordsLearnt) {
-            const wordOnLearning: IWordLearningState = {};
-            wordOnLearning[word] = 1
-            user.statisticState.audioCall.wordsLearntArr.push((wordOnLearning));
-        } else {
-            wordInWordsLearnt[word] += 1;
-            if(wordInWordsLearnt[word] === 3) {
-                user.statisticState.audioCall.wordsLearnt += 1;
-            }
-            if(wordInWordsLearnt[word] > 3) {
-                wordInWordsLearnt[word] = 3;
-            }
-        }
-    });
-    (currentGame.game as AudioCall).state.answers.false.forEach(word => {
-        const wordInWordsLearnt = isWordInWordsLearnt(word, user, AUDIO_CALL);
-        if(wordInWordsLearnt) {
-            wordInWordsLearnt[word] = 0;
-            if (user.statisticState.audioCall.wordsLearnt > 0) {
-                user.statisticState.audioCall.wordsLearnt -= 1
-            } else {
-                user.statisticState.audioCall.wordsLearnt = 0;
-            }
-        }
-    })
+    user.statisticState.total.correctAnswers += game.state.answers.true.length;
     user.statisticState.total.wordsLearnt = user.statisticState.audioCall.wordsLearnt + user.statisticState.sprint.wordsLearnt;
-    user.statisticState.audioCall.numberOfGames += 1;
-    user.statisticState.audioCall.correctAnswersPercent = calcCorrectAnswersPercent(
-        user.statisticState.audioCall.numberOfGames,
-        user.statisticState.audioCall.correctAnswers
-    )
-    user.statisticState.total.correctAnswersPercent = calcCorrectAnswersPercent(
-        user.statisticState.audioCall.numberOfGames + user.statisticState.sprint.numberOfGames,
-        user.statisticState.audioCall.correctAnswers + user.statisticState.sprint.correctAnswers
-    )
+    user.statisticState.total.numberOfGames += 1;
+    const totalWordsInGames = user.statisticState.audioCall.totalAnswers + user.statisticState.sprint.totalAnswers
+    user.statisticState.total.correctAnswersPercent = calcCorrectAnswersPercent(user.statisticState.total.correctAnswers, totalWordsInGames);
     if(!appState.isSignedIn) return;
     setUserStatsArr(appState.user);
 }
-
-// export function createCharts(gameName: string): Chart<"bar", number[], string> {
-//     const ctx = (document.getElementById(`${gameName}-chart`) as HTMLCanvasElement).getContext('2d');
-//     console.log(ctx)
-//     const myChart = new Chart(ctx!, {
-//         type: 'bar',
-//         data: {
-//             labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-//             datasets: [{
-//                 label: '# of Votes',
-//                 data: [12, 19, 3, 5, 2, 3],
-//                 backgroundColor: [
-//                     'rgba(255, 99, 132, 0.2)',
-//                     'rgba(54, 162, 235, 0.2)',
-//                     'rgba(255, 206, 86, 0.2)',
-//                     'rgba(75, 192, 192, 0.2)',
-//                     'rgba(153, 102, 255, 0.2)',
-//                     'rgba(255, 159, 64, 0.2)'
-//                 ],
-//                 borderColor: [
-//                     'rgba(255, 99, 132, 1)',
-//                     'rgba(54, 162, 235, 1)',
-//                     'rgba(255, 206, 86, 1)',
-//                     'rgba(75, 192, 192, 1)',
-//                     'rgba(153, 102, 255, 1)',
-//                     'rgba(255, 159, 64, 1)'
-//                 ],
-//                 borderWidth: 1
-//             }]
-//         },
-//         options: {
-//             scales: {
-//                 y: {
-//                     beginAtZero: true
-//                 }
-//             }
-//         }
-//     });
-//     return myChart;
-// }
 // logIn
 
 async function setCurrentUser(data: ISignInResponse) {
@@ -612,11 +589,12 @@ export function getLocalStorage() {
 
 // games
 
-function keyboardEventsHandler(e: Event) {
+export function keyboardEventsHandler(e: Event) {
     const gameContainer = document.querySelector('.game-popup');
     if(!isHTMLDivElement(gameContainer)) return;
     const nextButton = gameContainer.querySelector('.next-button');
     if(!isHTMLElement(nextButton)) return;
+    if((currentGame.game as AudioCall).currentSlide === undefined) return;
     const currentSlide = gameContainer.querySelector((`.audio-call>div:nth-child(${(currentGame.game as AudioCall).currentSlide + 1})`));
     if(!isHTMLDivElement(currentSlide)) return;
     const buttonsContainer = currentSlide.querySelector('.answers-container');
@@ -737,7 +715,7 @@ export function startGame(
     }
     container.append(popup);
     document.addEventListener('keydown', closeGameOnPressESC);
-    document.addEventListener('keydown', keyboardEventsHandler);
+    // document.addEventListener('keydown', keyboardEventsHandler);
     const closeButton = container.querySelector(".close-button");
     if (!isHTMLElement(closeButton)) return;
     closeButton.addEventListener("click", async () => {
