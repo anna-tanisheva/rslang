@@ -57,6 +57,7 @@
     "webpack-merge": "^5.7.3"
   },
   "dependencies": {
+    "chart.js": "^3.9.1",
     "identity-obj-proxy": "^3.0.0",
     "route-parser": "^0.0.5",
     "url-loader": "^4.1.1"

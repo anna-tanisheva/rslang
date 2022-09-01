@@ -1,12 +1,10 @@
 import { IStatisticState } from "../../../typings";
 import {
-  // createElementWithAttributes,
+  createElementWithAttributes,
   createElementWithClassnames, createElementWithContent,
   // createElementWithContent,
 } from "../utils";
-// import { calcCorrectAnswersPercent } from "../../controller/ui";
-// import { AudioCall } from "../audio-call/call/audio-call";
-
+import { setDailyChart } from "../../controller/ui";
 
 export class GameStatistic {
   public template: HTMLElement;
@@ -35,16 +33,19 @@ export class GameStatistic {
     const wordsLearntContent = createElementWithContent('p', `Изучено слов: ${statisticState[this.gameName as keyof typeof statisticState].wordsLearnt}`);
     const correctAnswersWrapper = createElementWithClassnames('div', 'correct-answers-wrapper');
     const correctAnswersContent = createElementWithContent('p', `Правильные ответы: ${String(statisticState[this.gameName as keyof typeof statisticState].correctAnswers)}`);
-    const correctAnswersPercentWrapper = createElementWithClassnames('div', 'correct-answers-percent-wrapper');
-    const correctAnswersPercentContent = createElementWithContent('p', `Вы ответили правильно на ${String(statisticState[this.gameName as keyof typeof statisticState].correctAnswersPercent)} % вопросов`);
     const correctAnswersStrickWrapper = createElementWithClassnames('div', 'correct-answers-wrapper');
     const correctAnswersStrickContent = createElementWithContent('p', `Самая длинная серия: ${String(statisticState[this.gameName as keyof typeof statisticState].correctAnswersStrick)}`);
+    const chartHTMLElemOptions = {
+      id: `${this.gameName}-chart`,
+      class: `chart`
+    }
+    const chart = createElementWithAttributes('canvas', chartHTMLElemOptions);
+    const data = [statisticState[this.gameName as keyof typeof statisticState].correctAnswersPercent, 100 - statisticState[this.gameName as keyof typeof statisticState].correctAnswersPercent];
+    setDailyChart((chart as HTMLCanvasElement), data)
     wordsLearntWrapper.append(wordsLearntContent);
     correctAnswersWrapper.append(correctAnswersContent);
     correctAnswersStrickWrapper.append(correctAnswersStrickContent);
-    correctAnswersPercentWrapper.append(correctAnswersPercentContent);
-    statisticContainer.append(statisticHeader, wordsLearntWrapper, correctAnswersWrapper, correctAnswersPercentWrapper, correctAnswersStrickWrapper);
-
+    statisticContainer.append(statisticHeader, wordsLearntWrapper, correctAnswersWrapper, correctAnswersStrickWrapper, chart);
     return statisticContainer;
   }
 }
