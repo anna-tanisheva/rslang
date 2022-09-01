@@ -701,7 +701,6 @@ export const pressKey = function(event: KeyboardEvent) {
     }
 }
 
-export function startGameHandler(e: Event): void {
 // для запуска игры из учебника
 export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
     const CALL_GAME = "Audio Call";
