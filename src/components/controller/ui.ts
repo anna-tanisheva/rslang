@@ -187,10 +187,11 @@ async function setCurrentUser(data: ISignInResponse) {
         } else {
             const statsObj = await fetchUserStatistic();
             const modifiedObj = JSON.parse(JSON.stringify(statsObj));
+            delete modifiedObj.id;
             if(!modifiedObj.optional) modifiedObj.optional = {};
-            modifiedObj.optional[((userInUserStats as IUserStatsInArr)[id].statisticTimeStamp as string)] = (userInUserStats as IUserStatsInArr)[id].statisticState
+            modifiedObj.optional[((userInUserStats as IUserStatsInArr)[id].statisticTimeStamp as string)] = (userInUserStats as IUserStatsInArr)[id].statisticState;
+            modifiedObj.learnedWords += (userInUserStats as IUserStatsInArr)[id].statisticState.total.wordsLearnt;
             const body: IUserStatisticToDB = JSON.parse(JSON.stringify(modifiedObj));
-            console.log(`обновление статистики в БД: `, body)
             putUserStatistic(body);
             appState.usersStats.splice(appState.usersStats.indexOf(userInUserStats), 1);
             appState.user.statsToday = setEmptyStatistic(newDate);
