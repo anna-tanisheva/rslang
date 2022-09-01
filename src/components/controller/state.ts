@@ -101,7 +101,6 @@ export const currentGame: ICurrentGame = {game: null};
 
 export const audio = new Audio();
 
-<<<<<<< HEAD
 export const KEYBOARD_CODES = ["1", "2", "3", "4", "Enter", "ArrowRight"];
 
 export const COLORS = [
@@ -112,6 +111,3 @@ export const COLORS = [
     "#87cefa",
     "#8080ff",
 ];
-=======
-// export const KEYBOARD_CODES = ['1', '2', '3', '4', 'Enter', 'ArrowRight'];
->>>>>>> fix-issues
