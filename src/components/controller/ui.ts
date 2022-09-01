@@ -848,6 +848,7 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
         const page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
         startGame(gameContainer, section, SPRINT, page);
         const timer = setTimeout(() => {(currentGame.game as Sprint).endGame()}, 61000);
+        console.log(currentGame)
         const closeButton = document.querySelector(".close-button");
         if (!isHTMLElement(closeButton)) return;
         closeButton.addEventListener("click", () => { clearTimeout(timer) })

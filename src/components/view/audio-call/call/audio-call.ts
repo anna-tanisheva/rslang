@@ -30,7 +30,7 @@ export class AudioCall {
     }
   };
 
-  game: string;
+  // game: string;
 
   currentSlide: number;
 

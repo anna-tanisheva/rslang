@@ -3,7 +3,7 @@ import {
   createElementWithAttributes,
 } from "../utils";
 import { AudioCall } from "./call/audio-call";
-import { currentGame, AUDIO_CALL } from "../../controller/state";
+import { currentGame, AUDIO_CALL, SPRINT } from "../../controller/state";
 import { playWordInGameHandler, appendGameStats, playAgainHandler } from '../../controller/ui';
 // import { IUserStats } from "../../../typings";
 import { Sprint } from "./sprint/sprint-model";
@@ -40,7 +40,7 @@ export class GamePopUp {
         playWordInGameHandler(audio as HTMLAudioElement);
       });
 
-    } else if(game === 'Sprint'){
+    } else if(game === SPRINT){
       currentGame.game = new Sprint(section, page, game);
       (currentGame.game as Sprint).create()
       .then((res)=>{
