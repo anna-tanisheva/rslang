@@ -77,6 +77,7 @@ export class AudioCall {
       arrOfTranslations.push(word.wordTranslate)
     })
     this.wordsInGame = getGameWordsArr(words.words);
+    game.style.width = `${this.wordsInGame.length * 100}%`
     this.wordsInGame.forEach(word => {
       const card = createElementWithClassnames('div', 'word-card');
       card.setAttribute('data-id', word.id);

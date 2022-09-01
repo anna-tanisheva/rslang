@@ -667,7 +667,7 @@ export function moveGameSlider(
     nextButton: HTMLElement
 ) {
     const innerSliderContainer = sliderContainer;
-    if (sliderContainer.style.left !== "-900%") {
+    if ((Number(innerSliderContainer.style.left.split("%")[0])) !== -(Number(innerSliderContainer.style.width.split("%")[0])) + 100) {
         innerSliderContainer.style.left = `${
             Number(innerSliderContainer.style.left.split("%")[0]) - 100
         }%`;
@@ -866,9 +866,17 @@ export function playAgainHandler(gameContainer: HTMLElement, section: number){
 
 export function getGameWordsArr(arr: WordsData) {
     const output: IAggreagtedWord[] = [];
-    while (output.length < 10) {
-        const ind = getRandomInRange(arr.length);
-        if (!output.includes(arr[ind])) output.push(arr[ind]);
+    if(arr.length >= 10) {
+        while (output.length < 10) {
+            const ind = getRandomInRange(arr.length);
+            if (!output.includes(arr[ind])) output.push(arr[ind]);
+        }
+    } else {
+        while (output.length < arr.length) {
+            const ind = getRandomInRange(arr.length);
+            if (!output.includes(arr[ind])) output.push(arr[ind]);
+            console.log(output)
+        }
     }
     return output;
 }

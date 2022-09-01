@@ -9,7 +9,6 @@ export class GameStats {
   create(): HTMLElement {
     const wrapperInner = createElementWithClassnames('div', 'stats');
     const answers = createElementWithClassnames('div', 'answers');
-    console.log(currentGame.game)
     const correctAnswers = createElementWithContent('p', `Вы ответили правильно на ${String((currentGame.game as AudioCall).state.answers.true.length)} вопросов`);
     const strick = createElementWithContent('p', `Самая длинная последовательность правильных ответов: ${String((currentGame.game as AudioCall).state.maxStrick)}`);
     const name = createElementWithContent('h3', String((currentGame.game as AudioCall).gameName));
