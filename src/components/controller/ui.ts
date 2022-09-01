@@ -17,6 +17,8 @@ import {
     ENDPOINT,
     WORDS_IN_GAME,
     COLORS,
+    AUDIO_CALL,
+    SPRINT
 } from "./state";
 import {
     isHTMLButtonElement,
@@ -185,7 +187,6 @@ export async function setStats(
     if(user.statisticState.audioCall.correctAnswersStrick < game.state.maxStrick) {
         user.statisticState.audioCall.correctAnswersStrick = game.state.maxStrick;
     }
-    const AUDIO_CALL = 'audioCall';
     (currentGame.game as AudioCall).state.answers.true.forEach(word => {
         const wordInWordsLearnt = isWordInWordsLearnt(word, user, AUDIO_CALL);
         if(!wordInWordsLearnt) {
@@ -318,9 +319,12 @@ function validationHandler(nodeList: Node[]): boolean | undefined {
     if (!isHTMLElement(invalidPassword)) return undefined;
     const invalidName = document.querySelector(".invalid-name");
     if (!isHTMLElement(invalidName)) return undefined;
+    const invalidPasswordRepeat = document.querySelector(".invalid-password-repeat");
+    if (!isHTMLElement(invalidPasswordRepeat)) return undefined;
     invalidEmail.classList.add("hidden");
     invalidPassword.classList.add("hidden");
     invalidName.classList.add("hidden");
+    invalidPasswordRepeat.classList.add('hidden');
     if (nodeList[0]) {
         if (
             !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(.\w{2,3})+$/.test(
@@ -343,10 +347,18 @@ function validationHandler(nodeList: Node[]): boolean | undefined {
             invalidName.classList.remove("hidden");
         }
     }
+    if(nodeList[3]) {
+        if ((nodeList[3] as HTMLInputElement).value !== (nodeList[2] as HTMLInputElement).value) {
+            valid = false;
+            invalidPasswordRepeat.classList.remove('hidden');
+        }
+    }
+
     if (valid) {
         invalidEmail.classList.add("hidden");
         invalidPassword.classList.add("hidden");
         invalidName.classList.add("hidden");
+        invalidPasswordRepeat.classList.add('hidden');
     }
     return valid;
 }
@@ -355,6 +367,7 @@ function validateForm(form: string): boolean | undefined {
     let nameInput;
     let emailInput;
     let passwordInput;
+    let repeatPasswordInput;
     let isValid: boolean | undefined = true;
     switch (form) {
         case "registration":
@@ -364,7 +377,9 @@ function validateForm(form: string): boolean | undefined {
             if (!isHTMLInputElement(passwordInput)) return undefined;
             emailInput = document.querySelector(".registration-email");
             if (!isHTMLInputElement(emailInput)) return undefined;
-            isValid = validationHandler([emailInput, passwordInput, nameInput]);
+            repeatPasswordInput = document.querySelector(".registration-password-repeat");
+            if (!isHTMLInputElement(repeatPasswordInput)) return undefined;
+            isValid = validationHandler([emailInput, passwordInput, nameInput, repeatPasswordInput]);
             break;
         case "login":
             emailInput = document.querySelector(".login-email");
@@ -384,13 +399,13 @@ function serverErrorsHandler(message: string) {
     if (!isHTMLElement(messageContainer)) return;
     if (message === "403") {
         messageContainer.innerText =
-            "Access denied, probably password was incorrect";
+            "Отказано в доступе, проверьте пароль.";
     } else if (message === "404") {
-        messageContainer.innerText = "We couldn't find this user, check email";
+        messageContainer.innerText = "Мы не нашли такого пользователя, проверьте email";
     } else if (message === "417") {
-        messageContainer.innerText = "This email is already used";
+        messageContainer.innerText = "Этот email уже используется";
     } else if (message === "422") {
-        messageContainer.innerText = "Incorrect email or password";
+        messageContainer.innerText = "Некорректный email или пароль";
     }
 }
 
@@ -506,6 +521,59 @@ export function logOutHandler(): void {
 
 export function showFormHandler() {
     document.querySelector(".form-container")?.classList.toggle("hidden");
+    const mainPageFormButtons = document.querySelector('.start-screen-buttons');
+    if(!isHTMLDivElement(mainPageFormButtons)) return;
+    [...mainPageFormButtons.children].forEach(elem=>{
+        if(!document.querySelector(".form-container")?.classList.contains("hidden")) {
+            elem.setAttribute('disabled', 'true');
+        } else {
+            elem.removeAttribute('disabled');
+        };
+    })
+}
+
+export function addFormHandlerToMainPage(e: Event){
+    if (!isHTMLButtonElement(e.target)) return;
+    e.target.setAttribute('disabled', 'true');
+    const signIn = document.querySelector(".sign-in");
+    if (!isHTMLElement(signIn)) return;
+    const signUp = document.querySelector(".sign-up");
+    if (!isHTMLElement(signUp)) return;
+    const showSignInButton = document.querySelector('.show-sign-in');
+    if (!isHTMLElement(showSignInButton)) return;
+    const showSignUpButton = document.querySelector('.show-sign-up');
+    if (!isHTMLElement(showSignUpButton)) return;
+    if((e.target as HTMLButtonElement).classList.contains('sign-in-button')) {
+        showFormHandler();
+        showSignInButton.classList.add("active-form");
+        showSignUpButton.classList.remove("active-form");
+        signIn.classList.remove("hidden");
+        signUp.classList.add("hidden");
+        // if (!isHTMLButtonElement(e.target.nextElementSibling)) return;
+        // e.target.nextElementSibling.setAttribute('disabled', 'true');
+    } else if((e.target as HTMLButtonElement).classList.contains('registration-button')) {
+        showFormHandler();
+        showSignUpButton.classList.add("active-form");
+        showSignInButton.classList.remove("active-form");
+        signIn.classList.add("hidden");
+        signUp.classList.remove("hidden");
+    }
+
+
+
+    if (e.target.classList.contains("show-sign-in")) {
+        e.target.classList.add("active-form");
+        if (!isHTMLButtonElement(e.target.nextElementSibling)) return;
+        e.target.nextElementSibling.classList.remove("active-form");
+        signIn.classList.remove("hidden");
+        signUp.classList.add("hidden");
+    } else if (e.target.classList.contains("show-sign-up")) {
+        e.target.classList.add("active-form");
+        if (!isHTMLButtonElement(e.target.previousElementSibling)) return;
+        e.target.previousElementSibling.classList.remove("active-form");
+        signIn.classList.add("hidden");
+        signUp.classList.remove("hidden");
+    }
 }
 
 export function setLocalStorage() {
@@ -767,10 +835,9 @@ export const pressKey = function(event: KeyboardEvent) {
     }
 }
 
-// для запуска игры из учебника
 export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
-    const CALL_GAME = "Audio Call";
-    const SPRINT = "Sprint";
+    // const CALL_GAME = "Audio Call";
+    // const SPRINT = 'Sprint';
     const {target} = e;
     const gameContainer = document.querySelector(".games");
     if (!isHTMLElement(gameContainer)) return;
@@ -791,9 +858,9 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
         );
         const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);
         if(!arrOfWords) {
-            startGame(gameContainer, section, CALL_GAME, PAGE);
+            startGame(gameContainer, section, AUDIO_CALL, PAGE);
         } else {
-            startGame(gameContainer, section, CALL_GAME, PAGE, arrOfWords);
+            startGame(gameContainer, section, AUDIO_CALL, PAGE, arrOfWords);
         }
     }
 }

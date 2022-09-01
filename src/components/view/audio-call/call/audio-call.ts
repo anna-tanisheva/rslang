@@ -15,6 +15,8 @@ import { IAggreagtedWord, IResWordsPage } from '../../../../typings';
 
 export class AudioCall {
 
+  gameName: string;
+
   section: number;
 
   page: number;
@@ -28,7 +30,7 @@ export class AudioCall {
     }
   };
 
-  gameName: string;
+  game: string;
 
   currentSlide: number;
 
@@ -48,6 +50,7 @@ export class AudioCall {
         false: []
       }
     };
+    // this.game = game;
     this.currentSlide = currentSlide;
     this.wordsInGame = null;
     this.arrOfWords = arrOfWords;

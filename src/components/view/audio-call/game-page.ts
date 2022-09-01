@@ -3,7 +3,7 @@ import {
   createElementWithAttributes,
 } from "../utils";
 import { AudioCall } from "./call/audio-call";
-import { currentGame } from "../../controller/state";
+import { currentGame, AUDIO_CALL } from "../../controller/state";
 import { playWordInGameHandler, appendGameStats, playAgainHandler } from '../../controller/ui';
 // import { IUserStats } from "../../../typings";
 import { Sprint } from "./sprint/sprint-model";
@@ -21,7 +21,7 @@ export class GamePopUp {
     const nextButton = createElementWithClassnames('button', 'next-button');
     nextButton.innerHTML = '&#8594;';
     // в конструктор передаем номер раздела от пользователя или слова страницы учебника, с которой была запущена игра
-    if(game === 'Audio Call') {
+    if(game === AUDIO_CALL) {
       const currentSlide = 0;
       if(!arrOfWords) {
         currentGame.game = new AudioCall(section, page, game, currentSlide);
