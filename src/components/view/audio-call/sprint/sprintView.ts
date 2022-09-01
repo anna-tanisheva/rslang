@@ -3,7 +3,7 @@ import { createElementWithAttributes,
 import "./sprint.scss";
 import { IWordsForSplit } from "../../../../typings";
 import { choseSplitAnswerHandler} from "../../../controller/ui";
-import { restartGameHandler } from "./restartSprint";
+import { restartGameHandler } from "./restart-game";
 
 export class SprintView {
 
@@ -33,13 +33,13 @@ export class SprintView {
             clearInterval(timerId);
           }
           this.seconds -= 1;
-        }, 1000);  
-   
-        const countersContainer = createElementWithClassnames("div",  "sprint-counters"); 
-        countersContainer.append(score, timer); 
+        }, 1000);
+
+        const countersContainer = createElementWithClassnames("div",  "sprint-counters");
+        countersContainer.append(score, timer);
         const playingField = createElementWithClassnames( "div", "sprint-playing-field", );
-        const stampsContainer = createElementWithClassnames( "div", "sprint-stamps-container",);        
-        const englishWord = createElementWithClassnames("p",  "sprint-enlish-word" );       
+        const stampsContainer = createElementWithClassnames( "div", "sprint-stamps-container",);
+        const englishWord = createElementWithClassnames("p",  "sprint-enlish-word" );
         englishWord.textContent = `${this.word.word}`;
         const translate = createElementWithClassnames("p","sprint-translate");
         translate.textContent = `${this.word.randomTranslate}`;
@@ -61,12 +61,12 @@ export class SprintView {
         const noKey = createElementWithAttributes("button",noKeyAttributes);
         noKey.textContent = ">";
         playKeysContainer.append(yesKey, noKey);
-        playingField.append(stampsContainer, englishWord, translate, playBtnsContainer, ); 
+        playingField.append(stampsContainer, englishWord, translate, playBtnsContainer, );
         const answer = createElementWithClassnames("div", "sprint-answer");
-        gameContainer.append(countersContainer, playingField, playKeysContainer, answer); 
+        gameContainer.append(countersContainer, playingField, playKeysContainer, answer);
         const resultContainer = createElementWithClassnames("div", "sprint-results");
         const resultWrapper = createElementWithClassnames("div", "sprint-results-wrapper");
-        const resultDescription = createElementWithClassnames("div", "sprint-results-discription");        
+        const resultDescription = createElementWithClassnames("div", "sprint-results-discription");
         const resultTitle = createElementWithClassnames("h2", "sprint-final-score");
         const recordTitle = createElementWithClassnames("h3", "sprint-record-score");
         const rightAnswers = createElementWithClassnames("h3", "results-right-answer");
@@ -88,7 +88,7 @@ export class SprintView {
         resultBtnsContainer.addEventListener(("click"), (e) => {restartGameHandler(e)});
         return game;
 
-    }    
+    }
 }
 
 
