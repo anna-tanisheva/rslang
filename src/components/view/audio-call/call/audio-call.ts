@@ -30,8 +30,6 @@ export class AudioCall {
     }
   };
 
-  // game: string;
-
   currentSlide: number;
 
   wordsInGame: IAggreagtedWord[] | null;
@@ -50,7 +48,6 @@ export class AudioCall {
         false: []
       }
     };
-    // this.game = game;
     this.currentSlide = currentSlide;
     this.wordsInGame = null;
     this.arrOfWords = arrOfWords;

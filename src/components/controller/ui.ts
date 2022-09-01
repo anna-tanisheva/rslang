@@ -320,6 +320,7 @@ async function setCurrentUser(data: ISignInResponse) {
         welcomeContainer.innerText = `Welcome stranger`;
     } else {
         welcomeContainer.innerText = `Welcome ${data.name} `;
+        appState.isSignedIn = true;
     }
     if (!data.name) return;
     if(userInUserStats) {
@@ -719,7 +720,6 @@ export function startGame(
     }
     container.append(popup);
     document.addEventListener('keydown', closeGameOnPressESC);
-    // document.addEventListener('keydown', keyboardEventsHandler);
     const closeButton = container.querySelector(".close-button");
     if (!isHTMLElement(closeButton)) return;
     closeButton.addEventListener("click", async () => {
@@ -742,6 +742,7 @@ export function startGame(
     const nextButton = container.querySelector(".next-button");
     if (!isHTMLElement(nextButton)) return;
     nextButton.addEventListener("click", () => {
+        nextButton.blur();
         const sliderContainer = popup.querySelector(".audio-call");
         (currentGame.game as AudioCall).currentSlide += 1;
         if (!isHTMLDivElement(sliderContainer)) return;
@@ -805,16 +806,17 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
     if (!isHTMLButtonElement(target)) return;
     if (!target.classList.contains("start-button")) return;
     if (target.classList.contains("sprint-button")) {
+        target.blur();
         const section = Number(target.closest('.game-container')?.querySelector('select')?.value);
         const page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
         startGame(gameContainer, section, SPRINT, page);
         const timer = setTimeout(() => {(currentGame.game as Sprint).endGame()}, 61000);
-        console.log(currentGame)
         const closeButton = document.querySelector(".close-button");
         if (!isHTMLElement(closeButton)) return;
         closeButton.addEventListener("click", () => { clearTimeout(timer) })
         document.removeEventListener("keydown", pressKey, false);
     } else {
+        target.blur();
         const section = Number(
             target.closest(".game-container")?.querySelector("select")?.value
         );
