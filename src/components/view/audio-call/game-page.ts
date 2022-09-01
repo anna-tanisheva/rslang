@@ -10,7 +10,7 @@ import { AudioCall } from "./call/audio-call";
 import { currentGame } from "../../controller/state";
 import { playWordInGameHandler, appendGameStats, playAgainHandler } from '../../controller/ui';
 // import { IUserStats } from "../../../typings";
-
+import { Sprint } from "./sprint/sprint-model"; 
 
 
 export class GamePopUp {
@@ -37,15 +37,19 @@ export class GamePopUp {
         playWordInGameHandler(audio as HTMLAudioElement);
       });
 
-    } else {
-    // здесь создаем спринт
+    } else if(game === 'Sprint'){
+      currentGame.game = new Sprint(section, page, game);
+      (currentGame.game as Sprint).create()
+      .then((res)=>{
+        gameContainer.append(res)
+      })
+      .catch((err)=>{
+        console.log("bfbbfbf");
+        (currentGame.game as Sprint).endGame();
+        console.log(JSON.stringify(err))
+      });   
+    } 
 
-      // currentGame.game = new AudioCall(section);
-      // (currentGame.game as AudioCall).create()
-      // .then((res)=>{
-      //   gameContainer.append(res);
-      // });
-    }
     const wrongSoundAttr = {
       src: `./sounds/wrong.mp3`,
       type: 'audio/mpeg',

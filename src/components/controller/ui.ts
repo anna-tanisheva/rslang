@@ -27,6 +27,7 @@ import {AudioCall} from "../view/audio-call/call/audio-call";
 import {GameStats} from "../view/audio-call/call/game-stats";
 import {AppView} from "../view/app-view";
 import {PagePagination} from "../view/textbook/components";
+import { Sprint } from "../view/audio-call/sprint/sprint-model"; 
 
 export async function getActiveViewData() {
   switch (appState.view) {
@@ -585,26 +586,62 @@ export function startGame(
     });
 }
 
+// eslint-disable-next-line func-names
+export const pressKey = function(event: KeyboardEvent) {
+    const arrayLeftKey = document.querySelector(".right-key");
+    if(!isHTMLButtonElement(arrayLeftKey)) return;
+    const arrayRightKey = document.querySelector(".wrong-key");
+    if(!isHTMLButtonElement(arrayRightKey)) return;
+    window.addEventListener('keydown', (e) => {
+        if( e.code === "ArrowLeft") {
+            arrayLeftKey.classList.add('active');
+        }
+        if( e.code === "ArrowRight") {
+            arrayRightKey.classList.add('active');
+        }
+    });
+      
+    window.addEventListener('keyup', (e) => {
+        if( e.code === "ArrowLeft") {
+            arrayLeftKey.classList.remove('active');
+        }
+        if( e.code === "ArrowRight") {
+            arrayRightKey.classList.remove('active');
+        }
+     });
+
+    event.preventDefault();    
+    if( event.code === "ArrowLeft") {
+        (currentGame.game as Sprint).onRightButton();
+    } else if (event.code === "ArrowRight") {
+        (currentGame.game as Sprint).onWrongButton();
+    }
+}
+
 export function startGameHandler(e: Event): void {
     const CALL_GAME = "Audio Call";
-    // const SPRINT = 'Sprint';
+    const SPRINT = "Sprint";
     const {target} = e;
     const gameContainer = document.querySelector(".games");
     if (!isHTMLElement(gameContainer)) return;
     if (!isHTMLButtonElement(target)) return;
     if (!target.classList.contains("start-button")) return;
     if (target.classList.contains("sprint-button")) {
-        console.log("sprint");
-        // логика по созданию экземпляра игры
-        // const section = Number(target.closest('.game-container')?.querySelector('select')?.value);
-        // startGame(gameContainer, section, SPRINT);
+        const section = Number(target.closest('.game-container')?.querySelector('select')?.value);        
+        const page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
+        startGame(gameContainer, section, SPRINT, page); 
+        const timer = setTimeout(() => {(currentGame.game as Sprint).endGame()}, 61000);      
+        const closeButton = document.querySelector(".close-button");
+        if (!isHTMLElement(closeButton)) return;
+        closeButton.addEventListener("click", () => { clearTimeout(timer) }) 
+        document.removeEventListener("keydown", pressKey, false);   
     } else {
         const section = Number(
             target.closest(".game-container")?.querySelector("select")?.value
         );
         const page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
         startGame(gameContainer, section, CALL_GAME, page);
-    }
+    } 
 }
 
 
@@ -753,6 +790,19 @@ export function choseAnswerHandler(e: Event, answer: string) {
     statsOld.replaceChildren();
     const statsNew = appendGameStats(statsOld);
     statsCurrentContainer.replaceChild(statsOld, statsNew);
+}
+export function choseSplitAnswerHandler(e: Event) {    
+    const {target} = e;
+    if (!isHTMLButtonElement(target)) return;     
+    if(target.classList.contains("yes-button")) {
+        (currentGame.game as Sprint).onRightButton();       
+    } else if (target.classList.contains("no-button")) {
+        (currentGame.game as Sprint).onWrongButton();
+    }
+}
+
+export function getRandomNumber(number: number) {
+    return Math.floor(Math.random() * number);
 }
 
 export function getColor(): string {
