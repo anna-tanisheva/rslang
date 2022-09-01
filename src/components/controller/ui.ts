@@ -693,27 +693,6 @@ function stopPlayingWordHandler(audio: HTMLAudioElement) {
     audio.pause();
 }
 
-// export function getUserWord(word: IAggreagtedWord): IUserWord {
-//     if(word.userWord) {
-//         return word.userWord
-//     }
-//     return {
-//         difficulty: "norm",
-//         optional: {
-//             audiocall: {
-//                 countGames: 0,
-//                 rightAnswer: 0,
-//                 rightAnswerSeries: 0,
-//             },
-//             sprint: {
-//                 countGames: 0,
-//                 rightAnswer: 0,
-//                 rightAnswerSeries: 0,
-//             },
-//         },
-//     }
-// }
-
 export async function modifyWord(game: AudioCall, word: IAggreagtedWord)  {
     const body: IUserWord = getUserWord(word);
     if(!body) return;
