@@ -24,7 +24,7 @@ export class Sprint {
 
     correctAnswer: IWordsForSplit[];
 
-    wrongtAnswer: IWordsForSplit[];
+    wrongAnswer: IWordsForSplit[];
 
     words: IWordsForSplit[];
 
@@ -63,7 +63,7 @@ export class Sprint {
       };
       this.totalWordsInGame = [];
       this.correctAnswer = [];
-      this.wrongtAnswer = [];
+      this.wrongAnswer = [];
       this.words = [];
       this.inputWords = [];
       this.arrOfWords = arrOfWords;
@@ -115,7 +115,7 @@ export class Sprint {
             this.correctAnswer.push(this.words[0]);
         } else {
             this.state.currentStrick = 0;
-            this.wrongtAnswer.push(this.words[0]);
+            this.wrongAnswer.push(this.words[0]);
             this.hideStamps();
         }
     }
@@ -224,7 +224,7 @@ export class Sprint {
         (resultWindow as HTMLInputElement).style.display = "block";
         (gameField as HTMLInputElement).style.display = "none";
         this.drawFinalResults(500);
-        if (this.wrongtAnswer.length > 0) {
+        if (this.wrongAnswer.length > 0) {
             this.drawAllWrongAnswers();
         }
         if (this.correctAnswer.length > 0) {
@@ -243,10 +243,10 @@ export class Sprint {
     }
 
 
-    async create(): Promise<HTMLElement> {
+    async create(): Promise<HTMLElement> {        
         if(this.arrOfWords === undefined) {
             await this.getInputWords();
-
+            
         } else {
             const words = this.arrOfWords;
             this.inputWords = words.words;
@@ -254,7 +254,7 @@ export class Sprint {
             this.words = wordsForCards;
         }
 
-        const sprintContainer = new SprintView(this.words[0], this.state.score).create();
+        const sprintContainer = new SprintView(this.words[0], this.state.score).create();  
         return sprintContainer;
     }
 
@@ -303,7 +303,7 @@ export class Sprint {
     drawAllWrongAnswers() {
         const wrongAnswersContainer = document.querySelector('.results-wrong-answer');
 
-        this.wrongtAnswer.forEach((word: IWordsForSplit) => {
+        this.wrongAnswer.forEach((word: IWordsForSplit) => {
             const resWrongAnswerView = new ResultWord(word);
             if (!isHTMLElement(wrongAnswersContainer)) return;
             wrongAnswersContainer.append(resWrongAnswerView.create());

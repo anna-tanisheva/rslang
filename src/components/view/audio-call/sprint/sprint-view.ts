@@ -2,7 +2,7 @@ import { createElementWithAttributes,
     createElementWithClassnames} from "../../utils";
 import "./sprint.scss";
 import { IWordsForSplit } from "../../../../typings";
-import { choseSplitAnswerHandler, pressKey } from "../../../controller/ui";
+import { choseSplitAnswerHandler } from "../../../controller/ui";
 import { restartGameHandler } from "./restart-game";
 
 export class SprintView {
@@ -79,13 +79,12 @@ export class SprintView {
 
         resultBtnsContainer.addEventListener(("click"), (e) => {restartGameHandler(e)});
 
-        document.addEventListener("keydown", pressKey, false);
-            const timerId = setInterval(() => {
-            timer.textContent = `${this.seconds}`
-          if (this.seconds === 0) {
-            clearInterval(timerId);
-          }
-          this.seconds -= 1;
+        const timerId = setInterval(() => {
+        timer.textContent = `${this.seconds}`
+            if (this.seconds === 0) {
+                clearInterval(timerId);
+            }
+            this.seconds -= 1;
         }, 1000);
         return game;
 
