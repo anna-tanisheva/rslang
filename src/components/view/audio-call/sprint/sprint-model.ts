@@ -243,18 +243,20 @@ export class Sprint {
     }
 
 
-    async create(): Promise<HTMLElement> {        
+    async create(): Promise<HTMLElement> {
         if(this.arrOfWords === undefined) {
             await this.getInputWords();
-            
         } else {
             const words = this.arrOfWords;
+            this.arrOfWords.words.forEach(word=>{
+                this.totalWordsInGame.push(word);
+            })
             this.inputWords = words.words;
             const wordsForCards = [...this.getWordsForCards()];
             this.words = wordsForCards;
         }
 
-        const sprintContainer = new SprintView(this.words[0], this.state.score).create();  
+        const sprintContainer = new SprintView(this.words[0], this.state.score).create();
         return sprintContainer;
     }
 

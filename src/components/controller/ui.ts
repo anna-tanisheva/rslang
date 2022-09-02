@@ -245,15 +245,11 @@ export function setEmptyStatistic(str: string) {
     };
 }
 
-export function areDaysEqual(oldDate: string, newDate: string) {
+export function compareDates(oldDate: string, newDate: string){
     [oldDate] = oldDate.split("T");
     [newDate] = newDate.split("T");
-    oldDate = oldDate.slice(oldDate.length - 2);
-    newDate = newDate.slice(newDate.length - 2);
-    if (Number(oldDate) !== Number(newDate)) {
-        return false;
-    }
-    return true;
+    if (Date.parse(oldDate) === Date.parse(newDate)) return true;
+    return false;
 }
 
 function setNewDate() {
@@ -382,7 +378,7 @@ async function setCurrentUser(data: ISignInResponse) {
         const id = `user${appState.user.userId}`;
         const oldDate = (userInUserStats as IUserStatsInArr)[id]
             .statisticTimeStamp;
-        if (areDaysEqual(oldDate as string, newDate)) {
+        if (compareDates(oldDate as string, newDate)) {
             appState.user.statsToday = (userInUserStats as IUserStatsInArr)[id];
         } else {
             const statsObj = await fetchUserStatistic();
@@ -669,7 +665,7 @@ export function getLocalStorage() {
             }
             const oldDate = JSON.parse(localStorage.appState).userNull
                 .statisticTimeStamp;
-            if (!areDaysEqual(oldDate, newDate)) {
+            if (!compareDates(oldDate as string, newDate)) {
                 appState.userNull = setEmptyStatistic(newDate);
             } else {
                 appState.userNull.statisticTimeStamp = oldDate;
@@ -771,6 +767,7 @@ function stopPlayingWordHandler(audio: HTMLAudioElement) {
 
 export async function modifyWord(game: AudioCall | Sprint, word: IAggreagtedWord, gameName: string) {
     const body: IUserWord = getUserWord(word);
+
     if(!body) return;
 
     body.optional[gameName as keyof typeof body.optional].countGames += 1;
@@ -868,14 +865,6 @@ export function startGame(
                 appState.user.statsToday as IUserStats
             );
         }
-        if (appState.isSignedIn) {
-            if (currentGame.game instanceof AudioCall) {
-                (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
-                    modifyWord((currentGame.game as AudioCall), word, 'audiocall')
-                })
-            }
-        }
-
         currentGame.game = null;
         container.removeChild(popup);
         const overlay = document.querySelector(".overlay");
@@ -938,6 +927,17 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
             startGame(gameContainer, section, SPRINT, page, arrOfWords);
         }
         // startGame(gameContainer, section, SPRINT, page);
+<<<<<<< HEAD
+        // const timer = setTimeout(() => {
+        //     (currentGame.game as Sprint).endGame();
+        // }, 61000);
+        // const closeButton = document.querySelector(".close-button");
+        // if (!isHTMLElement(closeButton)) return;
+        // closeButton.addEventListener("click", () => {
+        //     clearTimeout(timer);
+        // });
+        document.removeEventListener("keydown", pressKey, false);
+=======
         const timer = setTimeout(() => {
             (currentGame.game as Sprint).endGame();
             document.removeEventListener("keydown", pressKey);
@@ -947,6 +947,7 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
         closeButton.addEventListener("click", () => {
             clearTimeout(timer);
         });
+>>>>>>> develop
     } else if (!arrOfWords) {
             page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
             section = Number(
@@ -966,11 +967,6 @@ export function playAgainHandler(gameContainer: HTMLElement, section: number){
         setStats((currentGame.game as AudioCall | Sprint), appState.userNull);
       } else {
           setStats((currentGame.game as AudioCall | Sprint), (appState.user.statsToday as IUserStats));
-          if(currentGame instanceof AudioCall) {
-            (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
-                modifyWord((currentGame.game as AudioCall), word, 'audiocall')
-            })
-          }
       }
       currentGame.game = null;
       const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);
@@ -1096,6 +1092,7 @@ export function choseAnswerHandler(e: Event, answer: string) {
     const correctAnswer = card.querySelector(".answer");
     if (!isHTMLElement(correctAnswer)) return;
     const wordId = card.getAttribute("data-id");
+
     if (target.getAttribute("data-option") !== answer) {
         (wrongSound as HTMLAudioElement).play();
         target.classList.add("incorrect-answer");
@@ -1113,6 +1110,13 @@ export function choseAnswerHandler(e: Event, answer: string) {
         });
         addToCurrentGameState(true, wordId as string); // !TODO
     }
+    const currentWord: IAggreagtedWord | undefined = (currentGame.game as AudioCall).wordsInGame?.find(word=>word.id === wordId);
+    if (appState.isSignedIn) {
+        if (currentGame.game instanceof AudioCall) {
+            modifyWord((currentGame.game as AudioCall), (currentWord as IAggreagtedWord), 'audiocall')
+        }
+    }
+    (currentGame.game as AudioCall).currentWord = currentWord;
     correctAnswer.classList.remove("opacity-hidden");
     const statsCurrentContainer = document.querySelector(".game-stats-wrapper");
     if (!isHTMLElement(statsCurrentContainer)) return;
