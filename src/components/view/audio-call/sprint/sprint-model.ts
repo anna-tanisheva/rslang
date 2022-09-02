@@ -3,7 +3,7 @@ import { isHTMLElement } from "../../../../typings/utils/utils";
 import "./sprint.scss";
 import { IWordsForSplit, IResWordsPage, IAggreagtedWord } from '../../../../typings';
 import { fetchWords } from "../../../controller/api";
-import { getRandomNumber, modifyWord } from '../../../controller/ui';
+import { getRandomNumber, modifyWord, pressKey } from '../../../controller/ui';
 import { SprintView } from "./sprint-view";
 import "../../../../assets/sounds/wrong.mp3";
 import "../../../../assets/sounds/correct.mp3";
@@ -43,6 +43,8 @@ export class Sprint {
       }
     };
 
+    totalWordsInGame: IAggreagtedWord[];
+
     gameName: string
 
     constructor(sec: number, page: number, gameName: string, arrOfWords?: IResWordsPage) {
@@ -58,7 +60,8 @@ export class Sprint {
             true: [],
             false: []
         },
-      }
+      };
+      this.totalWordsInGame = [];
       this.correctAnswer = [];
       this.wrongtAnswer = [];
       this.words = [];
@@ -157,15 +160,11 @@ export class Sprint {
         this.inputWords = words.words;
         const wordsForCards = [...this.getWordsForCards()];
         this.words = wordsForCards;
+        this.inputWords.forEach(word=>{this.totalWordsInGame.push(word)})
     }
 
     async getNextWords() {
         if (this.words.length === 1) {
-            this.inputWords.forEach(word => {
-                if(appState.isSignedIn) {
-                    modifyWord(this, (word as IAggreagtedWord), 'sprint')
-                }
-            })
             await this.getInputWords();
         }
     }
@@ -230,6 +229,13 @@ export class Sprint {
         }
         if (this.correctAnswer.length > 0) {
             this.drawAllRightAnswers();
+        }
+        document.removeEventListener("keydown", pressKey, false);
+        if(appState.isSignedIn) {
+            console.log(this)
+            this.totalWordsInGame.forEach(word=> {
+                modifyWord(this, (word as IAggreagtedWord), 'sprint');
+            })
         }
     }
 

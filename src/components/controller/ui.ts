@@ -791,6 +791,14 @@ export function startGame(
     document.addEventListener("keydown", keyboardEventsHandler);
     const closeButton = container.querySelector(".close-button");
     if (!isHTMLElement(closeButton)) return;
+    if(game === SPRINT) {
+        const timer = setTimeout(() => {
+            (currentGame.game as Sprint).endGame();
+        }, 61000);
+        closeButton.addEventListener("click", () => {
+            clearTimeout(timer);
+        });
+    }
     closeButton.addEventListener("click", async () => {
         if (!appState.isSignedIn) {
             setStats((currentGame.game as AudioCall | Sprint), appState.userNull);
