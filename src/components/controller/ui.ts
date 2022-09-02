@@ -52,9 +52,27 @@ import {AppView} from "../view/app-view";
 import {PagePagination} from "../view/textbook/components";
 import {Sprint} from "../view/audio-call/sprint/sprint-model";
 
+
+function clearFormFields(formName: string){
+    const emailInput = document.querySelector(`.${formName}-email`);
+    if (!isHTMLInputElement(emailInput)) return;
+    emailInput.value = "";
+    const passwordInput = document.querySelector(`.${formName}-password`);
+    if (!isHTMLInputElement(passwordInput)) return;
+    passwordInput.value = "";
+    const nameInput = document.querySelector(`.${formName}-name`);
+    if (!isHTMLInputElement(nameInput)) return;
+    nameInput.value = "";
+    const passwordInputRepeat = document.querySelector(`.${formName}-password-repeat`);
+    if (!isHTMLInputElement(passwordInputRepeat)) return;
+    passwordInputRepeat.value = "";
+}
+
 export function showFormHandler() {
     document.querySelector(".form-container")?.classList.toggle("hidden");
     const mainPageFormButtons = document.querySelector(".start-screen-buttons");
+    clearFormFields('registration');
+    clearFormFields('login');
     if (!isHTMLDivElement(mainPageFormButtons)) return;
     [...mainPageFormButtons.children].forEach((elem) => {
         if (
@@ -529,12 +547,14 @@ export function showForms(e: Event): void {
         e.target.nextElementSibling.classList.remove("active-form");
         signIn.classList.remove("hidden");
         signUp.classList.add("hidden");
+        clearFormFields('registration');
     } else if (e.target.classList.contains("show-sign-up")) {
         e.target.classList.add("active-form");
         if (!isHTMLButtonElement(e.target.previousElementSibling)) return;
         e.target.previousElementSibling.classList.remove("active-form");
         signIn.classList.add("hidden");
         signUp.classList.remove("hidden");
+        clearFormFields('login');
     }
 }
 
@@ -546,6 +566,8 @@ export async function addNewUserHandler(e: Event): Promise<void> {
     if (!isHTMLInputElement(emailInput)) return;
     const passwordInput = document.querySelector(".registration-password");
     if (!isHTMLInputElement(passwordInput)) return;
+    const passwordInputRepeat = document.querySelector(".registration-password-repeat");
+    if (!isHTMLInputElement(passwordInputRepeat)) return;
     if (!validateForm("registration")) return;
     const userData = {
         name: nameInput.value,
@@ -568,9 +590,7 @@ export async function addNewUserHandler(e: Event): Promise<void> {
     appState.isSignedIn = true;
     setCurrentUser(signedIn);
     localStorage.setItem("appState", JSON.stringify(appState));
-    passwordInput.value = "";
-    emailInput.value = "";
-    nameInput.value = "";
+    clearFormFields('registration');
 }
 
 export async function signInHandler(e: Event): Promise<void> {
@@ -600,8 +620,7 @@ export async function signInHandler(e: Event): Promise<void> {
     appState.isSignedIn = true;
     setCurrentUser(signedIn);
     localStorage.setItem("appState", JSON.stringify(appState));
-    passwordInput.value = "";
-    emailInput.value = "";
+    clearFormFields('login');
 }
 
 export function logOutHandler(): void {
