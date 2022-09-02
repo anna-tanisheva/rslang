@@ -953,6 +953,11 @@ export function playAgainHandler(gameContainer: HTMLElement, section: number){
       startGame(container, section, AUDIO_CALL, PAGE);
 }
 
+export function goToStatisticPageHandler(){
+    appState.view = 'stats';
+    getActiveViewData();
+}
+
 export function getGameWordsArr(arr: WordsData) {
     const output: IAggreagtedWord[] = [];
     if (arr.length >= 10) {

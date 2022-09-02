@@ -3,11 +3,11 @@ import {
   createElementWithAttributes,
 } from "../utils";
 import { AudioCall } from "./call/audio-call";
-import { currentGame, AUDIO_CALL, SPRINT } from "../../controller/state";
-import { playWordInGameHandler, appendGameStats, playAgainHandler } from '../../controller/ui';
+import { currentGame, AUDIO_CALL, SPRINT, appState } from "../../controller/state";
+import { playWordInGameHandler, appendGameStats, playAgainHandler, goToStatisticPageHandler, setStats } from '../../controller/ui';
 // import { IUserStats } from "../../../typings";
 import { Sprint } from "./sprint/sprint-model";
-import { IResWordsPage } from "../../../typings";
+import { IResWordsPage, IUserStats } from "../../../typings";
 
 
 
@@ -66,8 +66,18 @@ export class GamePopUp {
                 playAgainHandler(gameContainer, section);
               }
             })
+            const goToStatisticPage = createElementWithClassnames('button', 'go-to-stats', 'button');
+            goToStatisticPage.textContent = 'Статистика';
+            goToStatisticPage.addEventListener('click', () => {
+              if(!appState.isSignedIn) {
+                setStats((currentGame.game as AudioCall), appState.userNull);
+            } else {
+                setStats((currentGame.game as AudioCall), (appState.user.statsToday as IUserStats));
+            }
+              goToStatisticPageHandler();
+            });
             wrapper = createElementWithClassnames('div', 'game-stats');
-            gameStatsWrapper.append(playAgain, wrapper);
+            gameStatsWrapper.append(playAgain, goToStatisticPage, wrapper);
     } else if (game === SPRINT) {
         if (!arrOfWords) {
             currentGame.game = new Sprint(section, page, game);
