@@ -311,10 +311,14 @@ function setGameStatisticToStats(
         });
         usersStats[gameName as keyof typeof usersStats].numberOfGames += 1;
         const totalWordsInGames = game.state.answers.false.length + game.state.answers.true.length;
-        usersStats[gameName as keyof typeof usersStats].totalAnswers += totalWordsInGames
-        usersStats[gameName as keyof typeof usersStats].correctAnswersPercent = calcCorrectAnswersPercent(
-            usersStats[gameName as keyof typeof usersStats].correctAnswers, usersStats[gameName as keyof typeof usersStats].totalAnswers
-        );
+        usersStats[gameName as keyof typeof usersStats].totalAnswers += totalWordsInGames;
+        if(usersStats[gameName as keyof typeof usersStats].correctAnswers && usersStats[gameName as keyof typeof usersStats].totalAnswers) {
+            usersStats[gameName as keyof typeof usersStats].correctAnswersPercent = calcCorrectAnswersPercent(
+                usersStats[gameName as keyof typeof usersStats].correctAnswers, usersStats[gameName as keyof typeof usersStats].totalAnswers
+            );
+        } else {
+            usersStats[gameName as keyof typeof usersStats].correctAnswersPercent = 0;
+        }
 }
 
 
@@ -330,8 +334,12 @@ export async function setStats(
     user.statisticState.total.correctAnswers += game.state.answers.true.length;
     user.statisticState.total.wordsLearnt = user.statisticState.audioCall.wordsLearnt + user.statisticState.sprint.wordsLearnt;
     user.statisticState.total.numberOfGames += 1;
-    const totalWordsInGames = user.statisticState.audioCall.totalAnswers + user.statisticState.sprint.totalAnswers
-    user.statisticState.total.correctAnswersPercent = calcCorrectAnswersPercent(user.statisticState.total.correctAnswers, totalWordsInGames);
+    const totalWordsInGames = user.statisticState.audioCall.totalAnswers + user.statisticState.sprint.totalAnswers;
+    if(user.statisticState.total.correctAnswers && user.statisticState.total.totalAnswers) {
+        user.statisticState.total.correctAnswersPercent = calcCorrectAnswersPercent(user.statisticState.total.correctAnswers, totalWordsInGames);
+    } else {
+        user.statisticState.total.correctAnswersPercent = 0;
+    }
     if(!appState.isSignedIn) return;
     setUserStatsArr(appState.user);
 }
@@ -432,9 +440,10 @@ function validationHandler(nodeList: Node[]): boolean | undefined {
     if (nodeList[3]) {
         if (
             (nodeList[3] as HTMLInputElement).value !==
-            (nodeList[2] as HTMLInputElement).value
+            (nodeList[1] as HTMLInputElement).value
         ) {
             valid = false;
+            console.log((nodeList[3] as HTMLInputElement).value, (nodeList[1] as HTMLInputElement).value )
             invalidPasswordRepeat.classList.remove("hidden");
         }
     }

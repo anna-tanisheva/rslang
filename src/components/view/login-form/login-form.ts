@@ -25,8 +25,8 @@ export class Form {
         Пароль:
         <input type="password" class="registration-password" placeholder="Минимум 8 символов" autocomplete="off">
       </label>
-      <label class="label-password">
-      Пароль:
+      <label class="label-password-repeat">
+      Еще раз:
       <input type="password" class="registration-password-repeat" placeholder="Подтвердить пароль" autocomplete="off">
     </label>
       <button class="registration-submit">Отправить</button>
