@@ -312,9 +312,7 @@ export class TextbookView {
             }
             startGameHandler(e, {words: wordsForGame});
         });
-        const games = createElementWithClassnames("div", "games");
-
-        textbookContainer.append(wordsWrapper, gamesLauncherWrapper, games);
+        textbookContainer.append(wordsWrapper, gamesLauncherWrapper);
         return textbookContainer;
     }
 }

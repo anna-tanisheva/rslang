@@ -17,6 +17,10 @@ export class AppView {
 
     private showForm = new ShowFormPanel().create();
 
+    private gamesWrappeer = createElementWithAttributes("section", {
+        class: "games-wrapper",
+    });
+
     private drawForm(): void {
         const headerWrapper = document.querySelector(".header-wrapper");
         if (!isHTMLElement(headerWrapper)) return;
@@ -29,7 +33,8 @@ export class AppView {
             this.headerView,
             AppView.mainView,
             this.footerView,
-            this.form
+            this.form,
+            this.gamesWrappeer
         );
         document.body.append(root);
         this.drawForm();

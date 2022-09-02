@@ -10,7 +10,7 @@ export function restartGameHandler(e: Event) {
    if (!isHTMLButtonElement(target)) return;
    const popup = document.querySelector(".game-popup");
    if (!isHTMLElement(popup)) return;
-   const container = document.querySelector(".games");
+   const container = document.querySelector(".games-wrapper");
    if (!isHTMLElement(container)) return;
 
 

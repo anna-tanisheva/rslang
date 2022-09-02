@@ -846,7 +846,7 @@ export function startGame(
     document.addEventListener("keydown", keyboardEventsHandler);
     const closeButton = container.querySelector(".close-button");
     if (!isHTMLElement(closeButton)) return;
-    if(game === SPRINT) {
+    if (game === SPRINT) {
         document.addEventListener("keydown", pressKey, false);
         const timer = setTimeout(() => {
             (currentGame.game as Sprint).endGame();
@@ -858,22 +858,28 @@ export function startGame(
     }
     closeButton.addEventListener("click", async () => {
         if (!appState.isSignedIn) {
-            setStats((currentGame.game as AudioCall | Sprint), appState.userNull);
+            setStats(currentGame.game as AudioCall | Sprint, appState.userNull);
         } else {
             setStats(
-                currentGame.game as  AudioCall | Sprint,
+                currentGame.game as AudioCall | Sprint,
                 appState.user.statsToday as IUserStats
             );
+        }
+        if (currentGame.game === SPRINT) {
+            ((currentGame.game as unknown) as Sprint).endGame();
         }
         currentGame.game = null;
         container.removeChild(popup);
         const overlay = document.querySelector(".overlay");
         overlay?.classList.add("hidden");
+        if (appState.view === "textbook") {
+            getActiveViewData();
+        }
     });
     const nextButton = container.querySelector(".next-button");
     if (!isHTMLElement(nextButton)) return;
-    if(game === SPRINT) {
-        nextButton.classList.add('hidden');
+    if (game === SPRINT) {
+        nextButton.classList.add("hidden");
     }
     nextButton.addEventListener("click", () => {
         nextButton.blur();
@@ -903,7 +909,7 @@ export function startGame(
 
 export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
     const {target} = e;
-    const gameContainer = document.querySelector(".games");
+    const gameContainer = document.querySelector(".games-wrapper");
     if (!isHTMLElement(gameContainer)) return;
     if (!isHTMLButtonElement(target)) return;
     if (!target.classList.contains("start-button")) return;
@@ -911,8 +917,6 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
     let page;
     let section;
     if (target.classList.contains("sprint-button")) {
-
-
         if (!arrOfWords) {
             section = Number(
                 target.closest(".game-container")?.querySelector("select")
@@ -927,7 +931,6 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
             startGame(gameContainer, section, SPRINT, page, arrOfWords);
         }
         // startGame(gameContainer, section, SPRINT, page);
-<<<<<<< HEAD
         // const timer = setTimeout(() => {
         //     (currentGame.game as Sprint).endGame();
         // }, 61000);
@@ -937,43 +940,34 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
         //     clearTimeout(timer);
         // });
         document.removeEventListener("keydown", pressKey, false);
-=======
-        const timer = setTimeout(() => {
-            (currentGame.game as Sprint).endGame();
-            document.removeEventListener("keydown", pressKey);
-        }, 61000);
-        const closeButton = document.querySelector(".close-button");
-        if (!isHTMLElement(closeButton)) return;
-        closeButton.addEventListener("click", () => {
-            clearTimeout(timer);
-        });
->>>>>>> develop
     } else if (!arrOfWords) {
-            page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
-            section = Number(
-                target.closest(".game-container")?.querySelector("select")
-                    ?.value
-            );
-            startGame(gameContainer, section, AUDIO_CALL, page);
-        } else {
-            page = appState.viewsStates.textbook.page;
-            section = appState.viewsStates.textbook.group;
-            startGame(gameContainer, section, AUDIO_CALL, page, arrOfWords);
-        }
+        page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
+        section = Number(
+            target.closest(".game-container")?.querySelector("select")?.value
+        );
+        startGame(gameContainer, section, AUDIO_CALL, page);
+    } else {
+        page = appState.viewsStates.textbook.page;
+        section = appState.viewsStates.textbook.group;
+        startGame(gameContainer, section, AUDIO_CALL, page, arrOfWords);
+    }
 }
 
-export function playAgainHandler(gameContainer: HTMLElement, section: number){
-    if(!appState.isSignedIn) {
-        setStats((currentGame.game as AudioCall | Sprint), appState.userNull);
-      } else {
-          setStats((currentGame.game as AudioCall | Sprint), (appState.user.statsToday as IUserStats));
-      }
-      currentGame.game = null;
-      const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);
-      const container = document.querySelector('.games');
-      if(!isHTMLElement(container)) return;
-      container.removeChild(gameContainer);
-      startGame(container, section, AUDIO_CALL, PAGE);
+export function playAgainHandler(gameContainer: HTMLElement, section: number) {
+    if (!appState.isSignedIn) {
+        setStats(currentGame.game as AudioCall | Sprint, appState.userNull);
+    } else {
+        setStats(
+            currentGame.game as AudioCall | Sprint,
+            appState.user.statsToday as IUserStats
+        );
+    }
+    currentGame.game = null;
+    const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);
+    const container = document.querySelector(".games-wrapper");
+    if (!isHTMLElement(container)) return;
+    container.removeChild(gameContainer);
+    startGame(container, section, AUDIO_CALL, PAGE);
 }
 
 export function goToStatisticPageHandler(){
