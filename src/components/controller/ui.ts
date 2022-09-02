@@ -245,15 +245,11 @@ export function setEmptyStatistic(str: string) {
     };
 }
 
-export function areDaysEqual(oldDate: string, newDate: string) {
+export function compareDates(oldDate: string, newDate: string){
     [oldDate] = oldDate.split("T");
     [newDate] = newDate.split("T");
-    oldDate = oldDate.slice(oldDate.length - 2);
-    newDate = newDate.slice(newDate.length - 2);
-    if (Number(oldDate) !== Number(newDate)) {
-        return false;
-    }
-    return true;
+    if (Date.parse(oldDate) === Date.parse(newDate)) return true;
+    return false;
 }
 
 function setNewDate() {
@@ -382,7 +378,7 @@ async function setCurrentUser(data: ISignInResponse) {
         const id = `user${appState.user.userId}`;
         const oldDate = (userInUserStats as IUserStatsInArr)[id]
             .statisticTimeStamp;
-        if (areDaysEqual(oldDate as string, newDate)) {
+        if (compareDates(oldDate as string, newDate)) {
             appState.user.statsToday = (userInUserStats as IUserStatsInArr)[id];
         } else {
             const statsObj = await fetchUserStatistic();
@@ -669,7 +665,7 @@ export function getLocalStorage() {
             }
             const oldDate = JSON.parse(localStorage.appState).userNull
                 .statisticTimeStamp;
-            if (!areDaysEqual(oldDate, newDate)) {
+            if (!compareDates(oldDate as string, newDate)) {
                 appState.userNull = setEmptyStatistic(newDate);
             } else {
                 appState.userNull.statisticTimeStamp = oldDate;
