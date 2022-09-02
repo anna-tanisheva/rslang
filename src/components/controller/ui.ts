@@ -939,7 +939,7 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
         // closeButton.addEventListener("click", () => {
         //     clearTimeout(timer);
         // });
-        document.removeEventListener("keydown", pressKey, false);
+        // document.removeEventListener("keydown", pressKey, false);
     } else if (!arrOfWords) {
         page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
         section = Number(
