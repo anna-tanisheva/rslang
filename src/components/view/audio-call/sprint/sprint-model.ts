@@ -232,9 +232,12 @@ export class Sprint {
         }
         document.removeEventListener("keydown", pressKey, false);
         if(appState.isSignedIn) {
-            console.log(this)
             this.totalWordsInGame.forEach(word=> {
-                modifyWord(this, (word as IAggreagtedWord), 'sprint');
+                try {
+                    modifyWord(this, (word as IAggreagtedWord), 'sprint');
+                } catch (err) {
+                    console.log((err as Error).message)
+                }
             })
         }
     }

@@ -274,9 +274,12 @@ export async function fetchPostOrPutUserWord({
     let respData: IUserWordResponse;
     try {
         const resp = await fetch(url, options);
+        if (resp.status === 417) {
+            throw new Error('417');
+        }
         respData = (await resp.json()) as IUserWordResponse;
     } catch (error) {
-        console.log(error);
+        console.log((error as Error).message);
         respData = {
             wordId: word.id,
             id: appState.user.userId,
