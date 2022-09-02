@@ -799,6 +799,38 @@ export async function modifyWord(game: AudioCall | Sprint, word: IAggreagtedWord
     });
 }
 
+// eslint-disable-next-line func-names
+export const pressKey = function (event: KeyboardEvent) {
+    const arrayLeftKey = document.querySelector(".right-key");
+    if (!isHTMLButtonElement(arrayLeftKey)) return;
+    const arrayRightKey = document.querySelector(".wrong-key");
+    if (!isHTMLButtonElement(arrayRightKey)) return;
+    window.addEventListener("keydown", (e) => {
+        if (e.code === "ArrowLeft") {
+            arrayLeftKey.classList.add("active");
+        }
+        if (e.code === "ArrowRight") {
+            arrayRightKey.classList.add("active");
+        }
+    });
+
+    window.addEventListener("keyup", (e) => {
+        if (e.code === "ArrowLeft") {
+            arrayLeftKey.classList.remove("active");
+        }
+        if (e.code === "ArrowRight") {
+            arrayRightKey.classList.remove("active");
+        }
+    });
+
+    event.preventDefault();
+    if (event.code === "ArrowLeft") {
+        (currentGame.game as Sprint).onRightButton();
+    } else if (event.code === "ArrowRight") {
+        (currentGame.game as Sprint).onWrongButton();
+    }
+};
+
 export function startGame(
     container: HTMLElement,
     section: number,
@@ -818,8 +850,10 @@ export function startGame(
     const closeButton = container.querySelector(".close-button");
     if (!isHTMLElement(closeButton)) return;
     if(game === SPRINT) {
+        document.addEventListener("keydown", pressKey, false);
         const timer = setTimeout(() => {
             (currentGame.game as Sprint).endGame();
+            document.removeEventListener("keydown", pressKey);
         }, 61000);
         closeButton.addEventListener("click", () => {
             clearTimeout(timer);
@@ -878,38 +912,6 @@ export function startGame(
     overlay?.classList.remove("hidden");
 }
 
-// eslint-disable-next-line func-names
-export const pressKey = function (event: KeyboardEvent) {
-    const arrayLeftKey = document.querySelector(".right-key");
-    if (!isHTMLButtonElement(arrayLeftKey)) return;
-    const arrayRightKey = document.querySelector(".wrong-key");
-    if (!isHTMLButtonElement(arrayRightKey)) return;
-    window.addEventListener("keydown", (e) => {
-        if (e.code === "ArrowLeft") {
-            arrayLeftKey.classList.add("active");
-        }
-        if (e.code === "ArrowRight") {
-            arrayRightKey.classList.add("active");
-        }
-    });
-
-    window.addEventListener("keyup", (e) => {
-        if (e.code === "ArrowLeft") {
-            arrayLeftKey.classList.remove("active");
-        }
-        if (e.code === "ArrowRight") {
-            arrayRightKey.classList.remove("active");
-        }
-    });
-
-    event.preventDefault();
-    if (event.code === "ArrowLeft") {
-        (currentGame.game as Sprint).onRightButton();
-    } else if (event.code === "ArrowRight") {
-        (currentGame.game as Sprint).onWrongButton();
-    }
-};
-
 export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
     const {target} = e;
     const gameContainer = document.querySelector(".games");
@@ -938,13 +940,13 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
         // startGame(gameContainer, section, SPRINT, page);
         const timer = setTimeout(() => {
             (currentGame.game as Sprint).endGame();
+            document.removeEventListener("keydown", pressKey);
         }, 61000);
         const closeButton = document.querySelector(".close-button");
         if (!isHTMLElement(closeButton)) return;
         closeButton.addEventListener("click", () => {
             clearTimeout(timer);
         });
-        document.removeEventListener("keydown", pressKey, false);
     } else if (!arrOfWords) {
             page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
             section = Number(
