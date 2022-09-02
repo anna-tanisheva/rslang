@@ -295,7 +295,6 @@ function setGameStatisticToStats(
     usersStats: IUserStats["statisticState"],
     gameName: string
     ) {
-        console.log(gameState)
         usersStats[gameName as keyof typeof usersStats].correctAnswers += gameState.answers.true.length;
         if(usersStats[gameName as keyof typeof usersStats].correctAnswersStrick < gameState.maxStrick) {
             usersStats[gameName as keyof typeof usersStats].correctAnswersStrick = gameState.maxStrick;
@@ -353,7 +352,6 @@ export async function setStats(
     user.statisticState.total.wordsLearnt = user.statisticState.audioCall.wordsLearnt + user.statisticState.sprint.wordsLearnt;
     user.statisticState.total.numberOfGames += 1;
     const totalWordsInGames = user.statisticState.audioCall.totalAnswers + user.statisticState.sprint.totalAnswers;
-    console.log(totalWordsInGames)
     if(totalWordsInGames) {
         user.statisticState.total.correctAnswersPercent = calcCorrectAnswersPercent(user.statisticState.total.correctAnswers, totalWordsInGames);
     } else {
@@ -462,7 +460,6 @@ function validationHandler(nodeList: Node[]): boolean | undefined {
             (nodeList[1] as HTMLInputElement).value
         ) {
             valid = false;
-            console.log((nodeList[3] as HTMLInputElement).value, (nodeList[1] as HTMLInputElement).value )
             invalidPasswordRepeat.classList.remove("hidden");
         }
     }
@@ -963,7 +960,6 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
 }
 
 export function playAgainHandler(gameContainer: HTMLElement, section: number){
-    console.log(`playAgainHandler`)
     if(!appState.isSignedIn) {
         setStats((currentGame.game as AudioCall | Sprint), appState.userNull);
       } else {
@@ -998,7 +994,6 @@ export function getGameWordsArr(arr: WordsData) {
         while (output.length < arr.length) {
             const ind = getRandomInRange(arr.length);
             if (!output.includes(arr[ind])) output.push(arr[ind]);
-            console.log(output);
         }
     }
     return output;

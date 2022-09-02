@@ -60,7 +60,6 @@ export class GamePopUp {
               playAgainHandler(gameContainer, section);
             });
             playAgain.addEventListener('keydown', (e) => {
-              console.log(e);
               e.preventDefault();
               if (e.keyCode === 13) {
                 playAgainHandler(gameContainer, section);
@@ -90,7 +89,6 @@ export class GamePopUp {
                 gameContainer.append(res);
             })
             .catch((err) => {
-                console.log("bfbbfbf");
                 (currentGame.game as Sprint).endGame();
                 console.log(JSON.stringify(err));
             });
