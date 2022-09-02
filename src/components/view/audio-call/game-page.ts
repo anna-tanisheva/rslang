@@ -17,10 +17,12 @@ export class GamePopUp {
 
     const gameContainer = createElementWithClassnames("div", "game-popup");
     const closeButton = createElementWithClassnames('div', 'close-button');
+    const gameStatsWrapper = createElementWithClassnames('div', 'game-stats-wrapper');
     closeButton.innerText = '+'
     const nextButton = createElementWithClassnames('button', 'next-button');
     nextButton.innerHTML = '&#8594;';
     // в конструктор передаем номер раздела от пользователя или слова страницы учебника, с которой была запущена игра
+    let wrapper;
     if (game === AUDIO_CALL) {
         const currentSlide = 0;
         if (!arrOfWords) {
@@ -48,14 +50,30 @@ export class GamePopUp {
                 );
                 playWordInGameHandler(audio as HTMLAudioElement);
             });
+
+            gameStatsWrapper.classList.add('opacity-hidden');
+            const stats = createElementWithClassnames('div', 'game-stats');
+            gameStatsWrapper.append(appendGameStats(stats));
+            const playAgain = createElementWithClassnames('button', 'play-again-btn', 'button');
+            playAgain.textContent = 'Играть еще раз';
+            playAgain.addEventListener('click', () => {
+              playAgainHandler(gameContainer, section);
+            });
+            playAgain.addEventListener('keydown', (e) => {
+              console.log(e);
+              e.preventDefault();
+              if (e.keyCode === 13) {
+                playAgainHandler(gameContainer, section);
+              }
+            })
+            wrapper = createElementWithClassnames('div', 'game-stats');
+            gameStatsWrapper.append(playAgain, wrapper);
     } else if (game === SPRINT) {
         if (!arrOfWords) {
             currentGame.game = new Sprint(section, page, game);
         } else {
             currentGame.game = new Sprint(section, page, game, arrOfWords);
         }
-
-        // currentGame.game = new Sprint(section, page, game);
         (currentGame.game as Sprint)
             .create()
             .then((res) => {
@@ -82,26 +100,10 @@ export class GamePopUp {
     wrongSound.classList.add('wrong-sound');
     const correctSound = createElementWithAttributes('audio', correctSoundAttr);
     correctSound.classList.add('correct-sound');
-
-    const gameStatsWrapper = createElementWithClassnames('div', 'game-stats-wrapper');
-    gameStatsWrapper.classList.add('opacity-hidden');
-    const stats = createElementWithClassnames('div', 'game-stats');
-    gameStatsWrapper.append(appendGameStats(stats));
-    const playAgain = createElementWithClassnames('button', 'play-again-btn', 'button');
-    playAgain.textContent = 'Играть еще раз';
-    playAgain.addEventListener('click', () => {
-      playAgainHandler(gameContainer, section);
-    });
-    playAgain.addEventListener('keydown', (e) => {
-      console.log(e);
-      e.preventDefault();
-      if (e.keyCode === 13) {
-        playAgainHandler(gameContainer, section);
-      }
-    })
-    const wrapper = createElementWithClassnames('div', 'game-stats');
-    gameStatsWrapper.append(playAgain, wrapper);
-    gameContainer.append(wrongSound, correctSound, closeButton, nextButton, gameStatsWrapper)
+    gameContainer.append(wrongSound, correctSound, closeButton, nextButton)
+    if(currentGame.game as AudioCall) {
+      gameContainer.append(gameStatsWrapper)
+    }
     return gameContainer;
   }
 }

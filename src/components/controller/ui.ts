@@ -86,8 +86,6 @@ export function addFormHandlerToMainPage(e: Event) {
         showSignUpButton.classList.remove("active-form");
         signIn.classList.remove("hidden");
         signUp.classList.add("hidden");
-        // if (!isHTMLButtonElement(e.target.nextElementSibling)) return;
-        // e.target.nextElementSibling.setAttribute('disabled', 'true');
     } else if (
         (e.target as HTMLButtonElement).classList.contains(
             "registration-button"
@@ -184,6 +182,7 @@ export function setDailyChart(chart: HTMLCanvasElement, data: number[]) {
     });
     return myChart;
 }
+
 export function isUserInUserStats(user: IUser) {
     const id = `user${user.userId}`;
     return (
@@ -278,12 +277,13 @@ function setGameStatisticToStats(
     usersStats: IUserStats["statisticState"],
     gameName: string
     ) {
+        console.log(gameState)
         usersStats[gameName as keyof typeof usersStats].correctAnswers += gameState.answers.true.length;
         if(usersStats[gameName as keyof typeof usersStats].correctAnswersStrick < gameState.maxStrick) {
             usersStats[gameName as keyof typeof usersStats].correctAnswersStrick = gameState.maxStrick;
         }
         gameState.answers.true.forEach(word => {
-            const wordInWordsLearnt = isWordInWordsLearnt(word, user, AUDIO_CALL);
+            const wordInWordsLearnt = isWordInWordsLearnt(word, user, gameName);
             if(!wordInWordsLearnt) {
                 const wordOnLearning: IWordLearningState = {};
                 wordOnLearning[word] = 1
@@ -299,7 +299,7 @@ function setGameStatisticToStats(
             }
         });
         gameState.answers.false.forEach(word => {
-            const wordInWordsLearnt = isWordInWordsLearnt(word, user, AUDIO_CALL);
+            const wordInWordsLearnt = isWordInWordsLearnt(word, user, gameName);
             if(wordInWordsLearnt) {
                 wordInWordsLearnt[word] = 0;
                 if (usersStats[gameName as keyof typeof usersStats].wordsLearnt > 0) {
@@ -793,17 +793,19 @@ export function startGame(
     if (!isHTMLElement(closeButton)) return;
     closeButton.addEventListener("click", async () => {
         if (!appState.isSignedIn) {
-            setStats(currentGame.game as AudioCall, appState.userNull);
+            setStats((currentGame.game as AudioCall | Sprint), appState.userNull);
         } else {
             setStats(
-                currentGame.game as AudioCall,
+                currentGame.game as  AudioCall | Sprint,
                 appState.user.statsToday as IUserStats
             );
         }
         if (appState.isSignedIn) {
-            (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
-                modifyWord((currentGame.game as AudioCall), word, 'audiocall')
-            })
+            if (currentGame.game instanceof AudioCall) {
+                (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
+                    modifyWord((currentGame.game as AudioCall), word, 'audiocall')
+                })
+            }
         }
 
         currentGame.game = null;
@@ -818,23 +820,25 @@ export function startGame(
     }
     nextButton.addEventListener("click", () => {
         nextButton.blur();
-        const sliderContainer = popup.querySelector(".audio-call");
-        (currentGame.game as AudioCall).currentSlide += 1;
-        if (!isHTMLDivElement(sliderContainer)) return;
-        moveGameSlider(sliderContainer, nextButton);
-        const audio = sliderContainer.querySelector(
-            `.word-card:nth-child(${
-                (currentGame.game as AudioCall).currentSlide + 1
-            })>audio`
-        );
-        const prevAudio = sliderContainer.querySelector(
-            `.word-card:nth-child(${
-                (currentGame.game as AudioCall).currentSlide
-            })>audio`
-        );
-        stopPlayingWordHandler(prevAudio as HTMLAudioElement);
-        if (!audio) return;
-        playWordInGameHandler(audio as HTMLAudioElement);
+        if (currentGame.game instanceof AudioCall) {
+            const sliderContainer = popup.querySelector(".audio-call");
+            if (!isHTMLDivElement(sliderContainer)) return;
+            (currentGame.game as AudioCall).currentSlide += 1;
+            moveGameSlider(sliderContainer, nextButton);
+            const audio = sliderContainer.querySelector(
+                `.word-card:nth-child(${
+                    (currentGame.game as AudioCall).currentSlide + 1
+                })>audio`
+            );
+            const prevAudio = sliderContainer.querySelector(
+                `.word-card:nth-child(${
+                    (currentGame.game as AudioCall).currentSlide
+                })>audio`
+            );
+            stopPlayingWordHandler(prevAudio as HTMLAudioElement);
+            if (!audio) return;
+            playWordInGameHandler(audio as HTMLAudioElement);
+        }
     });
     const overlay = document.querySelector(".overlay");
     overlay?.classList.remove("hidden");
@@ -878,7 +882,7 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
     if (!isHTMLElement(gameContainer)) return;
     if (!isHTMLButtonElement(target)) return;
     if (!target.classList.contains("start-button")) return;
-    console.log(arrOfWords?.words);
+    target.blur();
     let page;
     let section;
     if (target.classList.contains("sprint-button")) {
@@ -901,7 +905,6 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
         const timer = setTimeout(() => {
             (currentGame.game as Sprint).endGame();
         }, 61000);
-        console.log(currentGame);
         const closeButton = document.querySelector(".close-button");
         if (!isHTMLElement(closeButton)) return;
         closeButton.addEventListener("click", () => {
@@ -922,15 +925,17 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
         }
 }
 
-
 export function playAgainHandler(gameContainer: HTMLElement, section: number){
+    console.log(`playAgainHandler`)
     if(!appState.isSignedIn) {
         setStats((currentGame.game as AudioCall | Sprint), appState.userNull);
       } else {
           setStats((currentGame.game as AudioCall | Sprint), (appState.user.statsToday as IUserStats));
-          (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
-            modifyWord((currentGame.game as AudioCall), word, 'audiocall')
-        })
+          if(currentGame instanceof AudioCall) {
+            (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
+                modifyWord((currentGame.game as AudioCall), word, 'audiocall')
+            })
+          }
       }
       currentGame.game = null;
       const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);
@@ -1013,7 +1018,6 @@ export function createAnswersCards(key: boolean, container: HTMLElement) {
 
 function addToCurrentGameState(guess: boolean, wordID: string) {
     if (guess) {
-        // (currentGame.game as AudioCall).state.correctGuesses += 1;
         (currentGame.game as AudioCall).state.currentStrick += 1;
         if (
             (currentGame.game as AudioCall).state.currentStrick >
@@ -1079,6 +1083,7 @@ export function choseAnswerHandler(e: Event, answer: string) {
     const statsNew = appendGameStats(statsOld);
     statsCurrentContainer.replaceChild(statsOld, statsNew);
 }
+
 export function choseSplitAnswerHandler(e: Event) {
     const {target} = e;
     if (!isHTMLButtonElement(target)) return;

@@ -7,7 +7,7 @@ import { getRandomNumber, modifyWord } from '../../../controller/ui';
 import { SprintView } from "./sprint-view";
 import "../../../../assets/sounds/wrong.mp3";
 import "../../../../assets/sounds/correct.mp3";
-import { TEXTBOOK_PAGE_COUNT } from "../../../controller/state";
+import { appState, TEXTBOOK_PAGE_COUNT } from "../../../controller/state";
 import { createElementWithAttributes } from "../../utils";
 import "../../../../assets/images/stamp1.png";
 import "../../../../assets/images/stamp3.png";
@@ -104,7 +104,6 @@ export class Sprint {
 
 
     addToState(guess: boolean,){
-        console.log(guess)
         if (guess === true) {
             this.state.currentStrick += 1;
             if (this.state.currentStrick >  this.state.maxStrick) {
@@ -163,7 +162,9 @@ export class Sprint {
     async getNextWords() {
         if (this.words.length === 1) {
             this.inputWords.forEach(word => {
-                modifyWord(this, (word as IAggreagtedWord), 'sprint')
+                if(appState.isSignedIn) {
+                    modifyWord(this, (word as IAggreagtedWord), 'sprint')
+                }
             })
             await this.getInputWords();
         }
