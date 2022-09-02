@@ -76,6 +76,7 @@ export class SprintView {
         resultContainer.append(resultWrapper);
         sprintContainer.append(gameContainer, resultContainer);
         game.append(sprintContainer);
+
         resultBtnsContainer.addEventListener(("click"), (e) => {restartGameHandler(e)});
 
         document.addEventListener("keydown", pressKey, false);

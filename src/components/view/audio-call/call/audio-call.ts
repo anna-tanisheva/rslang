@@ -9,7 +9,7 @@ import {
 } from "../../utils";
 import { fetchWords } from "../../../controller/api";
 import { ENDPOINT } from '../../../controller/state';
-import { playWordInGameHandler, getGameWordsArr, getOptions, choseAnswerHandler, } from '../../../controller/ui';
+import { playWordInGameHandler, getGameWordsArr, getOptions, choseAnswerHandler, keyboardEventsHandler } from '../../../controller/ui';
 import { IAggreagtedWord, IResWordsPage } from '../../../../typings';
 
 
@@ -30,8 +30,6 @@ export class AudioCall {
     }
   };
 
-  // game: string;
-
   currentSlide: number;
 
   wordsInGame: IAggreagtedWord[] | null;
@@ -50,7 +48,6 @@ export class AudioCall {
         false: []
       }
     };
-    // this.game = game;
     this.currentSlide = currentSlide;
     this.wordsInGame = null;
     this.arrOfWords = arrOfWords;
@@ -118,6 +115,8 @@ export class AudioCall {
       card.append(audio, answersContainer, flipContainer, answer);
       game.append(card);
     })
+
+    document.addEventListener('keydown', keyboardEventsHandler);
 
     return game;
   }

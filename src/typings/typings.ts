@@ -103,11 +103,13 @@ export interface IResWordsPage {
 
 export interface IStatisticState {
     total: {
+        numberOfGames: number;
         correctAnswersPercent: number;
         wordsLearntArr: IWordLearningState[];
         wordsLearnt: number;
         correctAnswers: number;
         correctAnswersStrick: number;
+        totalAnswers: number;
     };
     audioCall: {
         correctAnswersPercent: number;
@@ -116,6 +118,7 @@ export interface IStatisticState {
         wordsLearnt: number;
         correctAnswers: number;
         correctAnswersStrick: number;
+        totalAnswers: number;
     };
     sprint: {
         correctAnswersPercent: number;
@@ -124,6 +127,7 @@ export interface IStatisticState {
         wordsLearnt: number;
         correctAnswers: number;
         correctAnswersStrick: number;
+        totalAnswers: number;
     };
 }
 

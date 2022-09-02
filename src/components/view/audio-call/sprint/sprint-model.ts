@@ -1,13 +1,13 @@
 import { ResultWord } from "./result-view";
 import { isHTMLElement } from "../../../../typings/utils/utils";
 import "./sprint.scss";
-import { IWord, IWordsForSplit, IResWordsPage } from '../../../../typings';
+import { IWordsForSplit, IResWordsPage, IAggreagtedWord } from '../../../../typings';
 import { fetchWords } from "../../../controller/api";
-import { getRandomNumber } from '../../../controller/ui';
+import { getRandomNumber, modifyWord, pressKey } from '../../../controller/ui';
 import { SprintView } from "./sprint-view";
 import "../../../../assets/sounds/wrong.mp3";
 import "../../../../assets/sounds/correct.mp3";
-import { TEXTBOOK_PAGE_COUNT } from "../../../controller/state"; 
+import { appState, TEXTBOOK_PAGE_COUNT } from "../../../controller/state";
 import { createElementWithAttributes } from "../../utils";
 import "../../../../assets/images/stamp1.png";
 import "../../../../assets/images/stamp3.png";
@@ -19,7 +19,7 @@ import "../../../../assets/images/stamp4.jpg";
 export class Sprint {
 
     section: number;
-  
+
     page: number;
 
     correctAnswer: IWordsForSplit[];
@@ -28,10 +28,10 @@ export class Sprint {
 
     words: IWordsForSplit[];
 
-    inputWords: IWord[];
+    inputWords: IAggreagtedWord[];
 
     arrOfWords: IResWordsPage | undefined;
-  
+
     state: {
       correctGuesses: number,
       currentStrick: number,
@@ -42,9 +42,11 @@ export class Sprint {
         false: string[]
       }
     };
-  
+
+    totalWordsInGame: IAggreagtedWord[];
+
     gameName: string
-  
+
     constructor(sec: number, page: number, gameName: string, arrOfWords?: IResWordsPage) {
       this.gameName = gameName;
       this.section = sec;
@@ -58,7 +60,8 @@ export class Sprint {
             true: [],
             false: []
         },
-      }
+      };
+      this.totalWordsInGame = [];
       this.correctAnswer = [];
       this.wrongtAnswer = [];
       this.words = [];
@@ -71,7 +74,7 @@ export class Sprint {
     getWordsForCards() {
         const conversionArray = [...this.inputWords];
         const wordsForGame: IWordsForSplit [] = [];
-    
+
         for (let i = 0; i <= (this.inputWords.length - 1); i += 1) {
            const wordIndex = getRandomNumber(conversionArray.length - 1);
             const originalWord = conversionArray[wordIndex];
@@ -97,13 +100,13 @@ export class Sprint {
                     randomTranslate: secondWord.wordTranslate,
                     outcome: false
                 })
-            }        
+            }
         }
       return wordsForGame;
     }
 
 
-    addToState(guess: boolean,) {
+    addToState(guess: boolean,){
         if (guess === true) {
             this.state.currentStrick += 1;
             if (this.state.currentStrick >  this.state.maxStrick) {
@@ -134,7 +137,7 @@ export class Sprint {
         }
         if (this.state.currentStrick > 4 && this.state.currentStrick <= 6) {
             this.state.score += 40;
-            this.showScore(40);        
+            this.showScore(40);
         }
         if (this.state.currentStrick === 6) {
             this.state.score += 60;
@@ -145,24 +148,25 @@ export class Sprint {
             this.state.score += 60;
             this.showScore(60);
         }
-    } 
+    }
 
 
-    getInputWords = async () => {        
+    getInputWords = async () => {
         const words = await fetchWords({
             group: this.section,
             page: getRandomNumber(TEXTBOOK_PAGE_COUNT),
             wordsPerPage: 20
-        });  
+        });
         this.inputWords = words.words;
         const wordsForCards = [...this.getWordsForCards()];
         this.words = wordsForCards;
+        this.inputWords.forEach(word=>{this.totalWordsInGame.push(word)})
     }
 
     async getNextWords() {
         if (this.words.length === 1) {
             await this.getInputWords();
-        }  
+        }
     }
 
     async onRightButton() {
@@ -171,7 +175,7 @@ export class Sprint {
         const correctSound = document.querySelector(".correct-sound");
         if (!isHTMLElement(wrongSound)) return;
 
-        if(this.words[0].outcome === true) { 
+        if(this.words[0].outcome === true) {
             this.addScore();
             this.addToState(true);
             (correctSound as HTMLAudioElement).play();
@@ -182,9 +186,9 @@ export class Sprint {
             this.showWrongAnswer();
             (wrongSound as HTMLAudioElement).play();
             this.state.answers.false.push(this.words[0].id);
-        }    
+        }
 
-        await this.getNextWords();         
+        await this.getNextWords();
         this.words.splice(0, 1);
         this.drawCards();
         this.updateScore();
@@ -199,25 +203,25 @@ export class Sprint {
         if(this.words[0].outcome  === false) {
             this.state.answers.true.push(this.words[0].id);
             this.addScore();
-            this.addToState(true); 
-            (correctSound as HTMLAudioElement).play();                
+            this.addToState(true);
+            (correctSound as HTMLAudioElement).play();
         } else {
             this.state.answers.false.push(this.words[0].id);
             this.addToState(false);
             (wrongSound as HTMLAudioElement).play();
-            this.showWrongAnswer();            
+            this.showWrongAnswer();
         }
 
         await this.getNextWords();
         this.words.splice(0, 1);
         this.drawCards();
         this.updateScore();
-    }  
+    }
 
-    endGame() {        
+    endGame() {
         const resultWindow = document.querySelector(".sprint-results");
         const gameField = document.querySelector(".spint-container");
-        (resultWindow as HTMLInputElement).style.display = "block";        
+        (resultWindow as HTMLInputElement).style.display = "block";
         (gameField as HTMLInputElement).style.display = "none";
         this.drawFinalResults(500);
         if (this.wrongtAnswer.length > 0) {
@@ -226,25 +230,35 @@ export class Sprint {
         if (this.correctAnswer.length > 0) {
             this.drawAllRightAnswers();
         }
+        document.removeEventListener("keydown", pressKey, false);
+        if(appState.isSignedIn) {
+            this.totalWordsInGame.forEach(word=> {
+                try {
+                    modifyWord(this, (word as IAggreagtedWord), 'sprint');
+                } catch (err) {
+                    console.log((err as Error).message)
+                }
+            })
+        }
     }
-  
-    
+
+
     async create(): Promise<HTMLElement> {
         if(this.arrOfWords === undefined) {
-            await this.getInputWords(); 
-                  
+            await this.getInputWords();
+
         } else {
             const words = this.arrOfWords;
             this.inputWords = words.words;
             const wordsForCards = [...this.getWordsForCards()];
             this.words = wordsForCards;
         }
- 
-        const sprintContainer = new SprintView(this.words[0], this.state.score).create();     
+
+        const sprintContainer = new SprintView(this.words[0], this.state.score).create();
         return sprintContainer;
-    } 
-    
-    hideAnswer() {        
+    }
+
+    hideAnswer() {
         const correctAnswer = document.querySelector(".sprint-answer");
         if (!isHTMLElement(correctAnswer)) return;
         correctAnswer.style.display = "none";
@@ -279,20 +293,20 @@ export class Sprint {
     drawAllRightAnswers() {
         const rightAnswersContainer = document.querySelector('.results-right-answer');
 
-        this.correctAnswer.forEach((word: IWordsForSplit) => {            
-            const resRightAnswerView = new ResultWord(word);                 
+        this.correctAnswer.forEach((word: IWordsForSplit) => {
+            const resRightAnswerView = new ResultWord(word);
             if (!isHTMLElement(rightAnswersContainer)) return;
-            rightAnswersContainer.append(resRightAnswerView.create());         
+            rightAnswersContainer.append(resRightAnswerView.create());
         });
     }
 
     drawAllWrongAnswers() {
         const wrongAnswersContainer = document.querySelector('.results-wrong-answer');
 
-        this.wrongtAnswer.forEach((word: IWordsForSplit) => {            
-            const resWrongAnswerView = new ResultWord(word);                 
+        this.wrongtAnswer.forEach((word: IWordsForSplit) => {
+            const resWrongAnswerView = new ResultWord(word);
             if (!isHTMLElement(wrongAnswersContainer)) return;
-            wrongAnswersContainer.append(resWrongAnswerView.create());         
+            wrongAnswersContainer.append(resWrongAnswerView.create());
         });
     }
 
@@ -308,13 +322,13 @@ export class Sprint {
         finalScore.textContent = `Результат: ${this.state.score} баллов`
         const recordScore = document.querySelector(".sprint-record-score")
         if (!isHTMLElement(recordScore)) return;
-        recordScore.textContent = `Рекорд: ${record} баллов`                           // ToDo Сохранить и вывести рекорд 
+        recordScore.textContent = `Рекорд: ${record} баллов`                           // ToDo Сохранить и вывести рекорд
         const amountOfCorrectAnswers = document.querySelector(".results-right-answer");
         if (!isHTMLElement(amountOfCorrectAnswers)) return;
         amountOfCorrectAnswers.textContent = `Правильные ответы: ${this.state.answers.true.length}`;
         const amountOfWrongAnswers = document.querySelector(".results-wrong-answer");
         if (!isHTMLElement(amountOfWrongAnswers)) return;
-        amountOfWrongAnswers.textContent = `Неверные ответы: ${this.state.answers.false.length}`;        
+        amountOfWrongAnswers.textContent = `Неверные ответы: ${this.state.answers.false.length}`;
     }
 
     drawStamp1() {
@@ -346,6 +360,6 @@ export class Sprint {
         const stampContsiner = document.querySelector(".sprint-stamps-container");
         if (!isHTMLElement(stampContsiner)) return;
         stampContsiner.replaceChildren();
-    }       
-  
-} 
+    }
+
+}

@@ -15,7 +15,6 @@ import {
     currentGame,
     TEXTBOOK_PAGE_COUNT,
     ENDPOINT,
-    WORDS_IN_GAME,
     COLORS,
     AUDIO_CALL,
     SPRINT,
@@ -53,9 +52,27 @@ import {AppView} from "../view/app-view";
 import {PagePagination} from "../view/textbook/components";
 import {Sprint} from "../view/audio-call/sprint/sprint-model";
 
+
+function clearFormFields(formName: string){
+    const emailInput = document.querySelector(`.${formName}-email`);
+    if (!isHTMLInputElement(emailInput)) return;
+    emailInput.value = "";
+    const passwordInput = document.querySelector(`.${formName}-password`);
+    if (!isHTMLInputElement(passwordInput)) return;
+    passwordInput.value = "";
+    const nameInput = document.querySelector(`.${formName}-name`);
+    if (!isHTMLInputElement(nameInput)) return;
+    nameInput.value = "";
+    const passwordInputRepeat = document.querySelector(`.${formName}-password-repeat`);
+    if (!isHTMLInputElement(passwordInputRepeat)) return;
+    passwordInputRepeat.value = "";
+}
+
 export function showFormHandler() {
     document.querySelector(".form-container")?.classList.toggle("hidden");
     const mainPageFormButtons = document.querySelector(".start-screen-buttons");
+    clearFormFields('registration');
+    clearFormFields('login');
     if (!isHTMLDivElement(mainPageFormButtons)) return;
     [...mainPageFormButtons.children].forEach((elem) => {
         if (
@@ -87,8 +104,6 @@ export function addFormHandlerToMainPage(e: Event) {
         showSignUpButton.classList.remove("active-form");
         signIn.classList.remove("hidden");
         signUp.classList.add("hidden");
-        // if (!isHTMLButtonElement(e.target.nextElementSibling)) return;
-        // e.target.nextElementSibling.setAttribute('disabled', 'true');
     } else if (
         (e.target as HTMLButtonElement).classList.contains(
             "registration-button"
@@ -185,6 +200,7 @@ export function setDailyChart(chart: HTMLCanvasElement, data: number[]) {
     });
     return myChart;
 }
+
 export function isUserInUserStats(user: IUser) {
     const id = `user${user.userId}`;
     return (
@@ -200,10 +216,12 @@ export function setEmptyStatistic(str: string) {
         statisticState: {
             total: {
                 correctAnswersPercent: 0,
+                numberOfGames: 0,
                 wordsLearntArr: [],
                 wordsLearnt: 0,
                 correctAnswers: 0,
                 correctAnswersStrick: 0,
+                totalAnswers: 0
             },
             audioCall: {
                 correctAnswersPercent: 0,
@@ -212,6 +230,7 @@ export function setEmptyStatistic(str: string) {
                 wordsLearnt: 0,
                 correctAnswers: 0,
                 correctAnswersStrick: 0,
+                totalAnswers: 0
             },
             sprint: {
                 correctAnswersPercent: 0,
@@ -220,6 +239,7 @@ export function setEmptyStatistic(str: string) {
                 wordsLearnt: 0,
                 correctAnswers: 0,
                 correctAnswersStrick: 0,
+                totalAnswers: 0
             },
         },
     };
@@ -263,112 +283,83 @@ export function isWordInWordsLearnt(
     );
 }
 
-export function calcCorrectAnswersPercent(
-    numberOfGames: number,
-    answers: number
-) {
-    return Math.floor(
-        (Number(answers) * 100) / (Number(numberOfGames) * WORDS_IN_GAME)
-    );
+export function calcCorrectAnswersPercent(answers: number, wordsInGames: number) {
+
+    return Math.floor((Number(answers) * 100) / wordsInGames);
 }
 
-export async function setStats(game: AudioCall, user: IUserStats) {
-    // !TODO тут в типы добавить 2ю игру, когда появится
-
-    user.statisticState.total.correctAnswers += game.state.answers.true.length;
-    user.statisticState.audioCall.correctAnswers +=
-        game.state.answers.true.length;
-    if (
-        user.statisticState.audioCall.correctAnswersStrick <
-        game.state.maxStrick
+function setGameStatisticToStats(
+    game: AudioCall | Sprint,
+    user: IUserStats,
+    gameState: AudioCall["state"] | Sprint["state"],
+    usersStats: IUserStats["statisticState"],
+    gameName: string
     ) {
-        user.statisticState.audioCall.correctAnswersStrick =
-            game.state.maxStrick;
-    }
-    (currentGame.game as AudioCall).state.answers.true.forEach((word) => {
-        const wordInWordsLearnt = isWordInWordsLearnt(word, user, AUDIO_CALL);
-        if (!wordInWordsLearnt) {
-            const wordOnLearning: IWordLearningState = {};
-            wordOnLearning[word] = 1;
-            user.statisticState.audioCall.wordsLearntArr.push(wordOnLearning);
-        } else {
-            wordInWordsLearnt[word] += 1;
-            if (wordInWordsLearnt[word] === 3) {
-                user.statisticState.audioCall.wordsLearnt += 1;
-            }
-            if (wordInWordsLearnt[word] > 3) {
-                wordInWordsLearnt[word] = 3;
-            }
+        usersStats[gameName as keyof typeof usersStats].correctAnswers += gameState.answers.true.length;
+        if(usersStats[gameName as keyof typeof usersStats].correctAnswersStrick < gameState.maxStrick) {
+            usersStats[gameName as keyof typeof usersStats].correctAnswersStrick = gameState.maxStrick;
         }
-    });
-    (currentGame.game as AudioCall).state.answers.false.forEach((word) => {
-        const wordInWordsLearnt = isWordInWordsLearnt(word, user, AUDIO_CALL);
-        if (wordInWordsLearnt) {
-            wordInWordsLearnt[word] = 0;
-            if (user.statisticState.audioCall.wordsLearnt > 0) {
-                user.statisticState.audioCall.wordsLearnt -= 1;
+        gameState.answers.true.forEach(word => {
+            const wordInWordsLearnt = isWordInWordsLearnt(word, user, gameName);
+            if(!wordInWordsLearnt) {
+                const wordOnLearning: IWordLearningState = {};
+                wordOnLearning[word] = 1
+                usersStats[gameName as keyof typeof usersStats].wordsLearntArr.push((wordOnLearning));
             } else {
-                user.statisticState.audioCall.wordsLearnt = 0;
+                wordInWordsLearnt[word] += 1;
+                if(wordInWordsLearnt[word] === 3) {
+                    usersStats[gameName as keyof typeof usersStats].wordsLearnt += 1;
+                }
+                if(wordInWordsLearnt[word] > 3) {
+                    wordInWordsLearnt[word] = 3;
+                }
             }
+        });
+        gameState.answers.false.forEach(word => {
+            const wordInWordsLearnt = isWordInWordsLearnt(word, user, gameName);
+            if(wordInWordsLearnt) {
+                wordInWordsLearnt[word] = 0;
+                if (usersStats[gameName as keyof typeof usersStats].wordsLearnt > 0) {
+                    usersStats[gameName as keyof typeof usersStats].wordsLearnt -= 1
+                } else {
+                    usersStats[gameName as keyof typeof usersStats].wordsLearnt = 0;
+                }
+            }
+        });
+        usersStats[gameName as keyof typeof usersStats].numberOfGames += 1;
+        const totalWordsInGames = game.state.answers.false.length + game.state.answers.true.length;
+        usersStats[gameName as keyof typeof usersStats].totalAnswers += totalWordsInGames;
+        if(usersStats[gameName as keyof typeof usersStats].totalAnswers) {
+            usersStats[gameName as keyof typeof usersStats].correctAnswersPercent = calcCorrectAnswersPercent(
+                usersStats[gameName as keyof typeof usersStats].correctAnswers, usersStats[gameName as keyof typeof usersStats].totalAnswers
+            );
+        } else {
+            usersStats[gameName as keyof typeof usersStats].correctAnswersPercent = 0;
         }
-    });
-    user.statisticState.total.wordsLearnt =
-        user.statisticState.audioCall.wordsLearnt +
-        user.statisticState.sprint.wordsLearnt;
-    user.statisticState.audioCall.numberOfGames += 1;
-    user.statisticState.audioCall.correctAnswersPercent = calcCorrectAnswersPercent(
-        user.statisticState.audioCall.numberOfGames,
-        user.statisticState.audioCall.correctAnswers
-    );
-    user.statisticState.total.correctAnswersPercent = calcCorrectAnswersPercent(
-        user.statisticState.audioCall.numberOfGames +
-            user.statisticState.sprint.numberOfGames,
-        user.statisticState.audioCall.correctAnswers +
-            user.statisticState.sprint.correctAnswers
-    );
-    if (!appState.isSignedIn) return;
+}
+
+
+export async function setStats(
+    game: AudioCall | Sprint,
+    user: IUserStats,
+    ) {
+    if(game instanceof AudioCall) {
+        setGameStatisticToStats(game, user, game.state, user.statisticState, AUDIO_CALL);
+    } else {
+        setGameStatisticToStats(game, user, game.state, user.statisticState, SPRINT);
+    }
+    user.statisticState.total.correctAnswers += game.state.answers.true.length;
+    user.statisticState.total.wordsLearnt = user.statisticState.audioCall.wordsLearnt + user.statisticState.sprint.wordsLearnt;
+    user.statisticState.total.numberOfGames += 1;
+    const totalWordsInGames = user.statisticState.audioCall.totalAnswers + user.statisticState.sprint.totalAnswers;
+    if(totalWordsInGames) {
+        user.statisticState.total.correctAnswersPercent = calcCorrectAnswersPercent(user.statisticState.total.correctAnswers, totalWordsInGames);
+    } else {
+        user.statisticState.total.correctAnswersPercent = 0;
+    }
+    if(!appState.isSignedIn) return;
     setUserStatsArr(appState.user);
 }
-
-// export function createCharts(gameName: string): Chart<"bar", number[], string> {
-//     const ctx = (document.getElementById(`${gameName}-chart`) as HTMLCanvasElement).getContext('2d');
-//     console.log(ctx)
-//     const myChart = new Chart(ctx!, {
-//         type: 'bar',
-//         data: {
-//             labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-//             datasets: [{
-//                 label: '# of Votes',
-//                 data: [12, 19, 3, 5, 2, 3],
-//                 backgroundColor: [
-//                     'rgba(255, 99, 132, 0.2)',
-//                     'rgba(54, 162, 235, 0.2)',
-//                     'rgba(255, 206, 86, 0.2)',
-//                     'rgba(75, 192, 192, 0.2)',
-//                     'rgba(153, 102, 255, 0.2)',
-//                     'rgba(255, 159, 64, 0.2)'
-//                 ],
-//                 borderColor: [
-//                     'rgba(255, 99, 132, 1)',
-//                     'rgba(54, 162, 235, 1)',
-//                     'rgba(255, 206, 86, 1)',
-//                     'rgba(75, 192, 192, 1)',
-//                     'rgba(153, 102, 255, 1)',
-//                     'rgba(255, 159, 64, 1)'
-//                 ],
-//                 borderWidth: 1
-//             }]
-//         },
-//         options: {
-//             scales: {
-//                 y: {
-//                     beginAtZero: true
-//                 }
-//             }
-//         }
-//     });
-//     return myChart;
-// }
 // logIn
 
 async function setCurrentUser(data: ISignInResponse) {
@@ -384,6 +375,7 @@ async function setCurrentUser(data: ISignInResponse) {
         welcomeContainer.innerText = `Welcome stranger`;
     } else {
         welcomeContainer.innerText = `Welcome ${data.name} `;
+        appState.isSignedIn = true;
     }
     if (!data.name) return;
     if (userInUserStats) {
@@ -465,7 +457,7 @@ function validationHandler(nodeList: Node[]): boolean | undefined {
     if (nodeList[3]) {
         if (
             (nodeList[3] as HTMLInputElement).value !==
-            (nodeList[2] as HTMLInputElement).value
+            (nodeList[1] as HTMLInputElement).value
         ) {
             valid = false;
             invalidPasswordRepeat.classList.remove("hidden");
@@ -553,12 +545,14 @@ export function showForms(e: Event): void {
         e.target.nextElementSibling.classList.remove("active-form");
         signIn.classList.remove("hidden");
         signUp.classList.add("hidden");
+        clearFormFields('registration');
     } else if (e.target.classList.contains("show-sign-up")) {
         e.target.classList.add("active-form");
         if (!isHTMLButtonElement(e.target.previousElementSibling)) return;
         e.target.previousElementSibling.classList.remove("active-form");
         signIn.classList.add("hidden");
         signUp.classList.remove("hidden");
+        clearFormFields('login');
     }
 }
 
@@ -570,6 +564,8 @@ export async function addNewUserHandler(e: Event): Promise<void> {
     if (!isHTMLInputElement(emailInput)) return;
     const passwordInput = document.querySelector(".registration-password");
     if (!isHTMLInputElement(passwordInput)) return;
+    const passwordInputRepeat = document.querySelector(".registration-password-repeat");
+    if (!isHTMLInputElement(passwordInputRepeat)) return;
     if (!validateForm("registration")) return;
     const userData = {
         name: nameInput.value,
@@ -592,9 +588,7 @@ export async function addNewUserHandler(e: Event): Promise<void> {
     appState.isSignedIn = true;
     setCurrentUser(signedIn);
     localStorage.setItem("appState", JSON.stringify(appState));
-    passwordInput.value = "";
-    emailInput.value = "";
-    nameInput.value = "";
+    clearFormFields('registration');
 }
 
 export async function signInHandler(e: Event): Promise<void> {
@@ -624,8 +618,7 @@ export async function signInHandler(e: Event): Promise<void> {
     appState.isSignedIn = true;
     setCurrentUser(signedIn);
     localStorage.setItem("appState", JSON.stringify(appState));
-    passwordInput.value = "";
-    emailInput.value = "";
+    clearFormFields('login');
 }
 
 export function logOutHandler(): void {
@@ -690,32 +683,26 @@ export function getLocalStorage() {
 
 // games
 
-function keyboardEventsHandler(e: Event) {
-    const gameContainer = document.querySelector(".game-popup");
-    if (!isHTMLDivElement(gameContainer)) return;
-    const nextButton = gameContainer.querySelector(".next-button");
-    if (!isHTMLElement(nextButton)) return;
-    const currentSlide = gameContainer.querySelector(
-        `.audio-call>div:nth-child(${
-            (currentGame.game as AudioCall).currentSlide + 1
-        })`
-    );
-    if (!isHTMLDivElement(currentSlide)) return;
-    const buttonsContainer = currentSlide.querySelector(".answers-container");
-    if (!isHTMLDivElement(buttonsContainer)) return;
-    const playButton = currentSlide.querySelector(".play-button");
-    if (!isHTMLButtonElement(playButton)) return;
-    const answerOne = buttonsContainer?.querySelector("button:nth-child(1)");
-    const answerTwo = buttonsContainer?.querySelector("button:nth-child(2)");
-    const answerThree = buttonsContainer?.querySelector("button:nth-child(3)");
-    const answerFour = buttonsContainer?.querySelector("button:nth-child(4)");
-    if (
-        !isHTMLButtonElement(answerOne) ||
-        !isHTMLButtonElement(answerTwo) ||
-        !isHTMLButtonElement(answerThree) ||
-        !isHTMLButtonElement(answerFour)
-    )
-        return;
+export function keyboardEventsHandler(e: Event) {
+    const gameContainer = document.querySelector('.game-popup');
+    if(!isHTMLDivElement(gameContainer)) return;
+    const nextButton = gameContainer.querySelector('.next-button');
+    if(!isHTMLElement(nextButton)) return;
+    if((currentGame.game as AudioCall).currentSlide === undefined) return;
+    const currentSlide = gameContainer.querySelector((`.audio-call>div:nth-child(${(currentGame.game as AudioCall).currentSlide + 1})`));
+    if(!isHTMLDivElement(currentSlide)) return;
+    const buttonsContainer = currentSlide.querySelector('.answers-container');
+    if(!isHTMLDivElement(buttonsContainer)) return;
+    const playButton = currentSlide.querySelector('.play-button');
+    if(!isHTMLButtonElement(playButton)) return;
+    const answerOne = (buttonsContainer?.querySelector('button:nth-child(1)'));
+    const answerTwo = (buttonsContainer?.querySelector('button:nth-child(2)'));
+    const answerThree = (buttonsContainer?.querySelector('button:nth-child(3)'));
+    const answerFour = (buttonsContainer?.querySelector('button:nth-child(4)'));
+    if(!isHTMLButtonElement(answerOne) ||
+     !isHTMLButtonElement(answerTwo) ||
+     !isHTMLButtonElement(answerThree) ||
+     !isHTMLButtonElement(answerFour) ) return;
     switch ((e as KeyboardEvent).key) {
         case String(KeyboardCodes.one):
             answerOne.click();
@@ -782,26 +769,27 @@ function stopPlayingWordHandler(audio: HTMLAudioElement) {
     audio.pause();
 }
 
-export async function modifyWord(game: AudioCall, word: IAggreagtedWord) {
+export async function modifyWord(game: AudioCall | Sprint, word: IAggreagtedWord, gameName: string) {
     const body: IUserWord = getUserWord(word);
-    if (!body) return;
-    body.optional.audiocall.countGames += 1;
-    if (game.state.answers.true.find((id) => id === word.id)) {
-        body.optional.audiocall.rightAnswer += 1;
-        body.optional.audiocall.rightAnswerSeries += 1;
-        if (body.difficulty === "hard") {
-            if (body.optional.audiocall.rightAnswerSeries >= 5) {
-                body.difficulty = "easy";
+    if(!body) return;
+
+    body.optional[gameName as keyof typeof body.optional].countGames += 1;
+    if(game.state.answers.true.find(id => id === word.id)) {
+        body.optional[gameName as keyof typeof body.optional].rightAnswer += 1;
+        body.optional[gameName as keyof typeof body.optional].rightAnswerSeries += 1;
+        if (body.difficulty === 'hard') {
+            if(body.optional[gameName as keyof typeof body.optional].rightAnswerSeries >= 5) {
+                body.difficulty = 'easy';
             }
         }
-        if (body.difficulty === "norm") {
-            if (body.optional.audiocall.rightAnswerSeries >= 3) {
-                body.difficulty = "easy";
+        if (body.difficulty === 'norm') {
+            if(body.optional[gameName as keyof typeof body.optional].rightAnswerSeries >= 3) {
+                body.difficulty = 'easy';
             }
         }
-    } else if (game.state.answers.false.find((id) => id === word.id)) {
-        body.optional.audiocall.rightAnswerSeries = 0;
-        body.difficulty = "hard";
+    } else if(game.state.answers.false.find(id => id === word.id)) {
+        body.optional[gameName as keyof typeof body.optional].rightAnswerSeries = 0;
+        body.difficulty = 'hard';
     } else {
         return;
     }
@@ -829,19 +817,29 @@ export function startGame(
     document.addEventListener("keydown", keyboardEventsHandler);
     const closeButton = container.querySelector(".close-button");
     if (!isHTMLElement(closeButton)) return;
+    if(game === SPRINT) {
+        const timer = setTimeout(() => {
+            (currentGame.game as Sprint).endGame();
+        }, 61000);
+        closeButton.addEventListener("click", () => {
+            clearTimeout(timer);
+        });
+    }
     closeButton.addEventListener("click", async () => {
         if (!appState.isSignedIn) {
-            setStats(currentGame.game as AudioCall, appState.userNull);
+            setStats((currentGame.game as AudioCall | Sprint), appState.userNull);
         } else {
             setStats(
-                currentGame.game as AudioCall,
+                currentGame.game as  AudioCall | Sprint,
                 appState.user.statsToday as IUserStats
             );
         }
         if (appState.isSignedIn) {
-            (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
-                modifyWord(currentGame.game as AudioCall, word);
-            });
+            if (currentGame.game instanceof AudioCall) {
+                (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
+                    modifyWord((currentGame.game as AudioCall), word, 'audiocall')
+                })
+            }
         }
 
         currentGame.game = null;
@@ -851,24 +849,30 @@ export function startGame(
     });
     const nextButton = container.querySelector(".next-button");
     if (!isHTMLElement(nextButton)) return;
+    if(game === SPRINT) {
+        nextButton.classList.add('hidden');
+    }
     nextButton.addEventListener("click", () => {
-        const sliderContainer = popup.querySelector(".audio-call");
-        (currentGame.game as AudioCall).currentSlide += 1;
-        if (!isHTMLDivElement(sliderContainer)) return;
-        moveGameSlider(sliderContainer, nextButton);
-        const audio = sliderContainer.querySelector(
-            `.word-card:nth-child(${
-                (currentGame.game as AudioCall).currentSlide + 1
-            })>audio`
-        );
-        const prevAudio = sliderContainer.querySelector(
-            `.word-card:nth-child(${
-                (currentGame.game as AudioCall).currentSlide
-            })>audio`
-        );
-        stopPlayingWordHandler(prevAudio as HTMLAudioElement);
-        if (!audio) return;
-        playWordInGameHandler(audio as HTMLAudioElement);
+        nextButton.blur();
+        if (currentGame.game instanceof AudioCall) {
+            const sliderContainer = popup.querySelector(".audio-call");
+            if (!isHTMLDivElement(sliderContainer)) return;
+            (currentGame.game as AudioCall).currentSlide += 1;
+            moveGameSlider(sliderContainer, nextButton);
+            const audio = sliderContainer.querySelector(
+                `.word-card:nth-child(${
+                    (currentGame.game as AudioCall).currentSlide + 1
+                })>audio`
+            );
+            const prevAudio = sliderContainer.querySelector(
+                `.word-card:nth-child(${
+                    (currentGame.game as AudioCall).currentSlide
+                })>audio`
+            );
+            stopPlayingWordHandler(prevAudio as HTMLAudioElement);
+            if (!audio) return;
+            playWordInGameHandler(audio as HTMLAudioElement);
+        }
     });
     const overlay = document.querySelector(".overlay");
     overlay?.classList.remove("hidden");
@@ -907,18 +911,16 @@ export const pressKey = function (event: KeyboardEvent) {
 };
 
 export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
-    // const CALL_GAME = "Audio Call";
-    // const SPRINT = 'Sprint';
     const {target} = e;
     const gameContainer = document.querySelector(".games");
     if (!isHTMLElement(gameContainer)) return;
     if (!isHTMLButtonElement(target)) return;
     if (!target.classList.contains("start-button")) return;
-    console.log(arrOfWords?.words);
+    target.blur();
     let page;
     let section;
     if (target.classList.contains("sprint-button")) {
-       
+
 
         if (!arrOfWords) {
             section = Number(
@@ -937,7 +939,6 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
         const timer = setTimeout(() => {
             (currentGame.game as Sprint).endGame();
         }, 61000);
-        console.log(currentGame);
         const closeButton = document.querySelector(".close-button");
         if (!isHTMLElement(closeButton)) return;
         closeButton.addEventListener("click", () => {
@@ -958,25 +959,28 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
         }
 }
 
-export function playAgainHandler(gameContainer: HTMLElement, section: number) {
-    if (!appState.isSignedIn) {
-        setStats(currentGame.game as AudioCall, appState.userNull);
-    } else {
-        setStats(
-            currentGame.game as AudioCall,
-            appState.user.statsToday as IUserStats
-        );
-        (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
-            modifyWord(currentGame.game as AudioCall, word);
-        });
-    }
-    currentGame.game = null;
-    const CALL_GAME = "Audio Call";
-    const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);
-    const container = document.querySelector(".games");
-    if (!isHTMLElement(container)) return;
-    container.removeChild(gameContainer);
-    startGame(container, section, CALL_GAME, PAGE);
+export function playAgainHandler(gameContainer: HTMLElement, section: number){
+    if(!appState.isSignedIn) {
+        setStats((currentGame.game as AudioCall | Sprint), appState.userNull);
+      } else {
+          setStats((currentGame.game as AudioCall | Sprint), (appState.user.statsToday as IUserStats));
+          if(currentGame instanceof AudioCall) {
+            (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
+                modifyWord((currentGame.game as AudioCall), word, 'audiocall')
+            })
+          }
+      }
+      currentGame.game = null;
+      const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);
+      const container = document.querySelector('.games');
+      if(!isHTMLElement(container)) return;
+      container.removeChild(gameContainer);
+      startGame(container, section, AUDIO_CALL, PAGE);
+}
+
+export function goToStatisticPageHandler(){
+    appState.view = 'stats';
+    getActiveViewData();
 }
 
 export function getGameWordsArr(arr: WordsData) {
@@ -990,7 +994,6 @@ export function getGameWordsArr(arr: WordsData) {
         while (output.length < arr.length) {
             const ind = getRandomInRange(arr.length);
             if (!output.includes(arr[ind])) output.push(arr[ind]);
-            console.log(output);
         }
     }
     return output;
@@ -1052,7 +1055,6 @@ export function createAnswersCards(key: boolean, container: HTMLElement) {
 
 function addToCurrentGameState(guess: boolean, wordID: string) {
     if (guess) {
-        // (currentGame.game as AudioCall).state.correctGuesses += 1;
         (currentGame.game as AudioCall).state.currentStrick += 1;
         if (
             (currentGame.game as AudioCall).state.currentStrick >
@@ -1118,6 +1120,7 @@ export function choseAnswerHandler(e: Event, answer: string) {
     const statsNew = appendGameStats(statsOld);
     statsCurrentContainer.replaceChild(statsOld, statsNew);
 }
+
 export function choseSplitAnswerHandler(e: Event) {
     const {target} = e;
     if (!isHTMLButtonElement(target)) return;
