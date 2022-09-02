@@ -244,8 +244,8 @@ export class WordDetails {
                 "p",
                 "card-transcription"
             );
-            audiocallHeading.textContent = "Спринт";
-            sprintHeading.textContent = "Аудиовызов";
+            audiocallHeading.textContent = "Аудиовызов";
+            sprintHeading.textContent = "Спринт";
             const audiocallValue = createElementWithClassnames(
                 "h5",
                 "card-translate"

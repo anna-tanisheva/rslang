@@ -303,7 +303,7 @@ export class TextbookView {
         );
         gamesLauncherWrapper.addEventListener("click", (e) => {
             if (!isHTMLButtonElement(e.target)) return;
-            let wordsForGame = this.wordsData;
+            let wordsForGame = textbookState.words;
             if (appState.isSignedIn) {
                 wordsForGame = wordsForGame.filter(
                     (word) =>
