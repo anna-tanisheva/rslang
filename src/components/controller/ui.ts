@@ -330,7 +330,7 @@ function setGameStatisticToStats(
         usersStats[gameName as keyof typeof usersStats].numberOfGames += 1;
         const totalWordsInGames = game.state.answers.false.length + game.state.answers.true.length;
         usersStats[gameName as keyof typeof usersStats].totalAnswers += totalWordsInGames;
-        if(usersStats[gameName as keyof typeof usersStats].correctAnswers && usersStats[gameName as keyof typeof usersStats].totalAnswers) {
+        if(usersStats[gameName as keyof typeof usersStats].totalAnswers) {
             usersStats[gameName as keyof typeof usersStats].correctAnswersPercent = calcCorrectAnswersPercent(
                 usersStats[gameName as keyof typeof usersStats].correctAnswers, usersStats[gameName as keyof typeof usersStats].totalAnswers
             );
@@ -353,7 +353,8 @@ export async function setStats(
     user.statisticState.total.wordsLearnt = user.statisticState.audioCall.wordsLearnt + user.statisticState.sprint.wordsLearnt;
     user.statisticState.total.numberOfGames += 1;
     const totalWordsInGames = user.statisticState.audioCall.totalAnswers + user.statisticState.sprint.totalAnswers;
-    if(user.statisticState.total.correctAnswers && user.statisticState.total.totalAnswers) {
+    console.log(totalWordsInGames)
+    if(totalWordsInGames) {
         user.statisticState.total.correctAnswersPercent = calcCorrectAnswersPercent(user.statisticState.total.correctAnswers, totalWordsInGames);
     } else {
         user.statisticState.total.correctAnswersPercent = 0;
