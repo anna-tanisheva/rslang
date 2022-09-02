@@ -37,6 +37,8 @@ export class AudioCall {
 
   arrOfWords: IResWordsPage | undefined;
 
+  currentWord: IAggreagtedWord | undefined;
+
   constructor(sec: number, page: number, gameName: string, currentSlide = 0, arrOfWords?: IResWordsPage) {
     this.gameName = gameName;
     this.section = sec;
@@ -52,6 +54,7 @@ export class AudioCall {
     this.currentSlide = currentSlide;
     this.wordsInGame = null;
     this.arrOfWords = arrOfWords;
+    this.currentWord = undefined;
   }
 
   async create(): Promise<HTMLElement> {

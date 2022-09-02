@@ -767,6 +767,7 @@ function stopPlayingWordHandler(audio: HTMLAudioElement) {
 
 export async function modifyWord(game: AudioCall | Sprint, word: IAggreagtedWord, gameName: string) {
     const body: IUserWord = getUserWord(word);
+
     if(!body) return;
 
     body.optional[gameName as keyof typeof body.optional].countGames += 1;
@@ -830,14 +831,6 @@ export function startGame(
                 appState.user.statsToday as IUserStats
             );
         }
-        if (appState.isSignedIn) {
-            if (currentGame.game instanceof AudioCall) {
-                (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
-                    modifyWord((currentGame.game as AudioCall), word, 'audiocall')
-                })
-            }
-        }
-
         currentGame.game = null;
         container.removeChild(popup);
         const overlay = document.querySelector(".overlay");
@@ -932,14 +925,14 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
             startGame(gameContainer, section, SPRINT, page, arrOfWords);
         }
         // startGame(gameContainer, section, SPRINT, page);
-        const timer = setTimeout(() => {
-            (currentGame.game as Sprint).endGame();
-        }, 61000);
-        const closeButton = document.querySelector(".close-button");
-        if (!isHTMLElement(closeButton)) return;
-        closeButton.addEventListener("click", () => {
-            clearTimeout(timer);
-        });
+        // const timer = setTimeout(() => {
+        //     (currentGame.game as Sprint).endGame();
+        // }, 61000);
+        // const closeButton = document.querySelector(".close-button");
+        // if (!isHTMLElement(closeButton)) return;
+        // closeButton.addEventListener("click", () => {
+        //     clearTimeout(timer);
+        // });
         document.removeEventListener("keydown", pressKey, false);
     } else if (!arrOfWords) {
             page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
@@ -960,11 +953,6 @@ export function playAgainHandler(gameContainer: HTMLElement, section: number){
         setStats((currentGame.game as AudioCall | Sprint), appState.userNull);
       } else {
           setStats((currentGame.game as AudioCall | Sprint), (appState.user.statsToday as IUserStats));
-          if(currentGame instanceof AudioCall) {
-            (currentGame.game as AudioCall).wordsInGame?.forEach((word) => {
-                modifyWord((currentGame.game as AudioCall), word, 'audiocall')
-            })
-          }
       }
       currentGame.game = null;
       const PAGE = getRandomInRange(TEXTBOOK_PAGE_COUNT);
@@ -1090,6 +1078,7 @@ export function choseAnswerHandler(e: Event, answer: string) {
     const correctAnswer = card.querySelector(".answer");
     if (!isHTMLElement(correctAnswer)) return;
     const wordId = card.getAttribute("data-id");
+
     if (target.getAttribute("data-option") !== answer) {
         (wrongSound as HTMLAudioElement).play();
         target.classList.add("incorrect-answer");
@@ -1107,6 +1096,13 @@ export function choseAnswerHandler(e: Event, answer: string) {
         });
         addToCurrentGameState(true, wordId as string); // !TODO
     }
+    const currentWord: IAggreagtedWord | undefined = (currentGame.game as AudioCall).wordsInGame?.find(word=>word.id === wordId);
+    if (appState.isSignedIn) {
+        if (currentGame.game instanceof AudioCall) {
+            modifyWord((currentGame.game as AudioCall), (currentWord as IAggreagtedWord), 'audiocall')
+        }
+    }
+    (currentGame.game as AudioCall).currentWord = currentWord;
     correctAnswer.classList.remove("opacity-hidden");
     const statsCurrentContainer = document.querySelector(".game-stats-wrapper");
     if (!isHTMLElement(statsCurrentContainer)) return;

@@ -246,9 +246,11 @@ export class Sprint {
     async create(): Promise<HTMLElement> {
         if(this.arrOfWords === undefined) {
             await this.getInputWords();
-
         } else {
             const words = this.arrOfWords;
+            this.arrOfWords.words.forEach(word=>{
+                this.totalWordsInGame.push(word);
+            })
             this.inputWords = words.words;
             const wordsForCards = [...this.getWordsForCards()];
             this.words = wordsForCards;
