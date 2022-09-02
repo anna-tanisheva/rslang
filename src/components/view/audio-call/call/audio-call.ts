@@ -6,6 +6,7 @@ import {
   createElementWithAttributes,
   createElementWithClassnames,
   createElementWithContent,
+  getRandomInRange,
 } from "../../utils";
 import { fetchWords } from "../../../controller/api";
 import { ENDPOINT } from '../../../controller/state';
@@ -55,14 +56,25 @@ export class AudioCall {
 
   async create(): Promise<HTMLElement> {
     let words;
+    let incorrectOptions;
     if(this.arrOfWords === undefined) {
       words = await fetchWords({
         group: this.section,
         page: this.page,
         wordsPerPage: 20
       })
+      incorrectOptions = await fetchWords({
+        group: this.section,
+        page: getRandomInRange(30),
+        wordsPerPage: 20
+      })
     } else {
       words = this.arrOfWords;
+      incorrectOptions = await fetchWords({
+        group: this.section,
+        page: getRandomInRange(30),
+        wordsPerPage: 20
+      })
     }
     const game = createElementWithClassnames("div", "audio-call");
     const arrOfTranslations: string[] = [];
@@ -70,7 +82,7 @@ export class AudioCall {
       game.innerHTML += `<div class="error-game-message">Не удалось получить слова, попробуйте перезапустить игру</div>`
       return game;
     };
-    words.words.forEach(word => {
+    incorrectOptions.words.forEach(word => {
       arrOfTranslations.push(word.wordTranslate)
     })
     this.wordsInGame = getGameWordsArr(words.words);
