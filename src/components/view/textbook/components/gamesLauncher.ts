@@ -39,7 +39,12 @@ export class GamesLauncher {
                 textbookState.words.filter(
                     (word) =>
                         !word.userWord || word.userWord.difficulty !== "easy"
-                ).length < 10)
+                ).length < 10) ||
+            (appState.viewsStates.textbook.mode === "textbook" &&
+                textbookState.words.filter(
+                    (word) =>
+                        !word.userWord || word.userWord.difficulty !== "easy"
+                ).length === 0)
         ) {
             isStartGameDisabled = true;
         }
@@ -58,21 +63,22 @@ export class GamesLauncher {
         (sprintButton as HTMLButtonElement).disabled = isStartGameDisabled;
         audiocallButton.textContent = "Запустить игру\nАудиовызов";
         sprintButton.textContent = "Запустить игру\nСпринт";
-        const info = createElementWithClassnames("h3", "games-info");
-        info.textContent = `${
+        const info = createElementWithClassnames("h4", "games-info");
+        info.innerHTML = `${
             isStartGameDisabled
-                ? "К сожалению на данной странице не достаточно слов для запуска игры (минимальное допустимое количество 10). К игре допускается все слова кроме категории ИЗУЧЕННЫЕ."
+                ? "На данной странице не достаточно слов для запуска игры (минимальное допустимое количество 10).<br>К игре допускаются все слова кроме ИЗУЧЕНЫХ."
                 : ""
         }`;
         audiocallLauncherWrapper.append(audiocallButton);
         sprintLauncherWrapper.append(sprintButton);
         infoWrapper.append(info);
-        gamesLauncherWrapper.append(
-            audiocallLauncherWrapper,
-            infoWrapper,
-            sprintLauncherWrapper
+        const buttons = createElementWithClassnames(
+            "div",
+            "games-launcher-buttons"
         );
-        gamesLauncherWrapper.addEventListener("click", (e) => {
+        buttons.append(audiocallLauncherWrapper, sprintLauncherWrapper);
+        gamesLauncherWrapper.append(buttons, infoWrapper);
+        gamesLauncherWrapper.addEventListener("click", async (e) => {
             if (!isHTMLButtonElement(e.target)) return;
             let wordsForGame = textbookState.words;
             if (appState.isSignedIn) {
@@ -80,51 +86,27 @@ export class GamesLauncher {
                     (word) =>
                         !word.userWord || word.userWord.difficulty !== "easy"
                 );
-                console.log("массив слов до дополнения", wordsForGame);
-                if (wordsForGame.length < 10) {
-                    let newPage = appState.viewsStates.textbook.page;
-                    let newGroup = appState.viewsStates.textbook.group;
-                    while (wordsForGame.length < 10) {
-                        if (newPage > 0) {
-                            newPage -= 1;
-                        } else if (newPage === 0 && newGroup !== 0) {
-                            newPage = 29;
-                            newGroup -= 1;
-                        } else if (newPage === 0 && newGroup === 0) {
-                            /* console.log(
-                                "массив слов < 10 отправлен",
-                                wordsForGame
-                            );
-                            startGameHandler(e, {words: wordsForGame}); */
-                            break;
-                        }
-                        fetchWords({
-                            group: newGroup,
-                            page: newPage,
-                            wordsPerPage: 20,
-                            // eslint-disable-next-line @typescript-eslint/no-loop-func
-                        }).then((resp) => {
-                            const addedWords = resp.words.filter(
-                                (word) =>
-                                    !word.userWord ||
-                                    word.userWord.difficulty !== "easy"
-                            );
-                            wordsForGame.push(...addedWords);
-                            if (wordsForGame.length > 10) {
-                                console.log(
-                                    "массив слов после дополнения. Запуск",
-                                    wordsForGame
-                                );
-                                startGameHandler(e, {words: wordsForGame});
-                            }
-                        });
-                    }
-                }
             }
             if (wordsForGame.length >= 10) {
-                console.log("массив слов >= 10", wordsForGame);
                 startGameHandler(e, {words: wordsForGame});
-            } else console.log("запуск в конце проигнорирован");
+            } else {
+                const newWords = (
+                    await fetchWords({
+                        group: appState.viewsStates.textbook.group,
+                        wordsPerPage:
+                            (appState.viewsStates.textbook.page + 1) * 20,
+                    })
+                ).words
+                    .reverse()
+                    .filter(
+                        (word) =>
+                            !word.userWord ||
+                            word.userWord.difficulty !== "easy"
+                    )
+                    .slice(0, 10);
+                console.log(newWords);
+                startGameHandler(e, {words: newWords});
+            }
         });
         return gamesLauncherWrapper;
     }
