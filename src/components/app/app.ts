@@ -18,7 +18,6 @@ export class App {
     private view = new AppView();
 
     public start(): void {
-
         getLocalStorage();
         this.view.drawView();
         getActiveViewData();
@@ -43,7 +42,6 @@ export class App {
         const navigation = document.querySelector(".nav");
         if (!isHTMLElement(navigation)) return;
 
-
         window.addEventListener("DOMContentLoaded", () => {
             setCurrentUserOnLoad();
         });
@@ -52,7 +50,9 @@ export class App {
         submitRegistrationBtn.addEventListener("click", addNewUserHandler);
         submitLogInBtn.addEventListener("click", signInHandler);
         submitLogOutBtn.addEventListener("click", logOutHandler);
-        [showForm, closeFormButton].forEach(elem=>elem.addEventListener("click", showFormHandler));
+        [showForm, closeFormButton].forEach((elem) =>
+            elem.addEventListener("click", showFormHandler)
+        );
 
         // routing
         navigation.addEventListener("click", getRouteHandler);

@@ -52,8 +52,7 @@ import {AppView} from "../view/app-view";
 import {PagePagination} from "../view/textbook/components";
 import {Sprint} from "../view/audio-call/sprint/sprint-model";
 
-
-function clearFormFields(formName: string){
+function clearFormFields(formName: string) {
     const emailInput = document.querySelector(`.${formName}-email`);
     if (!isHTMLInputElement(emailInput)) return;
     emailInput.value = "";
@@ -63,7 +62,9 @@ function clearFormFields(formName: string){
     const nameInput = document.querySelector(`.${formName}-name`);
     if (!isHTMLInputElement(nameInput)) return;
     nameInput.value = "";
-    const passwordInputRepeat = document.querySelector(`.${formName}-password-repeat`);
+    const passwordInputRepeat = document.querySelector(
+        `.${formName}-password-repeat`
+    );
     if (!isHTMLInputElement(passwordInputRepeat)) return;
     passwordInputRepeat.value = "";
 }
@@ -71,8 +72,8 @@ function clearFormFields(formName: string){
 export function showFormHandler() {
     document.querySelector(".form-container")?.classList.toggle("hidden");
     const mainPageFormButtons = document.querySelector(".start-screen-buttons");
-    clearFormFields('registration');
-    clearFormFields('login');
+    clearFormFields("registration");
+    clearFormFields("login");
     if (!isHTMLDivElement(mainPageFormButtons)) return;
     [...mainPageFormButtons.children].forEach((elem) => {
         if (
@@ -163,7 +164,9 @@ export async function getActiveViewData() {
         default:
     }
     AppView.redrawView();
-    if (appState.view === "textbook") PagePagination.moveSlider();
+    if (appState.view === "textbook") {
+        PagePagination.moveSlider();
+    }
     if (appState.view === "index") {
         const startScreenButtons = document.querySelector(
             ".start-screen-buttons"
@@ -221,7 +224,7 @@ export function setEmptyStatistic(str: string) {
                 wordsLearnt: 0,
                 correctAnswers: 0,
                 correctAnswersStrick: 0,
-                totalAnswers: 0
+                totalAnswers: 0,
             },
             audioCall: {
                 correctAnswersPercent: 0,
@@ -230,7 +233,7 @@ export function setEmptyStatistic(str: string) {
                 wordsLearnt: 0,
                 correctAnswers: 0,
                 correctAnswersStrick: 0,
-                totalAnswers: 0
+                totalAnswers: 0,
             },
             sprint: {
                 correctAnswersPercent: 0,
@@ -239,13 +242,13 @@ export function setEmptyStatistic(str: string) {
                 wordsLearnt: 0,
                 correctAnswers: 0,
                 correctAnswersStrick: 0,
-                totalAnswers: 0
+                totalAnswers: 0,
             },
         },
     };
 }
 
-export function compareDates(oldDate: string, newDate: string){
+export function compareDates(oldDate: string, newDate: string) {
     [oldDate] = oldDate.split("T");
     [newDate] = newDate.split("T");
     if (Date.parse(oldDate) === Date.parse(newDate)) return true;
@@ -279,8 +282,10 @@ export function isWordInWordsLearnt(
     );
 }
 
-export function calcCorrectAnswersPercent(answers: number, wordsInGames: number) {
-
+export function calcCorrectAnswersPercent(
+    answers: number,
+    wordsInGames: number
+) {
     return Math.floor((Number(answers) * 100) / wordsInGames);
 }
 
@@ -290,70 +295,106 @@ function setGameStatisticToStats(
     gameState: AudioCall["state"] | Sprint["state"],
     usersStats: IUserStats["statisticState"],
     gameName: string
+) {
+    usersStats[gameName as keyof typeof usersStats].correctAnswers +=
+        gameState.answers.true.length;
+    if (
+        usersStats[gameName as keyof typeof usersStats].correctAnswersStrick <
+        gameState.maxStrick
     ) {
-        usersStats[gameName as keyof typeof usersStats].correctAnswers += gameState.answers.true.length;
-        if(usersStats[gameName as keyof typeof usersStats].correctAnswersStrick < gameState.maxStrick) {
-            usersStats[gameName as keyof typeof usersStats].correctAnswersStrick = gameState.maxStrick;
-        }
-        gameState.answers.true.forEach(word => {
-            const wordInWordsLearnt = isWordInWordsLearnt(word, user, gameName);
-            if(!wordInWordsLearnt) {
-                const wordOnLearning: IWordLearningState = {};
-                wordOnLearning[word] = 1
-                usersStats[gameName as keyof typeof usersStats].wordsLearntArr.push((wordOnLearning));
-            } else {
-                wordInWordsLearnt[word] += 1;
-                if(wordInWordsLearnt[word] === 3) {
-                    usersStats[gameName as keyof typeof usersStats].wordsLearnt += 1;
-                }
-                if(wordInWordsLearnt[word] > 3) {
-                    wordInWordsLearnt[word] = 3;
-                }
-            }
-        });
-        gameState.answers.false.forEach(word => {
-            const wordInWordsLearnt = isWordInWordsLearnt(word, user, gameName);
-            if(wordInWordsLearnt) {
-                wordInWordsLearnt[word] = 0;
-                if (usersStats[gameName as keyof typeof usersStats].wordsLearnt > 0) {
-                    usersStats[gameName as keyof typeof usersStats].wordsLearnt -= 1
-                } else {
-                    usersStats[gameName as keyof typeof usersStats].wordsLearnt = 0;
-                }
-            }
-        });
-        usersStats[gameName as keyof typeof usersStats].numberOfGames += 1;
-        const totalWordsInGames = game.state.answers.false.length + game.state.answers.true.length;
-        usersStats[gameName as keyof typeof usersStats].totalAnswers += totalWordsInGames;
-        if(usersStats[gameName as keyof typeof usersStats].totalAnswers) {
-            usersStats[gameName as keyof typeof usersStats].correctAnswersPercent = calcCorrectAnswersPercent(
-                usersStats[gameName as keyof typeof usersStats].correctAnswers, usersStats[gameName as keyof typeof usersStats].totalAnswers
+        usersStats[gameName as keyof typeof usersStats].correctAnswersStrick =
+            gameState.maxStrick;
+    }
+    gameState.answers.true.forEach((word) => {
+        const wordInWordsLearnt = isWordInWordsLearnt(word, user, gameName);
+        if (!wordInWordsLearnt) {
+            const wordOnLearning: IWordLearningState = {};
+            wordOnLearning[word] = 1;
+            usersStats[gameName as keyof typeof usersStats].wordsLearntArr.push(
+                wordOnLearning
             );
         } else {
-            usersStats[gameName as keyof typeof usersStats].correctAnswersPercent = 0;
+            wordInWordsLearnt[word] += 1;
+            if (wordInWordsLearnt[word] === 3) {
+                usersStats[
+                    gameName as keyof typeof usersStats
+                ].wordsLearnt += 1;
+            }
+            if (wordInWordsLearnt[word] > 3) {
+                wordInWordsLearnt[word] = 3;
+            }
         }
+    });
+    gameState.answers.false.forEach((word) => {
+        const wordInWordsLearnt = isWordInWordsLearnt(word, user, gameName);
+        if (wordInWordsLearnt) {
+            wordInWordsLearnt[word] = 0;
+            if (
+                usersStats[gameName as keyof typeof usersStats].wordsLearnt > 0
+            ) {
+                usersStats[
+                    gameName as keyof typeof usersStats
+                ].wordsLearnt -= 1;
+            } else {
+                usersStats[gameName as keyof typeof usersStats].wordsLearnt = 0;
+            }
+        }
+    });
+    usersStats[gameName as keyof typeof usersStats].numberOfGames += 1;
+    const totalWordsInGames =
+        game.state.answers.false.length + game.state.answers.true.length;
+    usersStats[
+        gameName as keyof typeof usersStats
+    ].totalAnswers += totalWordsInGames;
+    if (usersStats[gameName as keyof typeof usersStats].totalAnswers) {
+        usersStats[
+            gameName as keyof typeof usersStats
+        ].correctAnswersPercent = calcCorrectAnswersPercent(
+            usersStats[gameName as keyof typeof usersStats].correctAnswers,
+            usersStats[gameName as keyof typeof usersStats].totalAnswers
+        );
+    } else {
+        usersStats[
+            gameName as keyof typeof usersStats
+        ].correctAnswersPercent = 0;
+    }
 }
 
-
-export async function setStats(
-    game: AudioCall | Sprint,
-    user: IUserStats,
-    ) {
-    if(game instanceof AudioCall) {
-        setGameStatisticToStats(game, user, game.state, user.statisticState, AUDIO_CALL);
+export async function setStats(game: AudioCall | Sprint, user: IUserStats) {
+    if (game instanceof AudioCall) {
+        setGameStatisticToStats(
+            game,
+            user,
+            game.state,
+            user.statisticState,
+            AUDIO_CALL
+        );
     } else {
-        setGameStatisticToStats(game, user, game.state, user.statisticState, SPRINT);
+        setGameStatisticToStats(
+            game,
+            user,
+            game.state,
+            user.statisticState,
+            SPRINT
+        );
     }
     user.statisticState.total.correctAnswers += game.state.answers.true.length;
-    user.statisticState.total.wordsLearnt = user.statisticState.audioCall.wordsLearnt + user.statisticState.sprint.wordsLearnt;
+    user.statisticState.total.wordsLearnt =
+        user.statisticState.audioCall.wordsLearnt +
+        user.statisticState.sprint.wordsLearnt;
     user.statisticState.total.numberOfGames += 1;
-    const totalWordsInGames = user.statisticState.audioCall.totalAnswers + user.statisticState.sprint.totalAnswers;
-    if(totalWordsInGames) {
-        user.statisticState.total.correctAnswersPercent = calcCorrectAnswersPercent(user.statisticState.total.correctAnswers, totalWordsInGames);
+    const totalWordsInGames =
+        user.statisticState.audioCall.totalAnswers +
+        user.statisticState.sprint.totalAnswers;
+    if (totalWordsInGames) {
+        user.statisticState.total.correctAnswersPercent = calcCorrectAnswersPercent(
+            user.statisticState.total.correctAnswers,
+            totalWordsInGames
+        );
     } else {
         user.statisticState.total.correctAnswersPercent = 0;
     }
-    if(!appState.isSignedIn) return;
+    if (!appState.isSignedIn) return;
     setUserStatsArr(appState.user);
 }
 // logIn
@@ -541,14 +582,14 @@ export function showForms(e: Event): void {
         e.target.nextElementSibling.classList.remove("active-form");
         signIn.classList.remove("hidden");
         signUp.classList.add("hidden");
-        clearFormFields('registration');
+        clearFormFields("registration");
     } else if (e.target.classList.contains("show-sign-up")) {
         e.target.classList.add("active-form");
         if (!isHTMLButtonElement(e.target.previousElementSibling)) return;
         e.target.previousElementSibling.classList.remove("active-form");
         signIn.classList.add("hidden");
         signUp.classList.remove("hidden");
-        clearFormFields('login');
+        clearFormFields("login");
     }
 }
 
@@ -560,7 +601,9 @@ export async function addNewUserHandler(e: Event): Promise<void> {
     if (!isHTMLInputElement(emailInput)) return;
     const passwordInput = document.querySelector(".registration-password");
     if (!isHTMLInputElement(passwordInput)) return;
-    const passwordInputRepeat = document.querySelector(".registration-password-repeat");
+    const passwordInputRepeat = document.querySelector(
+        ".registration-password-repeat"
+    );
     if (!isHTMLInputElement(passwordInputRepeat)) return;
     if (!validateForm("registration")) return;
     const userData = {
@@ -584,7 +627,7 @@ export async function addNewUserHandler(e: Event): Promise<void> {
     appState.isSignedIn = true;
     setCurrentUser(signedIn);
     localStorage.setItem("appState", JSON.stringify(appState));
-    clearFormFields('registration');
+    clearFormFields("registration");
 }
 
 export async function signInHandler(e: Event): Promise<void> {
@@ -614,7 +657,7 @@ export async function signInHandler(e: Event): Promise<void> {
     appState.isSignedIn = true;
     setCurrentUser(signedIn);
     localStorage.setItem("appState", JSON.stringify(appState));
-    clearFormFields('login');
+    clearFormFields("login");
 }
 
 export function logOutHandler(): void {
@@ -680,25 +723,32 @@ export function getLocalStorage() {
 // games
 
 export function keyboardEventsHandler(e: Event) {
-    const gameContainer = document.querySelector('.game-popup');
-    if(!isHTMLDivElement(gameContainer)) return;
-    const nextButton = gameContainer.querySelector('.next-button');
-    if(!isHTMLElement(nextButton)) return;
-    if((currentGame.game as AudioCall).currentSlide === undefined) return;
-    const currentSlide = gameContainer.querySelector((`.audio-call>div:nth-child(${(currentGame.game as AudioCall).currentSlide + 1})`));
-    if(!isHTMLDivElement(currentSlide)) return;
-    const buttonsContainer = currentSlide.querySelector('.answers-container');
-    if(!isHTMLDivElement(buttonsContainer)) return;
-    const playButton = currentSlide.querySelector('.play-button');
-    if(!isHTMLButtonElement(playButton)) return;
-    const answerOne = (buttonsContainer?.querySelector('button:nth-child(1)'));
-    const answerTwo = (buttonsContainer?.querySelector('button:nth-child(2)'));
-    const answerThree = (buttonsContainer?.querySelector('button:nth-child(3)'));
-    const answerFour = (buttonsContainer?.querySelector('button:nth-child(4)'));
-    if(!isHTMLButtonElement(answerOne) ||
-     !isHTMLButtonElement(answerTwo) ||
-     !isHTMLButtonElement(answerThree) ||
-     !isHTMLButtonElement(answerFour) ) return;
+    const gameContainer = document.querySelector(".game-popup");
+    if (!isHTMLDivElement(gameContainer)) return;
+    const nextButton = gameContainer.querySelector(".next-button");
+    if (!isHTMLElement(nextButton)) return;
+    if ((currentGame.game as AudioCall).currentSlide === undefined) return;
+    const currentSlide = gameContainer.querySelector(
+        `.audio-call>div:nth-child(${
+            (currentGame.game as AudioCall).currentSlide + 1
+        })`
+    );
+    if (!isHTMLDivElement(currentSlide)) return;
+    const buttonsContainer = currentSlide.querySelector(".answers-container");
+    if (!isHTMLDivElement(buttonsContainer)) return;
+    const playButton = currentSlide.querySelector(".play-button");
+    if (!isHTMLButtonElement(playButton)) return;
+    const answerOne = buttonsContainer?.querySelector("button:nth-child(1)");
+    const answerTwo = buttonsContainer?.querySelector("button:nth-child(2)");
+    const answerThree = buttonsContainer?.querySelector("button:nth-child(3)");
+    const answerFour = buttonsContainer?.querySelector("button:nth-child(4)");
+    if (
+        !isHTMLButtonElement(answerOne) ||
+        !isHTMLButtonElement(answerTwo) ||
+        !isHTMLButtonElement(answerThree) ||
+        !isHTMLButtonElement(answerFour)
+    )
+        return;
     switch ((e as KeyboardEvent).key) {
         case String(KeyboardCodes.one):
             answerOne.click();
@@ -765,28 +815,42 @@ function stopPlayingWordHandler(audio: HTMLAudioElement) {
     audio.pause();
 }
 
-export async function modifyWord(game: AudioCall | Sprint, word: IAggreagtedWord, gameName: string) {
+export async function modifyWord(
+    game: AudioCall | Sprint,
+    word: IAggreagtedWord,
+    gameName: string
+) {
     const body: IUserWord = getUserWord(word);
 
-    if(!body) return;
+    if (!body) return;
 
     body.optional[gameName as keyof typeof body.optional].countGames += 1;
-    if(game.state.answers.true.find(id => id === word.id)) {
+    if (game.state.answers.true.find((id) => id === word.id)) {
         body.optional[gameName as keyof typeof body.optional].rightAnswer += 1;
-        body.optional[gameName as keyof typeof body.optional].rightAnswerSeries += 1;
-        if (body.difficulty === 'hard') {
-            if(body.optional[gameName as keyof typeof body.optional].rightAnswerSeries >= 5) {
-                body.difficulty = 'easy';
+        body.optional[
+            gameName as keyof typeof body.optional
+        ].rightAnswerSeries += 1;
+        if (body.difficulty === "hard") {
+            if (
+                body.optional[gameName as keyof typeof body.optional]
+                    .rightAnswerSeries >= 5
+            ) {
+                body.difficulty = "easy";
             }
         }
-        if (body.difficulty === 'norm') {
-            if(body.optional[gameName as keyof typeof body.optional].rightAnswerSeries >= 3) {
-                body.difficulty = 'easy';
+        if (body.difficulty === "norm") {
+            if (
+                body.optional[gameName as keyof typeof body.optional]
+                    .rightAnswerSeries >= 3
+            ) {
+                body.difficulty = "easy";
             }
         }
-    } else if(game.state.answers.false.find(id => id === word.id)) {
-        body.optional[gameName as keyof typeof body.optional].rightAnswerSeries = 0;
-        body.difficulty = 'hard';
+    } else if (game.state.answers.false.find((id) => id === word.id)) {
+        body.optional[
+            gameName as keyof typeof body.optional
+        ].rightAnswerSeries = 0;
+        body.difficulty = "hard";
     } else {
         return;
     }
@@ -970,8 +1034,10 @@ export function playAgainHandler(gameContainer: HTMLElement, section: number) {
     startGame(container, section, AUDIO_CALL, PAGE);
 }
 
-export function goToStatisticPageHandler(){
-    appState.view = 'stats';
+export function goToStatisticPageHandler() {
+    currentGame.game = null;
+    document.querySelector(".games-wrapper")?.replaceChildren();
+    appState.view = "stats";
     getActiveViewData();
 }
 

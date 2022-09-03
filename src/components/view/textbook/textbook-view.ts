@@ -12,8 +12,8 @@ import {
 } from "../utils";
 import {appState, textbookState} from "../../controller/state";
 import {IAggreagtedWord} from "../../../typings";
-import {getActiveViewData, startGameHandler} from "../../controller/ui";
-import {isHTMLButtonElement} from "../../../typings/utils/utils";
+import {getActiveViewData} from "../../controller/ui";
+import {GamesLauncher} from "./components/gamesLauncher";
 
 export class TextbookView {
     public wordsData: IAggreagtedWord[] = [];
@@ -257,61 +257,7 @@ export class TextbookView {
             wordsWrapper.append(pagePaginationComponent);
         }
         // Блок с запуском игр
-        const gamesLauncherWrapper = createElementWithClassnames(
-            "div",
-            "games-launcher-wrapper"
-        );
-        const audiocallLauncherWrapper = createElementWithClassnames(
-            "div",
-            "audiocall-launcher-wrapper"
-        );
-        const sprintLauncherWrapper = createElementWithClassnames(
-            "div",
-            "sprint-launcher-wrapper"
-        );
-
-        let isStartGameDisabled = false;
-        if (
-            (appState.viewsStates.textbook.mode === "dictionary" &&
-                appState.viewsStates.textbook.dictionaryMode === "easy") ||
-            (appState.viewsStates.textbook.mode === "dictionary" &&
-                appState.viewsStates.textbook.dictionaryMode !== "easy" &&
-                textbookState.words.length < 10)
-        ) {
-            isStartGameDisabled = true;
-        }
-
-        const audiocallButton = createElementWithClassnames(
-            "button",
-            "start-button",
-            "audio-call-button"
-        );
-        const sprintButton = createElementWithClassnames(
-            "button",
-            "start-button",
-            "sprint-button"
-        );
-        (audiocallButton as HTMLButtonElement).disabled = isStartGameDisabled;
-        (sprintButton as HTMLButtonElement).disabled = isStartGameDisabled;
-        audiocallButton.textContent = "Запустить игру\nАудиовызов";
-        sprintButton.textContent = "Запустить игру\nСпринт";
-        audiocallLauncherWrapper.append(audiocallButton);
-        sprintLauncherWrapper.append(sprintButton);
-        gamesLauncherWrapper.append(
-            audiocallLauncherWrapper,
-            sprintLauncherWrapper
-        );
-        gamesLauncherWrapper.addEventListener("click", (e) => {
-            if (!isHTMLButtonElement(e.target)) return;
-            let wordsForGame = textbookState.words;
-            if (appState.isSignedIn) {
-                wordsForGame = wordsForGame.filter(
-                    (word) =>
-                        !word.userWord || word.userWord.difficulty !== "easy"
-                );
-            }
-            startGameHandler(e, {words: wordsForGame});
-        });
+        const gamesLauncherWrapper = new GamesLauncher().create();
         textbookContainer.append(wordsWrapper, gamesLauncherWrapper);
         return textbookContainer;
     }
