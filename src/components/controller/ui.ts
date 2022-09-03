@@ -366,16 +366,16 @@ export function isWordInWordsLearnt(
     user: IUserStats,
     game: string
 ) {
-    // return (
-    //     user.statisticState[
-    //         game as keyof typeof user.statisticState
-    //     ].wordsLearntArr.find((word) => Object.keys(word)[0] === wordId) ||
-    //     false
-    // );
     return (
-        user.statisticState.total.wordsLearntArr.find((word) => Object.keys(word)[0] === wordId) ||
+        user.statisticState[
+            game as keyof typeof user.statisticState
+        ].wordsLearntArr.find((word) => Object.keys(word)[0] === wordId) ||
         false
     );
+    // return (
+    //     user.statisticState.total.wordsLearntArr.find((word) => Object.keys(word)[0] === wordId) ||
+    //     false
+    // );
 }
 
 export function calcCorrectAnswersPercent(answers: number, wordsInGames: number) {
