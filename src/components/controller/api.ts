@@ -11,6 +11,8 @@ import {
     IUserStatisticToDB,
     IUserWord,
     IUserWordResponse,
+    IStatisticState,
+    IUserStats,
 } from "../../typings/typings";
 import {AppView} from "../view/app-view";
 import {
@@ -263,7 +265,12 @@ export async function fetchPostOrPutUserWord({
         method,
         body: "",
     };
-    let body: IUserWord = getUserWord(word);
+    if((modifyedUserWord?.optional.audiocall.countGames === 1 && modifyedUserWord?.optional.sprint.countGames === 0)
+    || (modifyedUserWord?.optional.sprint.countGames === 1 && modifyedUserWord?.optional.audiocall.countGames === 0)) {
+        (appState.user.statsToday as IUserStats).statisticState.total.newWords += 1;
+    }
+
+    let body: IUserWord = modifyedUserWord || getUserWord(word);
     if (difficulty) {
         body.difficulty = difficulty;
     }

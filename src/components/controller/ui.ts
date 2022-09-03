@@ -37,6 +37,7 @@ import {
     IUserWord,
     IUserStatisticToDB,
     IResWordsPage,
+    IStatisticState,
 } from "../../typings/typings";
 
 import {GamePopUp} from "../view/audio-call/game-page";
@@ -173,7 +174,7 @@ export async function getActiveViewData() {
     }
 }
 
-// stats one day
+// stats
 Chart.register(...registerables);
 
 export function setDailyChart(chart: HTMLCanvasElement, data: number[]) {
@@ -203,6 +204,7 @@ export function setDailyChart(chart: HTMLCanvasElement, data: number[]) {
 
 export function isUserInUserStats(user: IUser) {
     const id = `user${user.userId}`;
+
     return (
         appState.usersStats.find(
             (elem) => Object.keys(elem as IUserStats)[0] === id
@@ -215,6 +217,7 @@ export function setEmptyStatistic(str: string) {
         statisticTimeStamp: str,
         statisticState: {
             total: {
+                newWords: 0,
                 correctAnswersPercent: 0,
                 numberOfGames: 0,
                 wordsLearntArr: [],
@@ -224,6 +227,7 @@ export function setEmptyStatistic(str: string) {
                 totalAnswers: 0
             },
             audioCall: {
+                newWords: 0,
                 correctAnswersPercent: 0,
                 numberOfGames: 0,
                 wordsLearntArr: [],
@@ -233,6 +237,7 @@ export function setEmptyStatistic(str: string) {
                 totalAnswers: 0
             },
             sprint: {
+                newWords: 0,
                 correctAnswersPercent: 0,
                 numberOfGames: 0,
                 wordsLearntArr: [],
@@ -245,12 +250,102 @@ export function setEmptyStatistic(str: string) {
     };
 }
 
+function setTodayUserStatsForGraph() {
+    const stats = isUserInUserStats(appState.user);
+    if(!Object.entries((stats as IUserStats))[0]
+    || !Object.entries((stats as IUserStats))[0]
+    || !Object.entries((stats as IUserStats))[0]) return {
+        date: '',
+        newWords: 0,
+        wordsLearnt: 0
+    };
+
+    const date = Object.entries((stats as IUserStats))[0][1].statisticTimeStamp;
+    const {newWords} = Object.entries((stats as IUserStats))[0][1].statisticState.total;
+    const {wordsLearnt} = Object.entries((stats as IUserStats))[0][1].statisticState.total;
+    return {
+        date,
+        newWords,
+        wordsLearnt
+    }
+}
+
+export function setLongTermGraph(chart: HTMLCanvasElement, data:{ string?: number[] | undefined}[]| undefined) {
+    if(!data) return;
+    const arrOfDates: string[] = [];
+    const arrOfLearntWords: number[] = [];
+    const arrOfnewWords: number[] = [];
+    data.forEach(item=>{
+        const entries = Object.entries(item);
+        arrOfDates.push((entries[0][0] as unknown as string));
+        arrOfnewWords.push((entries[0][1][0] as unknown as number));
+        arrOfLearntWords.push((entries[0][1][1] as unknown as number));
+    })
+    const ctx = (chart as HTMLCanvasElement).getContext("2d");
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    const myChart = new Chart(ctx as ChartItem, {
+        data: {
+            datasets: [{
+                type: 'bar',
+                label: 'New Words',
+                data: arrOfnewWords,
+                backgroundColor: [
+                    "rgba(54, 162, 235, 0.6)",
+                ],
+            }, {
+                type: 'line',
+                label: 'Learned Words',
+                data: arrOfLearntWords,
+                backgroundColor: [
+                    "rgba(255, 99, 132, 1)",
+                ],
+            }],
+            labels: arrOfDates
+        },
+    });
+}
+
 export function compareDates(oldDate: string, newDate: string){
     [oldDate] = oldDate.split("T");
     [newDate] = newDate.split("T");
     if (Date.parse(oldDate) === Date.parse(newDate)) return true;
     return false;
 }
+
+export async function processLongStats(): Promise<{ string?: number[] | undefined}[] | undefined> {
+    if(!appState.isSignedIn) return undefined;
+    const statsToday = setTodayUserStatsForGraph();
+    let dataArr= [];
+    let dayToday: string;
+    if(statsToday.date && statsToday.newWords && statsToday.wordsLearnt) {
+        dayToday = new Date(statsToday.date.split("T")[0]).toUTCString().split(',')[1].slice(0, 12);
+        // dayToday = dayToday;
+        console.log(dayToday)
+        const todayObj: {string?: number[]} = {};
+        todayObj[dayToday as keyof typeof todayObj] = [(statsToday.newWords as number), statsToday.wordsLearnt];
+        dataArr.push(todayObj);
+    }
+    const statsObj = await fetchUserStatistic();
+    const longTermStats = await statsObj.optional;
+    if(!longTermStats) return dataArr;
+    Object.entries(longTermStats).forEach((item)=>{
+        const day = new Date(item[0].split("T")[0]).toUTCString().split(',')[1].split('00:00:00')[0].trim();
+        if(compareDates(dayToday, day)) {
+            const statsObjDays: {string?: number[]} = {};
+            statsObjDays[day as unknown as keyof typeof statsObjDays] = [(((item[1] as IStatisticState).total.newWords) + ((appState.user.statsToday as IUserStats).statisticState.total.newWords)), ((item[1] as unknown as IStatisticState).total.wordsLearnt + (appState.user.statsToday as IUserStats).statisticState.total.newWords)];
+        } else {
+            const statsObjDays: {string?: number[]} = {};
+            statsObjDays[day as unknown as keyof typeof statsObjDays] = [(item[1] as IStatisticState).total.newWords, (item[1] as unknown as IStatisticState).total.wordsLearnt];
+            dataArr.push(statsObjDays);
+        }
+    })
+    console.log(dataArr)
+    dataArr = dataArr.sort((a, b) => (Date.parse(Object.keys(a)[0])) - (Date.parse(Object.keys(b)[0])))
+    return dataArr;
+
+}
+
+
 
 function setNewDate() {
     return new Date().toJSON();
@@ -271,10 +366,14 @@ export function isWordInWordsLearnt(
     user: IUserStats,
     game: string
 ) {
+    // return (
+    //     user.statisticState[
+    //         game as keyof typeof user.statisticState
+    //     ].wordsLearntArr.find((word) => Object.keys(word)[0] === wordId) ||
+    //     false
+    // );
     return (
-        user.statisticState[
-            game as keyof typeof user.statisticState
-        ].wordsLearntArr.find((word) => Object.keys(word)[0] === wordId) ||
+        user.statisticState.total.wordsLearntArr.find((word) => Object.keys(word)[0] === wordId) ||
         false
     );
 }
@@ -358,6 +457,13 @@ export async function setStats(
 }
 // logIn
 
+export function setEmptyUserStatisticForDB(): IUserStatisticToDB{
+    return {
+        learnedWords: 0,
+        optional: {}
+    }
+}
+
 async function setCurrentUser(data: ISignInResponse) {
     const newDate = setNewDate();
     appState.user.name = data.name;
@@ -372,6 +478,13 @@ async function setCurrentUser(data: ISignInResponse) {
     } else {
         welcomeContainer.innerText = `Welcome ${data.name} `;
         appState.isSignedIn = true;
+        try {
+            await fetchUserStatistic();
+        } catch (err) {
+            console.log((err as Error).message);
+            const body = setEmptyUserStatisticForDB();
+            putUserStatistic(body);
+        }
     }
     if (!data.name) return;
     if (userInUserStats) {
@@ -930,16 +1043,6 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
             section = appState.viewsStates.textbook.group;
             startGame(gameContainer, section, SPRINT, page, arrOfWords);
         }
-        // startGame(gameContainer, section, SPRINT, page);
-        // const timer = setTimeout(() => {
-        //     (currentGame.game as Sprint).endGame();
-        // }, 61000);
-        // const closeButton = document.querySelector(".close-button");
-        // if (!isHTMLElement(closeButton)) return;
-        // closeButton.addEventListener("click", () => {
-        //     clearTimeout(timer);
-        // });
-        document.removeEventListener("keydown", pressKey, false);
     } else if (!arrOfWords) {
         page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
         section = Number(

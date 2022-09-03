@@ -6,17 +6,18 @@ import {
   createElementWithClassnames,
   createElementWithContent,
 } from "../utils";
-import { setDailyChart } from '../../controller/ui';
+import { setDailyChart, processLongStats } from '../../controller/ui';
 
 import { SPRINT, AUDIO_CALL } from '../../controller/state';
+import { LongStats } from './long-term-stats';
 
 export class StatisticView {
 
   create(appState: IAppState){
-    let wordsLearntContent;
-    let correctAnswersContent;
-    let sprintStatistic;
-    let callStatistic;
+    let wordsLearntContent: string | Node;
+    let correctAnswersContent: string | Node;
+    let sprintStatistic: GameStatistic;
+    let callStatistic: GameStatistic;
     let userStats;
     if(appState.isSignedIn) {
       userStats = appState.user.statsToday;
@@ -46,9 +47,16 @@ export class StatisticView {
     }
     const chart = createElementWithAttributes('canvas', chartHTMLElemOptions);
     const data = [(userStats as IUserStats).statisticState.total.correctAnswersPercent, 100 - (userStats as IUserStats).statisticState.total.correctAnswersPercent];
-    setDailyChart((chart as HTMLCanvasElement), data)
-    statsToday.append(statisticHeaderToday, wordsLearntContent, correctAnswersContent, chart);
-    statisticContainer.append(statisticHeader, statsToday, sprintStatistic.template, callStatistic.template);
+    setDailyChart((chart as HTMLCanvasElement), data);
+
+    const longTermHeader = createElementWithContent('h3', `Ежедневный прогресс`)
+    let longStats: LongStats | HTMLElement;
+    processLongStats().then((res)=>{
+      longStats = new LongStats(res).create();
+    }).finally(()=>{
+      statsToday.append(statisticHeaderToday, wordsLearntContent, correctAnswersContent, chart);
+      statisticContainer.append(statisticHeader, statsToday, sprintStatistic.template, callStatistic.template, longTermHeader, (longStats as string | Node));
+    })
     return statisticContainer;
   }
 }
