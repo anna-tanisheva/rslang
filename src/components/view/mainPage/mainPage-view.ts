@@ -5,6 +5,7 @@ import "../../../assets/images/icons8-cards-64.png";
 import "../../../assets/images/icons8-динамик-100.png";
 import "../../../assets/images/kisspng-programmer.png";
 import "../../../assets/images/pngwing.com.png";
+import "../../../assets/images/team-lead.jpg";
 import {createElementWithAttributes} from "../utils";
 
 export class MainPageView {
@@ -95,8 +96,9 @@ export class MainPageView {
                       <h3>Станислав Яроцкий</h3>
                       <ul>Вклад:
                         <li>Электронный учебник</li>
-                        <li>Поиск и исправление багов приложения</li>
-                        <li>Трансформация данных, получаемых с сервера, для дальнейшей работы</li>
+                        <li>Tестирование</li>
+                        <li>Разработка клиент-сервер API</li>
+                        <li>Дизайн приложения</li>
                       </ul>  
                     </div>
                   </div> 
@@ -109,6 +111,7 @@ export class MainPageView {
                       <ul>Вклад:
                         <li>Главная страница</li>
                         <li>Игра "Спринт"</li>
+                        <li>Дизайн приложения</li>
                       </ul>  
                     </div>
                   </div>

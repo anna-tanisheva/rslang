@@ -8,18 +8,18 @@ export class HeaderView {
         <h1 class="header-title">RS Lang</h1>
       </a>
       <nav class="nav">
-        <ul class="nav-list">
+        <ul class="nav-list" id="nav-list">
           <li class="nav-item"><a href="index" class="nav-link">Главная</a></li>
           <li class="nav-item"><a href="textbook" class="nav-link nav-link_active">Учебник</a></li>
           <li class="nav-item"><a href="games" class="nav-link">Игры</a></li>
           <li class="nav-item"><a href="stats" class="nav-link">Статистика</a></li>
         </ul>
-      </nav>
-      <div class="hamburger" id="hamburger-1">
+        <div class="hamburger" id="hamburger">
         <span class="top-line"></span>
         <span class="line"></span>
         <span class="bottom-line"></span>
       </div>
+      </nav>
     </div>`;
         return header;
     }

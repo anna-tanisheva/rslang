@@ -13,6 +13,7 @@ import {
 } from "../controller/ui";
 import {getRouteHandler} from "../controller/routing";
 import {appState, currentGame} from "../controller/state";
+import { toggleMenu } from '../view/header/burger';
 
 export class App {
     private view = new AppView();
@@ -43,7 +44,9 @@ export class App {
         if (!isHTMLElement(navigation)) return;
         const logo = document.querySelector(".logo-link");
         if (!isHTMLElement(logo)) return;
-
+        const burger = document.querySelector(".nav");
+        if (!isHTMLElement(burger)) return;
+        
         window.addEventListener("DOMContentLoaded", () => {
             setCurrentUserOnLoad();
         });
@@ -54,7 +57,8 @@ export class App {
         submitLogOutBtn.addEventListener("click", logOutHandler);
         [showForm, closeFormButton].forEach((elem) =>
             elem.addEventListener("click", showFormHandler)
-        );
+        );        
+        burger.addEventListener("click", toggleMenu);
 
         // routing
         navigation.addEventListener("click", getRouteHandler);
