@@ -364,7 +364,6 @@ input[name="textbook-mode"]:checked+.textbook-mode {
         min-height: 700px;
         display: flex;
         flex-direction: column;
-        position: relative;
         .games-statictic-wrapper {
             position: absolute;
             bottom: 0;
@@ -470,3 +469,87 @@ input[name="textbook-mode"]:checked+.textbook-mode {
         }
     }
 }
+
+.games-launcher-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: calc($sides-padding);
+    .games-launcher-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        padding: calc($sides-padding/2);
+        gap: $sides-padding;
+    }
+    .start-button {
+        width: unset;
+        height: unset;
+        margin: unset;
+        display: block;
+        background-color: unset;
+        border: unset;
+        font-size: unset;
+        padding: calc($sides-padding/2) $sides-padding;
+        border-radius: calc($sides-padding*2);
+        background-color: lighten(lightgrey, 9%);
+        font-family: "Rubik", sans-serif;
+        color: $colorActive;
+        font-weight: 700;
+        font-size: 1.3rem;
+        height: 2.5rem;
+        transition: 0.2s;
+        &:hover {
+            box-shadow: 2px 2px 0px 0px currentColor;
+        }
+        &:active {
+            box-shadow: 1px 1px 0px 0px currentColor;
+        }
+        &:disabled,
+        &:disabled:hover {
+            color: lighten($colorActive, 40%);
+            // background-color: $colorActive;
+            box-shadow: unset;
+            cursor: auto;
+        }
+    }
+    .sprint-button {
+        border: unset;
+        padding: calc($sides-padding/2);
+    }
+    .games-info {
+        padding: calc($sides-padding/2);
+        width: 100%;
+        text-align: center;
+        font-family: "Rubik", sans-serif;
+        font-weight: 100;
+    }
+}
+
+
+/* .page-button {
+  background-color: lighten(lightgrey, 9%);
+  font-family: "Rubik", sans-serif;
+  color: $colorActive;
+  font-weight: 700;
+  font-size: 1.5rem;
+  height: 2.5rem;
+  width: 2.5rem;
+  flex-shrink: 0;
+  border: unset;
+  border-radius: 50%;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: 0.2s;
+  &:disabled {
+      cursor: auto;
+      pointer-events: none;
+      color: #999;
+      box-shadow: 1px 1px 0px 0px currentColor;
+  }
+  &:hover {
+      box-shadow: 2px 2px 0px 0px currentColor;
+  }
+  &:active {
+      box-shadow: 1px 1px 0px 0px currentColor;
+  } */
