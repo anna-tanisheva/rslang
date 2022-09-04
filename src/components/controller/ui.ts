@@ -185,7 +185,7 @@ export function setDailyChart(chart: HTMLCanvasElement, data: number[]) {
     const myChart = new Chart(ctx as ChartItem, {
         type: "doughnut",
         data: {
-            labels: [`${data[0]} % правильных ответов за сегодня`],
+            labels: [`% правильных ответов за сегодня`, `% неправильных ответов`],
             datasets: [
                 {
                     data,
@@ -253,7 +253,6 @@ export function setEmptyStatistic(str: string) {
     };
 }
 
-<<<<<<< HEAD
 function setTodayUserStatsForGraph() {
     const stats = isUserInUserStats(appState.user);
     if(!Object.entries((stats as IUserStats))[0]
@@ -314,9 +313,6 @@ export function setLongTermGraph(chart: HTMLCanvasElement, data:{ string?: numbe
 }
 
 export function compareDates(oldDate: string, newDate: string){
-=======
-export function compareDates(oldDate: string, newDate: string) {
->>>>>>> develop
     [oldDate] = oldDate.split("T");
     [newDate] = newDate.split("T");
     if (Date.parse(oldDate) === Date.parse(newDate)) return true;
@@ -1118,19 +1114,6 @@ export function startGameHandler(e: Event, arrOfWords?: IResWordsPage): void {
             section = appState.viewsStates.textbook.group;
             startGame(gameContainer, section, SPRINT, page, arrOfWords);
         }
-<<<<<<< HEAD
-=======
-        // startGame(gameContainer, section, SPRINT, page);
-        // const timer = setTimeout(() => {
-        //     (currentGame.game as Sprint).endGame();
-        // }, 61000);
-        // const closeButton = document.querySelector(".close-button");
-        // if (!isHTMLElement(closeButton)) return;
-        // closeButton.addEventListener("click", () => {
-        //     clearTimeout(timer);
-        // });
-        // document.removeEventListener("keydown", pressKey, false);
->>>>>>> develop
     } else if (!arrOfWords) {
         page = getRandomInRange(TEXTBOOK_PAGE_COUNT);
         section = Number(
