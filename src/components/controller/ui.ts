@@ -32,7 +32,6 @@ import {
     IUser,
     IUserStats,
     IUserStatsInArr,
-    IWordLearningState,
     KeyboardCodes,
     IUserWord,
     IUserStatisticToDB,
@@ -371,23 +370,6 @@ function setUserStatsArr(user: IUser) {
     }
 }
 
-export function isWordInWordsLearnt(
-    wordId: string,
-    user: IUserStats,
-    game: string
-) {
-    return (
-        user.statisticState[
-            game as keyof typeof user.statisticState
-        ].wordsLearntArr.find((word) => Object.keys(word)[0] === wordId) ||
-        false
-    );
-    // return (
-    //     user.statisticState.total.wordsLearntArr.find((word) => Object.keys(word)[0] === wordId) ||
-    //     false
-    // );
-}
-
 export function calcCorrectAnswersPercent(
     answers: number,
     wordsInGames: number
@@ -411,41 +393,6 @@ function setGameStatisticToStats(
         usersStats[gameName as keyof typeof usersStats].correctAnswersStrick =
             gameState.maxStrick;
     }
-    gameState.answers.true.forEach((word) => {
-        const wordInWordsLearnt = isWordInWordsLearnt(word, user, gameName);
-        if (!wordInWordsLearnt) {
-            const wordOnLearning: IWordLearningState = {};
-            wordOnLearning[word] = 1;
-            usersStats[gameName as keyof typeof usersStats].wordsLearntArr.push(
-                wordOnLearning
-            );
-        } else {
-            wordInWordsLearnt[word] += 1;
-            if (wordInWordsLearnt[word] === 3) {
-                usersStats[
-                    gameName as keyof typeof usersStats
-                ].wordsLearnt += 1;
-            }
-            if (wordInWordsLearnt[word] > 3) {
-                wordInWordsLearnt[word] = 3;
-            }
-        }
-    });
-    gameState.answers.false.forEach((word) => {
-        const wordInWordsLearnt = isWordInWordsLearnt(word, user, gameName);
-        if (wordInWordsLearnt) {
-            wordInWordsLearnt[word] = 0;
-            if (
-                usersStats[gameName as keyof typeof usersStats].wordsLearnt > 0
-            ) {
-                usersStats[
-                    gameName as keyof typeof usersStats
-                ].wordsLearnt -= 1;
-            } else {
-                usersStats[gameName as keyof typeof usersStats].wordsLearnt = 0;
-            }
-        }
-    });
     usersStats[gameName as keyof typeof usersStats].numberOfGames += 1;
     const totalWordsInGames =
         game.state.answers.false.length + game.state.answers.true.length;
@@ -941,6 +888,10 @@ export async function modifyWord(
     gameName: string
 ) {
     const body: IUserWord = getUserWord(word);
+    let nameForLS;
+    if(gameName === 'audiocall') {
+        nameForLS = 'audioCall'
+    }
 
     if (!body) return;
 
@@ -956,6 +907,8 @@ export async function modifyWord(
                     .rightAnswerSeries >= 5
             ) {
                 body.difficulty = "easy";
+                const state = (appState.user.statsToday as IUserStats).statisticState;
+                state[nameForLS as keyof typeof state].wordsLearnt += 1;
             }
         }
         if (body.difficulty === "norm") {
@@ -964,6 +917,8 @@ export async function modifyWord(
                     .rightAnswerSeries >= 3
             ) {
                 body.difficulty = "easy";
+                const state = (appState.user.statsToday as IUserStats).statisticState;
+                state[nameForLS as keyof typeof state].wordsLearnt += 1;
             }
         }
     } else if (game.state.answers.false.find((id) => id === word.id)) {
@@ -971,6 +926,8 @@ export async function modifyWord(
             gameName as keyof typeof body.optional
         ].rightAnswerSeries = 0;
         body.difficulty = "hard";
+        const state = (appState.user.statsToday as IUserStats).statisticState;
+        state[nameForLS as keyof typeof state].wordsLearnt -= 1;
     } else {
         return;
     }

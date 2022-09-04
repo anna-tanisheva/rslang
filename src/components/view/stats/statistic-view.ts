@@ -53,6 +53,10 @@ export class StatisticView {
     let longStats: LongStats | HTMLElement;
     processLongStats().then((res)=>{
       longStats = new LongStats(res).create();
+      if(!appState.isSignedIn) {
+        longStats.classList.add('hidden');
+        longTermHeader.classList.add('hidden');
+      };
     }).finally(()=>{
       statsToday.append(statisticHeaderToday, wordsLearntContent, correctAnswersContent, chart);
       statisticContainer.append(statisticHeader, statsToday, sprintStatistic.template, callStatistic.template, longTermHeader, (longStats as string | Node));
