@@ -36,19 +36,19 @@ export class SprintView {
         translate.textContent = `${this.word.randomTranslate}`;
         const playBtnsContainer = createElementWithClassnames("div","sprint-buttons");
         playBtnsContainer.addEventListener(("click"), (e) => {choseSplitAnswerHandler(e)});
-        const yesButtonAttributes = {type: "button",class: "sprint-button yes-button",};
+        const yesButtonAttributes = {type: "button",class: "sprint-btn yes-button",};
         const yesButton = createElementWithAttributes("button",yesButtonAttributes);
         yesButton.textContent = "Правильно";
-        const noButtonAttributes = {type: "button",class: "sprint-button no-button",};
+        const noButtonAttributes = {type: "button",class: "sprint-btn no-button",};
         const noButton = createElementWithAttributes("button",noButtonAttributes);
         noButton.textContent = "Неверно"
         playBtnsContainer.append(yesButton, noButton);
         const playKeysContainer = createElementWithClassnames("div","sprint-buttons");
-        const yesKeyAttributes = {type: "button",class: "sprint-button right-key",};
+        const yesKeyAttributes = {type: "button",class: "right-key",};
         const yesKey = createElementWithAttributes("button",yesKeyAttributes);
         yesKey.setAttribute("data-set", "arrayRight");
         yesKey.textContent = "<";
-        const noKeyAttributes = {type: "button",class: "sprint-button wrong-key",};
+        const noKeyAttributes = {type: "button",class: "wrong-key",};
         const noKey = createElementWithAttributes("button",noKeyAttributes);
         noKey.textContent = ">";
         playKeysContainer.append(yesKey, noKey);
@@ -63,10 +63,10 @@ export class SprintView {
         const rightAnswers = createElementWithClassnames("h3", "results-right-answer");
         const wrongAnswers = createElementWithClassnames("h3", "results-wrong-answer");
         wrongAnswers.textContent ="Неверные ответы: ";
-        const restartButtonAttributes = {type: "button", class: "sprint-button sprint-restart-button",};
+        const restartButtonAttributes = {type: "button", class: "sprint-btn sprint-restart-button",};
         const restartButton = createElementWithAttributes("button", restartButtonAttributes);
         restartButton.textContent = "Играть"
-        const statsButtonAttributes = {type: "button", class: "sprint-button sprint-stats-button" };
+        const statsButtonAttributes = {type: "button", class: "sprint-btn sprint-stats-button" };
         const statsButton = createElementWithAttributes( "button", statsButtonAttributes );
         statsButton.textContent = "Статистика";
         const resultBtnsContainer = createElementWithClassnames( "div", "sprint-buttons");

@@ -223,7 +223,7 @@ export class Sprint {
         const gameField = document.querySelector(".spint-container");
         (resultWindow as HTMLInputElement).style.display = "block";
         (gameField as HTMLInputElement).style.display = "none";
-        this.drawFinalResults(500);
+        this.drawFinalResults();
         if (this.wrongAnswer.length > 0) {
             this.drawAllWrongAnswers();
         }
@@ -318,13 +318,10 @@ export class Sprint {
         newScore.textContent = `${this.state.score}`
     }
 
-    drawFinalResults(record: number) {
+    drawFinalResults() {
         const finalScore = document.querySelector(".sprint-final-score")
         if (!isHTMLElement(finalScore)) return;
         finalScore.textContent = `Результат: ${this.state.score} баллов`
-        const recordScore = document.querySelector(".sprint-record-score")
-        if (!isHTMLElement(recordScore)) return;
-        recordScore.textContent = `Рекорд: ${record} баллов`                           // ToDo Сохранить и вывести рекорд
         const amountOfCorrectAnswers = document.querySelector(".results-right-answer");
         if (!isHTMLElement(amountOfCorrectAnswers)) return;
         amountOfCorrectAnswers.textContent = `Правильные ответы: ${this.state.answers.true.length}`;

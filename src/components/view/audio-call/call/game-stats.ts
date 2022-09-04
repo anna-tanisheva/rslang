@@ -1,5 +1,5 @@
 import './game-stats.scss'
-import { createElementWithClassnames, createElementWithContent } from "../../utils";
+import { createElementWithClassnames } from "../../utils";
 import { currentGame } from "../../../controller/state";
 import { AudioCall } from "./audio-call";
 import { createAnswersCards } from "../../../controller/ui";
@@ -8,14 +8,14 @@ export class GameStats {
 
   create(): HTMLElement {
     const wrapperInner = createElementWithClassnames('div', 'stats');
+    const wrapperStats = createElementWithClassnames('div', 'stats-wrapper');
     const answers = createElementWithClassnames('div', 'answers');
-    const correctAnswers = createElementWithContent('p', `Вы ответили правильно на ${String((currentGame.game as AudioCall).state.answers.true.length)} вопросов`);
-    const strick = createElementWithContent('p', `Самая длинная последовательность правильных ответов: ${String((currentGame.game as AudioCall).state.maxStrick)}`);
-    const name = createElementWithContent('h3', String((currentGame.game as AudioCall).gameName));
+    const strick = createElementWithClassnames('h2', 'stats-best-series');
+    strick.textContent = `Самая длинная серия правильных ответов: ${String((currentGame.game as AudioCall).state.maxStrick)}`;
     const answersFalseWrapper = createElementWithClassnames('div', 'answers-wrapper');
-    answersFalseWrapper.innerHTML = `<h4>Вы ответили неправильно: </h4>`;
+    answersFalseWrapper.innerHTML = `<h3 class = "audiocall-wrong-answers">Неверные ответы: ${String((currentGame.game as AudioCall).state.answers.false.length)}</h3>`;
     const answersTrueWrapper = createElementWithClassnames('div', 'answers-wrapper');
-    answersTrueWrapper.innerHTML = `<h4>Вы ответили правильно: </h4>`;
+    answersTrueWrapper.innerHTML = `<h3 class = "audiocall-right-answers">Правильные ответы: ${String((currentGame.game as AudioCall).state.answers.true.length)} </h3>`;
     Object.keys((currentGame.game as AudioCall).state.answers).forEach(key => {
       if (key === 'false') {
         createAnswersCards(false, answersFalseWrapper);
@@ -23,8 +23,9 @@ export class GameStats {
         createAnswersCards(true, answersTrueWrapper);
       }
     })
-    answers.append(answersFalseWrapper, answersTrueWrapper);
-    wrapperInner.append(name, strick, correctAnswers, answers);
+    answers.append(answersTrueWrapper, answersFalseWrapper);
+    wrapperInner.append(wrapperStats);
+    wrapperStats.append(strick, answers);
     return wrapperInner;
   }
 }

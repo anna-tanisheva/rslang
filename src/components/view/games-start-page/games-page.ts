@@ -12,14 +12,16 @@ export class GamesPage {
   create() {
     const gamesContainer = createElementWithClassnames("section", "games");
     const callStartView = new GameStartView({
+      name: 'Аудиовызов',
       game: 'audio-call',
-      text: 'Тренировка понимания речи на слух. Выберете уровень сложности слов и попробуйте набрать максимальное количество очков',
+      text: 'Тренировка понимания речи на слух. Найди правильный перевод из четырех предложенных',
       pathToImg: './images/icons8-динамик-100.png'
     }).create();
 
     const sprintStartView = new GameStartView({
+      name: 'Спринт',
       game: 'sprint',
-      text: 'Будьте fast and furious, угадывайте перевод слов на время',
+      text: 'Будь fast and furious, успей за минуту дать максимальное количество верных ответов',
       pathToImg: './images/icons8-cards-64.png'
     }).create();
 

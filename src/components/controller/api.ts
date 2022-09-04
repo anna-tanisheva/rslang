@@ -22,7 +22,7 @@ import {
 } from "../view/textbook/components";
 import {getActiveViewData} from "./ui";
 import {WordItem} from "../view/textbook/components/word";
-
+import {GamesLauncher} from "../view/textbook/components/gamesLauncher";
 
 export const BASE_URL = "http://localhost:3000";
 const ID = "";
@@ -190,6 +190,7 @@ export async function redrawTextbookWordsPage({
     WordsItem.drawNewWordsItem(words);
     WordDetails.setCard(words[0]);
     PagePagination.moveSlider();
+    GamesLauncher.redraw();
 }
 
 export function getUserWord(word: IAggreagtedWord) {
@@ -218,23 +219,25 @@ export async function fetchUserStatistic(): Promise<IUserStatisticToDB> {
         headers: {
             Authorization: `Bearer ${appState.user.token}`,
             Accept: "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         },
-    })
+    });
     const stats = await res.json();
     return stats;
 }
 
-export async function putUserStatistic(body: IUserStatisticToDB): Promise<void> {
+export async function putUserStatistic(
+    body: IUserStatisticToDB
+): Promise<void> {
     const res = await fetch(`${URLs.usersIDStatistics()}`, {
         method: "PUT",
         body: JSON.stringify(body),
         headers: {
             Authorization: `Bearer ${appState.user.token}`,
             Accept: "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         },
-    })
+    });
 }
 /**
  * Функция отправки POST или PUT запроса для приходящего слова userWord
@@ -242,7 +245,6 @@ export async function putUserStatistic(body: IUserStatisticToDB): Promise<void> 
  * @augments {modifyedUserWord} - полностью модифицированный userWord, который нужно установить. Использовать если нужно поменять ещё что-то кроме сложности
  * @augments {difficulty} - сложность, которую нужно установить. Использовать если не нужно ничего менять кроме сложности
  * */
-
 
 export async function fetchPostOrPutUserWord({
     word,
@@ -282,7 +284,7 @@ export async function fetchPostOrPutUserWord({
     try {
         const resp = await fetch(url, options);
         if (resp.status === 417) {
-            throw new Error('417');
+            throw new Error("417");
         }
         respData = (await resp.json()) as IUserWordResponse;
     } catch (error) {
@@ -315,10 +317,17 @@ export async function setUserWord({
             getActiveViewData();
         }
         if (appState.viewsStates.textbook.mode === "textbook") {
-            const newWord = {...word};
+            const newWord = JSON.parse(JSON.stringify(word));
             newWord.userWord = body;
+            textbookState.words.forEach((oldWord, i) => {
+                if (oldWord.id === newWord.id)
+                    textbookState.words[i] = JSON.parse(
+                        JSON.stringify(newWord)
+                    );
+            });
             WordItem.setCard(newWord);
             WordDetails.setCard(newWord);
+            GamesLauncher.redraw();
         }
     } catch (error) {
         console.error(error);
