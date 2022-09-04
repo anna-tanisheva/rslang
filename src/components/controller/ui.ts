@@ -283,26 +283,30 @@ export function setLongTermGraph(chart: HTMLCanvasElement, data:{ string?: numbe
     })
     const ctx = (chart as HTMLCanvasElement).getContext("2d");
     /* eslint-disable @typescript-eslint/no-unused-vars */
-    const myChart = new Chart(ctx as ChartItem, {
-        data: {
-            datasets: [{
-                type: 'bar',
-                label: 'New Words',
-                data: arrOfnewWords,
-                backgroundColor: [
-                    "rgba(54, 162, 235, 0.6)",
-                ],
-            }, {
-                type: 'line',
-                label: 'Learned Words',
-                data: arrOfLearntWords,
-                backgroundColor: [
-                    "rgba(255, 99, 132, 1)",
-                ],
-            }],
-            labels: arrOfDates
-        },
-    });
+    try {
+        const myChart = new Chart(ctx as ChartItem, {
+            data: {
+                datasets: [{
+                    type: 'bar',
+                    label: 'Новые слова',
+                    data: arrOfnewWords,
+                    backgroundColor: [
+                        "rgba(54, 162, 235, 0.6)",
+                    ],
+                }, {
+                    type: 'line',
+                    label: 'Выученные слова',
+                    data: arrOfLearntWords,
+                    backgroundColor: [
+                        "rgba(255, 99, 132, 1)",
+                    ],
+                }],
+                labels: arrOfDates
+            },
+        });
+    } catch (err) {
+        console.log(JSON.stringify(err))
+    }
 }
 
 export function compareDates(oldDate: string, newDate: string){
@@ -317,10 +321,8 @@ export async function processLongStats(): Promise<{ string?: number[] | undefine
     const statsToday = setTodayUserStatsForGraph();
     let dataArr= [];
     let dayToday: string;
-    if(statsToday.date && statsToday.newWords && statsToday.wordsLearnt) {
+    if(statsToday.date && (statsToday.newWords || statsToday.wordsLearnt)) {
         dayToday = new Date(statsToday.date.split("T")[0]).toUTCString().split(',')[1].slice(0, 12);
-        // dayToday = dayToday;
-        console.log(dayToday)
         const todayObj: {string?: number[]} = {};
         todayObj[dayToday as keyof typeof todayObj] = [(statsToday.newWords as number), statsToday.wordsLearnt];
         dataArr.push(todayObj);
@@ -330,16 +332,21 @@ export async function processLongStats(): Promise<{ string?: number[] | undefine
     if(!longTermStats) return dataArr;
     Object.entries(longTermStats).forEach((item)=>{
         const day = new Date(item[0].split("T")[0]).toUTCString().split(',')[1].split('00:00:00')[0].trim();
-        if(compareDates(dayToday, day)) {
-            const statsObjDays: {string?: number[]} = {};
-            statsObjDays[day as unknown as keyof typeof statsObjDays] = [(((item[1] as IStatisticState).total.newWords) + ((appState.user.statsToday as IUserStats).statisticState.total.newWords)), ((item[1] as unknown as IStatisticState).total.wordsLearnt + (appState.user.statsToday as IUserStats).statisticState.total.newWords)];
+        if(dayToday) {
+            if(compareDates(dayToday, day)) {
+                const statsObjDays: {string?: number[]} = {};
+                statsObjDays[day as unknown as keyof typeof statsObjDays] = [(((item[1] as IStatisticState).total.newWords) + ((appState.user.statsToday as IUserStats).statisticState.total.newWords)), ((item[1] as unknown as IStatisticState).total.wordsLearnt + (appState.user.statsToday as IUserStats).statisticState.total.newWords)];
+            } else {
+                const statsObjDays: {string?: number[]} = {};
+                statsObjDays[day as unknown as keyof typeof statsObjDays] = [(item[1] as IStatisticState).total.newWords, (item[1] as unknown as IStatisticState).total.wordsLearnt];
+                dataArr.push(statsObjDays);
+            }
         } else {
             const statsObjDays: {string?: number[]} = {};
             statsObjDays[day as unknown as keyof typeof statsObjDays] = [(item[1] as IStatisticState).total.newWords, (item[1] as unknown as IStatisticState).total.wordsLearnt];
             dataArr.push(statsObjDays);
         }
     })
-    console.log(dataArr)
     dataArr = dataArr.sort((a, b) => (Date.parse(Object.keys(a)[0])) - (Date.parse(Object.keys(b)[0])))
     return dataArr;
 
