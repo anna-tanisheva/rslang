@@ -3,8 +3,6 @@ $backgroung-button-color: #8ab7f5;
 $color-correct-answer: #26850e;
 $color-answer: #000000;
 $backgroung-playing-field: #f2eabc;
-
-
 .sprint-section {
     width: 10%;
     height: 100%;
@@ -12,7 +10,6 @@ $backgroung-playing-field: #f2eabc;
     background-size: cover;
     background-repeat: no-repeat;
 }
-
 
 .sprint-game {
     position: absolute;
@@ -26,7 +23,7 @@ $backgroung-playing-field: #f2eabc;
 }
 
 .sprint-playing-field {
-    margin: 5px auto;    
+    margin: 5px auto;
     height: 290px;
     max-width: 400px;
     display: flex;
@@ -36,8 +33,6 @@ $backgroung-playing-field: #f2eabc;
     background: url(../../../../assets/images/envelop.jpg);
     background-size: contain;
     background-repeat: no-repeat;
-
-
     p {
         font-family: $main-font;
         font-size: 1.8rem;
@@ -76,7 +71,7 @@ $backgroung-playing-field: #f2eabc;
 }
 
 .sprint-translate {
-    margin-top: 10px;  
+    margin-top: 10px;
 }
 
 .sprint-buttons {
@@ -88,38 +83,38 @@ $backgroung-playing-field: #f2eabc;
 .sprint-btn,
 .right-key,
 .wrong-key {
-    margin: 0 5px; 
+    margin: 0 5px;
     padding: 0 16px;
     height: 35px;
     font-family: $main-font;
     font-size: 1rem;
     background-color: #8ab7f5;
-    background-image: linear-gradient(to bottom, #8ab7f5 0%,#547cb3 100%);
-    background-size: .65em auto, 100%; 
+    background-image: linear-gradient(to bottom, #8ab7f5 0%, #547cb3 100%);
+    background-size: .65em auto, 100%;
     border: 3px solid $primary-color;
     border-radius: .5em;
+    display: grid;
+    place-items: center;
 }
-
 
 .sprint-btn:hover,
 .active {
     border: 3px solid #615c5c;
     background-color: #efc97d;
-    background-image: linear-gradient(to bottom, #efc97d 0%,#a78b54 100%);
+    background-image: linear-gradient(to bottom, #efc97d 0%, #a78b54 100%);
 }
 
 .sprint-counters {
     display: flex;
-    justify-content: space-evenly;    
+    justify-content: space-evenly;
     font-size: 2.5rem;
     font-weight: 400;
 }
 
-
 .sprint-answer {
     display: none;
-    text-align: center; 
-    font-family: $main-font;      
+    text-align: center;
+    font-family: $main-font;
     font-weight: 500;
     font-size: 1.4rem;
 }
@@ -139,33 +134,24 @@ $backgroung-playing-field: #f2eabc;
 }
 
 .sprint-results {
-    padding-top: 50px;    
+    padding-top: 50px;
     display: none;
 }
 
 .sprint-results-discription {
     overflow-y: scroll;
     width: 90%;
-
     &::-webkit-scrollbar {
-        width:  5px;
+        width: 5px;
     }
-    
     &::-webkit-scrollbar-thumb {
         width: 5px;
         background-color: $primary-color;
-        background-image: -webkit-linear-gradient(45deg,rgba(255, 255, 255, .25) 25%,
-                    transparent 25%,
-                    transparent 50%,
-                    rgba(255, 255, 255, .25) 50%,
-                    rgba(255, 255, 255, .25) 75%,
-                    transparent 75%,
-                    transparent);
+        background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .25) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .25) 50%, rgba(255, 255, 255, .25) 75%, transparent 75%, transparent);
     }
-
     h2,
     h3 {
-        margin: 5px auto;        
+        margin: 5px auto;
         font-family: $main-font;
         text-align: center;
     }
@@ -179,23 +165,22 @@ $backgroung-playing-field: #f2eabc;
     color: $color-answer;
 }
 
-.result-answers-audio {    
+.result-answers-audio {
     width: 36px;
     height: 36px;
     margin-right: 5px;
     border: transparent;
     background: url(../../../../assets/images/icons8-динамик-100.png);
     background-size: contain;
-    background-repeat: no-repeat; 
+    background-repeat: no-repeat;
 }
 
 .result-answers-audio:hover {
     scale: 1.2;
 }
 
-
 .sprint-scores {
-    padding-top: 35px;    
+    padding-top: 35px;
     width: 95px;
     height: 110px;
     text-align: center;
@@ -205,7 +190,7 @@ $backgroung-playing-field: #f2eabc;
     background-size: contain;
     background-repeat: no-repeat;
 }
-  
+
 .sprint-timer {
     padding-top: 35px;
     width: 145px;
@@ -230,14 +215,13 @@ button {
 
 .game-lavel {
     margin: 32px;
-
     span {
-        margin: 0 5px; 
+        margin: 0 5px;
         padding: 0 10px;
         height: 30px;
         font-size: 1rem;
         border: 3px solid $primary-color;
-        background-color: $backgroung-button-color; 
+        background-color: $backgroung-button-color;
         cursor: pointer;
     }
 }
@@ -271,9 +255,8 @@ button {
     color: $color-correct-answer;
 }
 
-
 @media (max-width: 800px) {
     .sprint-section {
         background: $backgroung-playing-field;
     }
-  }
+}

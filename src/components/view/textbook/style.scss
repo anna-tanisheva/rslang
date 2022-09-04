@@ -1,7 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Rubik+Mono+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,700;0,900;1,400;1,700;1,900&display=swap');
 $sides-padding: 1rem;
-$colorActiveBg:lighten(lightgrey,
+$colorActiveBg:lighten(rgba(211,
+211,
+211,
+0.5),
 15%);
 $colorActive:lighten(black,
 40%);
@@ -198,7 +201,7 @@ input[name="textbook-mode"]:checked+.textbook-mode {
 }
 
 .group-label {
-    background-color: lighten(lightgrey, 11%);
+    background-color: lighten(rgba(211, 211, 211, 0.8), 11%);
     font-family: 'Rubik Mono One', sans-serif;
     color: currentColor;
     border-radius: 1rem;
@@ -221,7 +224,7 @@ input[name="textbook-mode"]:checked+.textbook-mode {
         color: $colorActive;
         .card {
             width: 250px;
-            background-color: lighten(lightgrey, 11%);
+            background-color: lighten(rgba(211, 211, 211, 0.8), 11%);
             margin: calc($sides-padding/2);
             border-radius: 9rem 1rem 1rem 1rem;
             .card-image {
@@ -335,12 +338,12 @@ input[name="textbook-mode"]:checked+.textbook-mode {
                 width: 20px;
                 right: 0px;
                 height: 100%;
-                background: linear-gradient(-90deg, rgba(249, 249, 249, 1) 5%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0) 100%);
+                background: linear-gradient(-90deg, rgba(235, 222, 203, 1) 5%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0) 100%);
                 z-index: 5;
                 pointer-events: none;
             }
             &::before {
-                background: linear-gradient(90deg, rgba(249, 249, 249, 1) 5%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0) 100%);
+                background: linear-gradient(90deg, rgba(235, 222, 203, 1) 5%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0) 100%);
                 right: unset;
                 left: 0;
             }
@@ -507,7 +510,6 @@ input[name="textbook-mode"]:checked+.textbook-mode {
         &:disabled,
         &:disabled:hover {
             color: lighten($colorActive, 40%);
-            // background-color: $colorActive;
             box-shadow: unset;
             cursor: auto;
         }

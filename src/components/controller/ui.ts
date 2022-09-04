@@ -52,6 +52,7 @@ import {GameStats} from "../view/audio-call/call/game-stats";
 import {AppView} from "../view/app-view";
 import {PagePagination} from "../view/textbook/components";
 import {Sprint} from "../view/audio-call/sprint/sprint-model";
+import {getRouteHandlerFromMain} from "./routing";
 
 function clearFormFields(formName: string) {
     const emailInput = document.querySelector(`.${formName}-email`);
@@ -174,6 +175,18 @@ export async function getActiveViewData() {
         );
         if (!isHTMLElement(startScreenButtons)) return;
         startScreenButtons.addEventListener("click", addFormHandlerToMainPage);
+        const navigationFromMain = document.querySelectorAll(".benefits-img");
+        navigationFromMain.forEach((linkFromMain) => {
+            linkFromMain.addEventListener("click", getRouteHandlerFromMain);
+            linkFromMain.addEventListener("click", (e: Event) => {
+                const {target} = e;
+                if (!isHTMLElement(target)) return;
+                if (!target.classList.contains("benefits-img")) return;
+                const link = target.getAttribute("href");
+                if (!link) return;
+                getActiveViewData();
+            });
+        });
     }
 }
 

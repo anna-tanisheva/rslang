@@ -41,6 +41,8 @@ export class App {
         if (!isHTMLButtonElement(closeFormButton)) return;
         const navigation = document.querySelector(".nav");
         if (!isHTMLElement(navigation)) return;
+        const logo = document.querySelector(".logo-link");
+        if (!isHTMLElement(logo)) return;
 
         window.addEventListener("DOMContentLoaded", () => {
             setCurrentUserOnLoad();
@@ -60,6 +62,17 @@ export class App {
             const {target} = e;
             if (!isHTMLElement(target)) return;
             if (!target.classList.contains("nav-link")) return;
+            const link = target.getAttribute("href");
+            if (!link) return;
+            currentGame.game = null;
+            document.querySelector(".games-wrapper")?.replaceChildren();
+            getActiveViewData();
+        });
+        logo.addEventListener("click", getRouteHandler);
+        logo.addEventListener("click", (e: Event) => {
+            const {target} = e;
+            if (!isHTMLElement(target)) return;
+            if (!target.classList.contains("logo-link")) return;
             const link = target.getAttribute("href");
             if (!link) return;
             currentGame.game = null;

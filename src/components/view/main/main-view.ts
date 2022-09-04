@@ -22,7 +22,19 @@ export class MainView {
         this.activeViewName = appState.view;
         const main = createElementWithClassnames("main", "main");
         const overlay = createElementWithClassnames("div", "overlay", "hidden");
-
+            overlay.innerHTML = `
+                <ul class="circles">
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                </ul>`;
 
         if (
             this.activeViewName !== "index" &&

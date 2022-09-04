@@ -4,7 +4,9 @@ export class HeaderView {
         header.classList.add("header");
         header.innerHTML = `
     <div class="wrapper header-wrapper">
-      <h1 class="header-title">RS Lang</h1>
+      <a href="index" class="logo-link">
+        <h1 class="header-title">RS Lang</h1>
+      </a>
       <nav class="nav">
         <ul class="nav-list">
           <li class="nav-item"><a href="index" class="nav-link">Главная</a></li>

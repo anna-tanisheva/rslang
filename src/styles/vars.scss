@@ -1,19 +1,29 @@
 $main-color: #bfb279;
 @font-face {
-  font-family: "Rubik";
-  font-family: "Rubik Mono One";
-  src: url("https://fonts.googleapis.com/css2?family=Rubik+Mono+One&display=swap");
-  src: url("https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,700;0,900;1,400;1,700;1,900&display=swap");
+    font-family: "Rubik";
+    font-family: "Rubik Mono One";
+    src: url("https://fonts.googleapis.com/css2?family=Rubik+Mono+One&display=swap");
+    src: url("https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,700;0,900;1,400;1,700;1,900&display=swap");
 }
-$main-font: "Rubik", sans-serif;
-$secondary-font: "Rubik Mono One", sans-serif;
+
+$main-font: "Rubik",
+sans-serif;
+$secondary-font: "Rubik Mono One",
+sans-serif;
 $sides-padding: 1rem;
-$colorActiveBg: lighten(lightgrey, 15%);
-$colorActive: lighten(black, 40%);
+$colorActiveBg: lighten(lightgrey,
+15%);
+$colorActive: lighten(black,
+40%);
 $colorAccent: gold;
-$colorGroup1: darken(aquamarine, 35%);
-$colorGroup2: lighten(orange, 5%);
-$colorGroup3: darken(pink, 10%);
-$colorGroup4: lighten(red, 20%);
+$colorGroup1: darken(aquamarine,
+35%);
+$colorGroup2: lighten(orange,
+5%);
+$colorGroup3: darken(pink,
+10%);
+$colorGroup4: lighten(red,
+20%);
 $colorGroup5: lightskyblue;
-$colorGroup6: lighten(blue, 25%);
+$colorGroup6: lighten(blue,
+25%);
