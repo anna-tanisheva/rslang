@@ -1282,8 +1282,8 @@ export function getRandomNumber(number: number) {
 }
 
 export function getColor(): string {
-    let color = "";
-    if (appState.viewsStates.textbook.mode === "textbook") {
+    let color = "";    
+    if (appState.viewsStates.textbook.mode === "textbook" || (!appState.isSignedIn)) {
         color = COLORS[appState.viewsStates.textbook.group];
     } else if (appState.viewsStates.textbook.dictionaryMode === "hard") {
         color = "crimson";
