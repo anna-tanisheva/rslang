@@ -43,10 +43,10 @@ html {
     background-color: $header-color;
     align-items: center;
     font-family: $main-font;
+    padding: 0 10px
 }
 
 .header-title {
-    margin-left: 10px;
     color: #8ab7f5;
     text-shadow: -0 -1px 1px #000000, 0 -1px 1px #000000, -0 1px 1px #000000, 0 1px 1px #000000, -1px -0 1px #000000, 1px -0 1px #000000, -1px 0 1px #000000, 1px 0 1px #000000, -1px -1px 1px #000000, 1px -1px 1px #000000, -1px 1px 1px #000000, 1px 1px 1px #000000, -1px -1px 1px #000000, 1px -1px 1px #000000, -1px 1px 1px #000000, 1px 1px 1px #000000;
 }
@@ -255,7 +255,7 @@ a {
     flex-wrap: wrap;
     height: 100%;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
     font-family: $main-font;
     background-color: #af9477;
