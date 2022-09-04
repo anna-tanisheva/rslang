@@ -1,5 +1,6 @@
 .form-container {
     position: fixed;
+    z-index: 5;
     top: 50vh;
     left: 50vw;
     transform: translate(-50%, -50%);
@@ -135,7 +136,7 @@
 .show-form-container {
     display: flex;
     flex-direction: column;
-    align-items: center;    
+    align-items: center;
     margin-left: auto;
 }
 
