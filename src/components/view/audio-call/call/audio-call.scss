@@ -26,20 +26,20 @@
     right: 0;
     cursor: pointer;
     border-radius: 50%;
-    transform: rotate(45deg);
+    transform: rotate(0deg);
     background-color: #af9477;
     display: flex;
     justify-content: center;
     align-items: center;
     font-family: $main-font;
     font-size: 1.5rem;
-    color: #f1ebbb;
+    color: #ed1707;
     transition: 0.3s;
     z-index: 10;
 }
 
 .close-button:hover {
-    transform: rotate(-45deg);
+    transform: rotate(-90deg);
 }
 
 .next-button {
@@ -57,7 +57,7 @@
     align-items: center;
     font-family: $main-font;
     font-size: 1.5rem;
-    color: #ffeb3b;
+    color: black;
     border: unset;
 }
 

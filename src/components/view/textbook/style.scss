@@ -99,7 +99,7 @@ $colorGroup6:lighten(blue,
 .group-label,
 .textbook-mode {
     font-family: 'Rubik Mono One', sans-serif;
-    color: lightgrey;
+    color: lighten($colorActive, 10%);
     border-radius: 1rem 1rem 0 0;
     display: grid;
     place-items: center;
