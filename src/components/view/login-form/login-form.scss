@@ -6,11 +6,12 @@
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
-    width: fit-content;
+    width: 425px;
     min-height: 250px;
     padding: 10px;
     border: 2px solid $main-color;
     border-radius: 5px;
+    font-family: "Rubik", sans-serif;
 }
 
 .show-form {
@@ -34,6 +35,8 @@
     border: none;
     outline: none;
     background-color: transparent;
+    padding: 0.25rem;
+    transform: translateY(1px);
 }
 
 .validation-message {
@@ -55,6 +58,13 @@
         display: flex;
         justify-content: space-between;
         margin-bottom: 20px;
+        white-space: nowrap;
+    }
+    input {
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0 10px;
+        font-family: "Rubik", sans-serif;
     }
 }
 
@@ -80,8 +90,46 @@
     }
 }
 
+.form-container button {
+    font-family: 'Rubik Mono One', sans-serif;
+    letter-spacing: -1px;
+}
+
+.log-out-wrapper {
+    width: fit-content;
+    transition: 0.5s;
+}
+
+.form-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: 0.5s;
+}
+
+.logout-submit {
+    background-color: unset;
+    border: unset;
+    width: 1.9rem;
+    height: 1.9rem;
+    transition: 0.3s;
+    padding: 0.2rem;
+    padding-left: .25rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+}
+
 .logout-submit:disabled {
-    display: none;
+    width: 0;
+    opacity: 0;
+}
+
+.login-submit,
+.registration-submit {
+    padding: 0.1rem;
+    border-radius: 0.5rem;
 }
 
 .show-form-container {
@@ -91,6 +139,8 @@
 }
 
 .welcome-text {
+    width: fit-content;
+    transition: 0.3s;
     text-align: center;
     white-space: nowrap;
 }

@@ -29,6 +29,19 @@ export class AppView {
 
     public drawView(): void {
         const root = createElementWithAttributes("div", {id: "root"});
+        root.innerHTML = `
+                <ul class="circles">
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                </ul>`;
         root.append(
             this.headerView,
             AppView.mainView,
@@ -45,6 +58,19 @@ export class AppView {
         if (!isHTMLElement(root)) return;
         AppView.mainView = new MainView().create();
         root.replaceChildren();
+        root.innerHTML = `
+                <ul class="circles">
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                </ul>`;
         root.append(...this.mainView.children);
     }
 }

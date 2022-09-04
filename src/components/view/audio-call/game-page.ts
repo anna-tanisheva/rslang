@@ -18,9 +18,9 @@ export class GamePopUp {
     const gameContainer = createElementWithClassnames("div", "game-popup");
     const closeButton = createElementWithClassnames('div', 'close-button');
     const gameStatsWrapper = createElementWithClassnames('div', 'game-stats-wrapper');
-    closeButton.innerText = '+'
-    const nextButton = createElementWithClassnames('button', 'next-button');
-    nextButton.innerHTML = '&#8594;';
+    closeButton.innerText = "🞫";
+    const nextButton = createElementWithClassnames("button", "next-button");
+    nextButton.innerHTML = "➟";
     // в конструктор передаем номер раздела от пользователя или слова страницы учебника, с которой была запущена игра
     let wrapper;
     if (game === AUDIO_CALL) {

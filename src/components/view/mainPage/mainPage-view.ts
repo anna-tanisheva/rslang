@@ -3,7 +3,6 @@ import "../../../assets/images/icons8-книга-100.png";
 import "../../../assets/images/icons8-комбинированный-график-100.png";
 import "../../../assets/images/icons8-cards-64.png";
 import "../../../assets/images/icons8-динамик-100.png";
-import "../../../assets/images/team-lead.jpg";
 import "../../../assets/images/kisspng-programmer.png";
 import "../../../assets/images/pngwing.com.png";
 import {createElementWithAttributes} from "../utils";
@@ -37,30 +36,30 @@ export class MainPageView {
               <div class="benefits-container">
                 
                 <div class="benefits-description benefits-tutorial">
-                  <div class="benefits-img">
+                  <a href="textbook" class="benefits-img">
                     <img src="./images/icons8-книга-100.png" alt="tutorial">
-                  </div>            
+                  </a>            
                   <h3 class="benefits-description-title">Учебник</h3>
                   <p class="benefit-description-item">Более 3500 самых употребляемых слов и примеров их использования</p>                
                 </div>
                 <div class="benefits-description benefits-stats">
-                  <div class="benefits-img">
+                  <a href="stats" class="benefits-img">
                     <img src="./images/icons8-комбинированный-график-100.png" alt="graphic">
-                  </div> 
+                  </a>
                   <h3 class="benefits-description-title">Статистика</h3>
                   <p class="benefit-description-item">Отслеживание своего прогресса в обучении</p>                
                 </div>
                 <div class="benefits-description benefits-sprint">
-                  <div class="benefits-img">
+                  <a href="games" class="benefits-img">
                     <img src="./images/icons8-cards-64.png" alt="cards">
-                  </div>
+                  </a>
                   <h3 class="benefits-description-title">Спринт</h3>
                   <p class="benefit-description-item">Тренировка скорости перевода с английского языка на русский </p>                
                 </div>
                 <div class="benefits-description benefits-audio-challenge">
-                  <div class="benefits-img">
+                  <a href="games" class="benefits-img">
                     <img src="./images/icons8-динамик-100.png" alt="dynamic">
-                  </div>
+                  </a>
                   <h3 class="benefits-description-title">Аудиовызов</h3>
                   <p class="benefit-description-item">Тренировка понимания речи на слух</p>                
                 </div>
