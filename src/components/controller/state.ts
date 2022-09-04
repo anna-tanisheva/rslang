@@ -18,6 +18,7 @@ export const appState: IAppState = {
             statisticTimeStamp: null,
             statisticState: {
                 total: {
+                    newWords: 0,
                     correctAnswersPercent: 0,
                     numberOfGames: 0,
                     wordsLearntArr: [],
@@ -26,6 +27,7 @@ export const appState: IAppState = {
                     correctAnswersStrick: 0,
                 },
                 audioCall: {
+                    newWords: 0,
                     correctAnswersPercent: 0,
                     numberOfGames: 0,
                     wordsLearntArr: [],
@@ -34,6 +36,7 @@ export const appState: IAppState = {
                     correctAnswersStrick: 0,
                 },
                 sprint: {
+                    newWords: 0,
                     correctAnswersPercent: 0,
                     numberOfGames: 0,
                     wordsLearntArr: [],
@@ -57,6 +60,7 @@ export const appState: IAppState = {
         statisticTimeStamp: null,
         statisticState: {
             total: {
+                newWords: 0,
                 correctAnswersPercent: 0,
                 numberOfGames: 0,
                 wordsLearntArr: [],
@@ -66,6 +70,7 @@ export const appState: IAppState = {
                 totalAnswers: 0
             },
             audioCall: {
+                newWords: 0,
                 correctAnswersPercent: 0,
                 numberOfGames: 0,
                 wordsLearntArr: [],
@@ -75,6 +80,7 @@ export const appState: IAppState = {
                 totalAnswers: 0
             },
             sprint: {
+                newWords: 0,
                 correctAnswersPercent: 0,
                 numberOfGames: 0,
                 wordsLearntArr: [],

@@ -1,80 +1,96 @@
 .form-container {
-  position: fixed;
-  top: 50vh;
-  left: 50vw;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: column;
-  width: fit-content;
-  min-height: 250px;
-  padding: 10px;
-  border: 2px solid $main-color;
-  border-radius: 5px;
+    position: fixed;
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    width: fit-content;
+    min-height: 250px;
+    padding: 10px;
+    border: 2px solid $main-color;
+    border-radius: 5px;
 }
 
 .show-form {
-  width: 40px;
-  height: 40px;
-  background-image: url("../../../assets/images/login.png");
-  background-size: cover;
-  cursor: pointer;
-  border: none;
-  outline: none;
+    width: 40px;
+    height: 40px;
+    background-image: url("../../../assets/images/login.png");
+    background-size: cover;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    border-radius: 50%;
 }
 
 .show-form-wrapper {
-  display: flex;
+    display: flex;
 }
 
 .show-tab {
-  display: block;
-  width: 50%;
-  border: none;
-  outline: none;
-  background-color: transparent;
+    display: block;
+    width: 50%;
+    border: none;
+    outline: none;
+    background-color: transparent;
 }
 
 .validation-message {
-  background-color: lighten($main-color, 10%);
-  padding: 0 20px 20px;
-  & > p {
-    margin-bottom: 5px;
-  }
+    background-color: lighten($main-color, 10%);
+    padding: 0 20px 20px;
+    &>p {
+        margin-bottom: 5px;
+    }
 }
 
 .form {
-  display: flex;
-  flex-direction: column;
-  background-color: lighten($main-color, 10%);
-  padding: 30px;
-  min-height: inherit;
-  justify-content: space-evenly;
-  label {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
+    flex-direction: column;
+    background-color: lighten($main-color, 10%);
+    padding: 30px;
+    min-height: inherit;
+    justify-content: space-evenly;
+    label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
 }
 
 .active-form {
-  background-color: lighten($main-color, 10%);
+    background-color: lighten($main-color, 10%);
 }
 
 .close-form-button {
-  position: absolute;
-  height: 25px;
-  width: 25px;
-  border-radius: 50%;
-  top: -15px;
-  right: -15px;
-  border: none;
-  background-color: $main-color;
-  transform: rotate(-45deg);
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: 0.3s;
-  &:hover {
-    transform: rotate(-90deg);
-  }
+    position: absolute;
+    height: 25px;
+    width: 25px;
+    border-radius: 50%;
+    top: -15px;
+    right: -15px;
+    border: none;
+    background-color: $main-color;
+    transform: rotate(-45deg);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: 0.3s;
+    &:hover {
+        transform: rotate(-90deg);
+    }
+}
+
+.logout-submit:disabled {
+    display: none;
+}
+
+.show-form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.welcome-text {
+    text-align: center;
+    white-space: nowrap;
 }

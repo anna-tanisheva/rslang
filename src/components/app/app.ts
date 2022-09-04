@@ -12,7 +12,7 @@ import {
     getActiveViewData,
 } from "../controller/ui";
 import {getRouteHandler} from "../controller/routing";
-import {appState} from "../controller/state";
+import {appState, currentGame} from "../controller/state";
 
 export class App {
     private view = new AppView();
@@ -62,6 +62,8 @@ export class App {
             if (!target.classList.contains("nav-link")) return;
             const link = target.getAttribute("href");
             if (!link) return;
+            currentGame.game = null;
+            document.querySelector(".games-wrapper")?.replaceChildren();
             getActiveViewData();
         });
         // change view on popstate event
