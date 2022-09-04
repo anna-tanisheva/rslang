@@ -1,8 +1,8 @@
 $primary-color: #d12121;
 $backgroung-button-color: #8ab7f5;
 $color-correct-answer: #26850e;
-$color-answer: black;
-$backgroung-active-button: #f0f08e;
+$color-answer: #000000;
+$backgroung-playing-field: #f2eabc;
 
 
 .sprint-section {
@@ -22,17 +22,13 @@ $backgroung-active-button: #f0f08e;
     width: 1000%;
     height: 100%;
     transition: all 1s ease;
-    background-color: honeydew;
-}
-
-sprint-container {
-    display: none;
+    background-color: #f0fff0;
 }
 
 .sprint-playing-field {
-    margin: 5px auto;
-    height: 298px;
-    max-width: 412px;
+    margin: 5px auto;    
+    height: 290px;
+    max-width: 400px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -43,7 +39,8 @@ sprint-container {
 
 
     p {
-        font-size: 2rem;
+        font-family: $main-font;
+        font-size: 1.8rem;
     }
 }
 
@@ -83,23 +80,37 @@ sprint-container {
 }
 
 .sprint-buttons {
-    margin-top: 20px;
+    margin: 20px 0 10px;
     display: flex;
     justify-content: center;
 }
 
-.sprint-button {
+.sprint-btn,
+.right-key,
+.wrong-key {
     margin: 0 5px; 
-    padding: 0 10px;
-    height: 30px;
+    padding: 0 16px;
+    height: 35px;
+    font-family: $main-font;
     font-size: 1rem;
+    background-color: #8ab7f5;
+    background-image: linear-gradient(to bottom, #8ab7f5 0%,#547cb3 100%);
+    background-size: .65em auto, 100%; 
     border: 3px solid $primary-color;
-    background-color: $backgroung-button-color;
+    border-radius: .5em;
+}
+
+
+.sprint-btn:hover,
+.active {
+    border: 3px solid #615c5c;
+    background-color: #efc97d;
+    background-image: linear-gradient(to bottom, #efc97d 0%,#a78b54 100%);
 }
 
 .sprint-counters {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-evenly;    
     font-size: 2.5rem;
     font-weight: 400;
 }
@@ -107,9 +118,10 @@ sprint-container {
 
 .sprint-answer {
     display: none;
-    text-align: center;       
+    text-align: center; 
+    font-family: $main-font;      
     font-weight: 500;
-    font-size: 1.8rem;
+    font-size: 1.4rem;
 }
 
 .sprint-results-wrapper {
@@ -121,10 +133,9 @@ sprint-container {
     flex-direction: column;
     align-items: flex-end;
     border-radius: 20px;
-    background: url(../../../../assets/images/frame.png);
+    background: url(../../../../assets/images/frame.jpg);
     background-size: contain;
-    background-repeat: no-repeat;  
-
+    background-repeat: no-repeat;
 }
 
 .sprint-results {
@@ -154,7 +165,8 @@ sprint-container {
 
     h2,
     h3 {
-        margin: 5px auto;
+        margin: 5px auto;        
+        font-family: $main-font;
         text-align: center;
     }
 }
@@ -163,6 +175,7 @@ sprint-container {
     margin: 5px auto;
     display: flex;
     align-items: center;
+    text-align: start;
     color: $color-answer;
 }
 
@@ -182,29 +195,31 @@ sprint-container {
 
 
 .sprint-scores {
-    padding-top: 35px;
-    width: 100px;
-    height: 118px;
+    padding-top: 35px;    
+    width: 95px;
+    height: 110px;
     text-align: center;
+    font-size: 1.8rem;
+    font-family: $main-font;
     background-image: url("../../../../assets/images/stamp5.png");
     background-size: contain;
+    background-repeat: no-repeat;
 }
   
 .sprint-timer {
     padding-top: 35px;
-    width: 160px;
-    height: 114px;
+    width: 145px;
+    height: 105px;
     text-align: center;
+    font-family: $main-font;
+    font-size: 1.8rem;
     background-image: url("../../../../assets/images/stamp7.png");
     background-size: contain;
+    background-repeat: no-repeat;
 }
 
 button {
     cursor: pointer;
-}
-
-.active {
- background-color: $backgroung-active-button;
 }
 
 .timing {
@@ -255,3 +270,10 @@ button {
 .results-right-answer {
     color: $color-correct-answer;
 }
+
+
+@media (max-width: 800px) {
+    .sprint-section {
+        background: $backgroung-playing-field;
+    }
+  }

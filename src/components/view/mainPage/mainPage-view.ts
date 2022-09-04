@@ -3,7 +3,7 @@ import "../../../assets/images/icons8-книга-100.png";
 import "../../../assets/images/icons8-комбинированный-график-100.png";
 import "../../../assets/images/icons8-cards-64.png";
 import "../../../assets/images/icons8-динамик-100.png";
-import "../../../assets/images/Pngtree-freelancer.png";
+import "../../../assets/images/team-lead.jpg";
 import "../../../assets/images/kisspng-programmer.png";
 import "../../../assets/images/pngwing.com.png";
 import {createElementWithAttributes} from "../utils";
@@ -64,9 +64,7 @@ export class MainPageView {
                   <h3 class="benefits-description-title">Аудиовызов</h3>
                   <p class="benefit-description-item">Тренировка понимания речи на слух</p>                
                 </div>
-
               </div>
-              <button class="start-button button-primary" type="button">Начать</button>
             </div>
           </section>
          
@@ -77,7 +75,7 @@ export class MainPageView {
       
                   <div class="our-team-card">
                     <div class="our-team-img" >
-                      <img src="./images/Pngtree-freelancer.png" alt="programmer">
+                      <img src="./images/team-lead.jpg" alt="programmer">
                     </div>
                     <div class="our-team-info">
                       <h3>Анна Танишева</h3>
@@ -85,6 +83,8 @@ export class MainPageView {
                       <ul>Вклад:
                         <li>Разработка архитектуры проекта</li>
                         <li>Авторизация</li>
+                        <li>Краткосрочная и долгосрочная статистика</li>
+                        <li>Игра "Аудиовызов"</li>
                       </ul>  
                     </div>
                   </div>
@@ -96,6 +96,8 @@ export class MainPageView {
                       <h3>Станислав Яроцкий</h3>
                       <ul>Вклад:
                         <li>Электронный учебник</li>
+                        <li>Поиск и исправление багов приложения</li>
+                        <li>Трансформация данных, получаемых с сервера, для дальнейшей работы</li>
                       </ul>  
                     </div>
                   </div> 
@@ -107,6 +109,7 @@ export class MainPageView {
                       <h3>Наталия Ланкевич</h3>
                       <ul>Вклад:
                         <li>Главная страница</li>
+                        <li>Игра "Спринт"</li>
                       </ul>  
                     </div>
                   </div>

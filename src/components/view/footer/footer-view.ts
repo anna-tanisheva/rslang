@@ -7,16 +7,13 @@ export class FooterView {
         footer.innerHTML = `
         <div class="footer-container">
           <div class="footer-gitHub">
-            <img src="./images/icons8-github-48.png" alt="Logo GitHub" width="50">
-            <p><a class="footer-logo-git" href="https://github.com/Nataliks">nataliks</a></p>
+            <a class="footer-logo-git" href="https://github.com/Nataliks"><img src="./images/icons8-github-48.png" alt="Logo GitHub" width="50">nataliks</a>
+          </div>
+          <div class="footer-gitHub">            
+            <a class="footer-logo-git" href="https://github.com/badikgit"><img src="./images/icons8-github-48.png" alt="Logo GitHub" width="50">badikgit</a>
           </div>
           <div class="footer-gitHub">
-            <img src="./images/icons8-github-48.png" alt="Logo GitHub" width="50">
-            <p><a class="footer-logo-git" href="https://github.com/badikgit">badikgit</a></p>
-          </div>
-          <div class="footer-gitHub">
-            <img src="./images/icons8-github-48.png" alt="Logo GitHub" width="50">
-            <p><a class="footer-logo-git" href="https://github.com/anna-tanisheva">anna-tanisheva</a></p>
+            <a class="footer-logo-git" href="https://github.com/anna-tanisheva"><img src="./images/icons8-github-48.png" alt="Logo GitHub" width="50">anna-tanisheva</a>
           </div>
           <div class="footer-year"><p>2022</p></div>
           <div class="footer-logo-rsschool">

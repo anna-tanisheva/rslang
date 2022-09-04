@@ -35,7 +35,8 @@ html {
 .header-wrapper {
     display: flex;
     background-color: $header-color;
-    align-items: center;
+    align-items: center;    
+    font-family: $main-font;
 }
 
 .header-title {
@@ -76,11 +77,13 @@ a {
     padding: 50px 0 50px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: center;    
+    font-family: $main-font;
 }
 
 .content-heading {
     font-size: 1.5rem;
+    padding: 0 10px;
     span {
         font-size: 2.5rem;
         font-weight: 600;
@@ -101,20 +104,27 @@ a {
 
 .start-screen-buttons {
     display: flex;
-    justify-content: center;
+    justify-content: center;   
 }
 
 .button-primary {
     margin: 0 5px;
-    height: 30px;
-    font-size: 1rem;
-    border: 3px solid #af9477;
+    font-size: 1rem; 
+    font-weight: 700; 
+    line-height: 1.3; 
+    padding: .6em 1.4em .5em .8em; 
+    border: 3px solid #aaa;
+    box-shadow: 0 1px 0 1px rgba(0,0,0,.04); 
+    border-radius: .5em;
     background-color: #8ab7f5;
+    background-image: linear-gradient(to bottom, #8ab7f5 0%,#547cb3 100%);
+    background-size: .65em auto, 100%; 
 }
 
 .button-primary:hover {
     border: 3px solid #615c5c;
     background-color: #efc97d;
+    background-image: linear-gradient(to bottom, #efc97d 0%,#a78b54 100%);
 }
 
 .section-benefits {
@@ -125,35 +135,32 @@ a {
 .benefits-heading,
 .our-team-heading {
     padding: 50px 0 50px;
-    text-align: center;
+    text-align: center;    
+    font-family: $main-font;
     font-size: 2rem;
 }
 
 .benefits-container {
     display: flex;
     justify-content: space-around;
+    flex-wrap: wrap;
 }
 
-.benefits-description {
+.benefits-description {    
+    margin: 5px 0;
     display: flex;
     flex-direction: column;
     max-width: 200px;
-    align-items: center;
+    align-items: center;    
+    font-family: $main-font;
 }
 
 .benefits-description-title {
     margin: 10px 0;
 }
 
-.benefit-description-item {
+.benefit-description-item {  
     text-align: center;
-}
-
-.start-button {
-    width: 100px;
-    height: 60px;
-    margin: 30px auto 0;
-    display: block;
 }
 
 .benefits-img {
@@ -179,7 +186,8 @@ a {
 
 .benefits-subheading {
     margin: 0 20px 60px;
-    text-align: justify;
+    text-align: justify;    
+    font-family: $main-font;
     font-size: 1.2rem;
 }
 
@@ -191,28 +199,48 @@ a {
 .our-team-container {
     display: flex;
     justify-content: space-around;
+    flex-wrap: wrap;
 }
 
 .our-team-img {
-    background-color: #af9477;
+    background-color: #fbe8ee;
+    border-top-left-radius: 1rem;
+    border-bottom-left-radius: 1rem;
+
+    img{    
+        border-radius: 1rem;
+    }
 }
 
 .our-team-card {
     display: flex;
     width: 400px;
-    margin: 5px;
+    margin: 5px;  
+    background-color: #dfbb94;
     border: solid #af9477;
+    border-radius: 1rem;
 }
 
 .our-team-info {
+    padding-left: 20px;
     width: 52%;
-    background-color: #ecdcca;
+    
     h3,
-    p {
+    p {        
+        font-family: $main-font;
         text-align: center;
     }
-    h3 {
+    h3 {        
+        font-family: $main-font;
         padding: 5px 0;
+    }
+}
+
+
+.img-container {
+    img{
+        width: 196px;
+        height: 100%;        
     }
 }
 
@@ -225,7 +253,8 @@ a {
     height: 100%;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
+    align-items: center;    
+    font-family: $main-font;
     background-color: #af9477;
 }
 
@@ -238,9 +267,30 @@ a {
     flex-direction: row;
     align-items: center;
     margin-left: 10px;
+
+    a {
+        display: flex;
+        align-items: center;
+    }
 }
 
 .footer-logo-rsschool {
     width: 100px;
     margin-right: 20px;
 }
+
+@media (max-width: 750px) {
+    .game-popup {
+      width: 495px;
+    }
+
+    .footer-year{
+        margin: 0 20px;
+    }
+
+    .content-heading span {
+        font-size: 2.2rem;
+    }
+
+}
+

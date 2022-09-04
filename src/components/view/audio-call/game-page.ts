@@ -54,6 +54,7 @@ export class GamePopUp {
             gameStatsWrapper.classList.add('opacity-hidden');
             const stats = createElementWithClassnames('div', 'game-stats');
             gameStatsWrapper.append(appendGameStats(stats));
+            const buttonsContainer = createElementWithClassnames('div', 'play-btns-container');
             const playAgain = createElementWithClassnames('button', 'play-again-btn', 'button');
             playAgain.textContent = 'Играть еще раз';
             playAgain.addEventListener('click', () => {
@@ -76,7 +77,8 @@ export class GamePopUp {
               goToStatisticPageHandler();
             });
             wrapper = createElementWithClassnames('div', 'game-stats');
-            gameStatsWrapper.append(playAgain, goToStatisticPage, wrapper);
+            buttonsContainer.append(playAgain, goToStatisticPage);
+            gameStatsWrapper.append(buttonsContainer, wrapper);
     } else if (game === SPRINT) {
         if (!arrOfWords) {
             currentGame.game = new Sprint(section, page, game);
