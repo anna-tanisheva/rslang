@@ -46,3 +46,10 @@
     max-width: 100%;
   }
 }
+.long-stats {
+  flex-basis: 100%;
+  border: 1px solid $colorGroup4;
+}
+.graph {
+  width: 100%;
+}
