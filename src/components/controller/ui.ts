@@ -891,6 +891,8 @@ export async function modifyWord(
     let nameForLS;
     if(gameName === 'audiocall') {
         nameForLS = 'audioCall'
+    } else {
+        nameForLS = 'sprint'
     }
 
     if (!body) return;
@@ -926,8 +928,6 @@ export async function modifyWord(
             gameName as keyof typeof body.optional
         ].rightAnswerSeries = 0;
         body.difficulty = "hard";
-        const state = (appState.user.statsToday as IUserStats).statisticState;
-        state[nameForLS as keyof typeof state].wordsLearnt -= 1;
     } else {
         return;
     }

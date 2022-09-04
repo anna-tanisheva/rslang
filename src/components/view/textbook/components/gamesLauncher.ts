@@ -104,7 +104,6 @@ export class GamesLauncher {
                             word.userWord.difficulty !== "easy"
                     )
                     .slice(0, 10);
-                console.log(newWords);
                 startGameHandler(e, {words: newWords});
             }
         });
