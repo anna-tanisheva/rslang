@@ -28,6 +28,12 @@ html {
     scroll-behavior: smooth;
 }
 
+.header {
+    position: fixed;
+    width: 100%;
+    z-index: 25;
+}
+
 .nav {
     margin: auto;
 }
