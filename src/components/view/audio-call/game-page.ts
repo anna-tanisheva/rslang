@@ -5,7 +5,6 @@ import {
 import { AudioCall } from "./call/audio-call";
 import { currentGame, AUDIO_CALL, SPRINT, appState } from "../../controller/state";
 import { playWordInGameHandler, appendGameStats, playAgainHandler, goToStatisticPageHandler, setStats } from '../../controller/ui';
-// import { IUserStats } from "../../../typings";
 import { Sprint } from "./sprint/sprint-model";
 import { IResWordsPage, IUserStats } from "../../../typings";
 

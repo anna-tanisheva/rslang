@@ -31,9 +31,6 @@ export function getRandomInRange(num: number) {
     return Math.floor(Math.random() * num)
 }
 
-
-
-
 export function localStorageSpace (){
         let allStrings = '';
         Object.keys(window.localStorage).forEach ( key=>

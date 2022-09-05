@@ -5,8 +5,6 @@ import {
   // createElementWithContent,
 } from "../utils";
 import { setDailyChart } from "../../controller/ui";
-// import { calcCorrectAnswersPercent } from "../../controller/ui";
-// import { AudioCall } from "../audio-call/call/audio-call";
 import { SPRINT } from "../../controller/state";
 
 

@@ -2,7 +2,6 @@ import './style.scss';
 import {
   createElementWithAttributes,
   createElementWithClassnames,
-  // createElementWithContent,
 } from "../utils";
 import { setLongTermGraph } from '../../controller/ui';
 

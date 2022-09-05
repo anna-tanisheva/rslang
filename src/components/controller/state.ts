@@ -1,6 +1,5 @@
 import {
     IAppState,
-    // IStatisticState,
     ICurrentGame,
     ITextbookState,
 } from "../../typings/typings";

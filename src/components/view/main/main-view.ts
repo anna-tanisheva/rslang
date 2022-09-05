@@ -46,7 +46,6 @@ export class MainView {
             main.append(errorView);
             return main;
         }
-        // const chart = createCharts('audioCall');
         main.append(this[this.activeViewName], overlay);
         return main;
     }
