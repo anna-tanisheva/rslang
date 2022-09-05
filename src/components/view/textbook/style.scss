@@ -1,0 +1,528 @@
+@import url("https://fonts.googleapis.com/css2?family=Rubik+Mono+One&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,700;0,900;1,400;1,700;1,900&display=swap");
+$sides-padding: 1rem;
+$colorActiveBg: lighten(rgba(211, 211, 211, 0.5), 15%);
+$colorActive: lighten(black, 40%);
+$colorGroup1: darken(aquamarine, 35%);
+$colorGroup2: lighten(orange, 5%);
+$colorGroup3: darken(pink, 10%);
+$colorGroup4: lighten(red, 20%);
+$colorGroup5: lightskyblue;
+$colorGroup6: lighten(blue, 25%);
+.textbook-container {
+  flex: 1 0 auto;
+  padding: 1rem 0;
+  width: min(1200px, calc(100% - $sides-padding));
+  margin: 0 auto;
+  .group-heading,
+  .group-container {
+    font-family: "Rubik", sans-serif;
+    font-weight: 300;
+    padding: calc($sides-padding/2);
+    background-color: $colorActiveBg;
+  }
+  .group-heading {
+    border-radius: 0 1rem 0 0;
+  }
+  .group-container {
+    padding-bottom: calc($sides-padding/2);
+  }
+}
+
+.textbook-controls {
+  display: flex;
+  gap: 0.5em;
+  height: 40px;
+  position: relative;
+  .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: $sides-padding;
+    border: 0;
+    border-radius: 1rem;
+    box-shadow: 2px 2px 5px #0007;
+    background-color: lighten(lightgrey, 11%);
+    font-family: "Rubik", sans-serif;
+    .modal-buttons {
+      display: flex;
+      padding: $sides-padding;
+      flex-direction: column;
+      gap: $sides-padding;
+      button {
+        color: $colorActive;
+        border: 1px dashed currentColor;
+        border-radius: 1rem;
+        cursor: pointer;
+        color: lightgrey;
+        border: 1px dashed currentColor;
+        margin: 0 0.5rem 0 0;
+        padding: 0.25rem;
+        border-radius: 1rem;
+        transition: 0.2s;
+        &:hover {
+          color: $colorActive;
+          border: 1px solid currentColor;
+        }
+      }
+    }
+  }
+}
+
+.group-label,
+.textbook-mode,
+.textbook-settings {
+  padding: calc($sides-padding/2);
+  font-size: 1rem;
+  letter-spacing: -0.1em;
+  cursor: pointer;
+  border: unset;
+  background: unset;
+  transition: 0.2s;
+}
+
+.textbook-control {
+  display: grid;
+}
+
+.group-label,
+.textbook-mode {
+  font-family: "Rubik Mono One", sans-serif;
+  color: lighten($colorActive, 10%);
+  border-radius: 1rem 1rem 0 0;
+  display: grid;
+  place-items: center;
+  padding-bottom: 0;
+  transition: 0.3s;
+}
+
+input[name="textbook-mode"],
+input[name="group-radio"],
+input[name="words-item-radio"],
+input[name="difficulty-radio"] {
+  width: 0;
+  height: 0;
+  opacity: 0;
+  display: none;
+}
+
+input[name="textbook-mode"]:checked + .textbook-mode,
+input[name="group-radio"]:checked + .group-label {
+  color: $colorActive;
+  text-shadow: unset;
+}
+
+input[name="textbook-mode"]:checked + .textbook-mode {
+  background-color: $colorActiveBg;
+}
+
+.textbook-mode:hover {
+  text-shadow: 1px 1px black;
+}
+
+.textbook-settings {
+  font-size: 1.5rem;
+  color: $colorActive;
+  display: grid;
+  place-items: center;
+}
+
+.textbook-settings .settings-icon {
+  fill: currentColor;
+  width: 1em;
+  height: 1em;
+  transition: 0.3s;
+  pointer-events: none;
+}
+
+.textbook-settings:hover .settings-icon {
+  transform: rotate(120deg);
+}
+
+.group-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1em;
+}
+
+.group-item {
+  color: lightgrey;
+  flex: 1;
+}
+
+.group-item h2 {
+  min-width: 160px;
+}
+
+.group-item p {
+  text-align: right;
+}
+
+.group-item:nth-child(1) input[name="group-radio"]:checked + .group-label {
+  color: $colorGroup1;
+  box-shadow: 2px 2px 0px 0px currentColor;
+}
+
+.group-item:nth-child(2) input[name="group-radio"]:checked + .group-label {
+  color: $colorGroup2;
+  box-shadow: 2px 2px 0px 0px currentColor;
+}
+
+.group-item:nth-child(3) input[name="group-radio"]:checked + .group-label {
+  color: $colorGroup3;
+  box-shadow: 2px 2px 0px 0px currentColor;
+}
+
+.group-item:nth-child(4) input[name="group-radio"]:checked + .group-label {
+  color: $colorGroup4;
+  box-shadow: 2px 2px 0px 0px currentColor;
+}
+
+.group-item:nth-child(5) input[name="group-radio"]:checked + .group-label {
+  color: $colorGroup5;
+  box-shadow: 2px 2px 0px 0px currentColor;
+}
+
+.group-item:nth-child(6) input[name="group-radio"]:checked + .group-label {
+  color: $colorGroup6;
+  box-shadow: 2px 2px 0px 0px currentColor;
+}
+
+.group-label {
+  background-color: lighten(rgba(211, 211, 211, 0.8), 11%);
+  font-family: "Rubik Mono One", sans-serif;
+  color: currentColor;
+  border-radius: 1rem;
+  place-items: unset;
+}
+
+.words-wrapper {
+  background-color: $colorActiveBg;
+  border-radius: 0 0 1rem 1rem;
+  color: $colorActive;
+  .words-heading {
+    font-family: "Rubik", sans-serif;
+    font-weight: 300;
+    padding: 0.5rem;
+  }
+  display: flex;
+  flex-direction: column;
+  .words-group {
+    display: flex;
+    color: $colorActive;
+    .card {
+      width: 250px;
+      background-color: lighten(rgba(211, 211, 211, 0.8), 11%);
+      margin: calc($sides-padding/2);
+      border-radius: 9rem 1rem 1rem 1rem;
+      .card-image {
+        height: 150px;
+        background-size: cover;
+        background-repeat: no-repeat;
+        border-radius: 5rem 1rem 5rem 1rem;
+      }
+    }
+    .words-page {
+      padding: calc($sides-padding/2);
+      display: flex;
+      align-content: start;
+      flex-wrap: wrap;
+      gap: 1rem;
+      width: calc(100% - 250px);
+      pointer-events: none;
+      .message {
+        font-family: "Rubik", sans-serif;
+      }
+      .words-item-wrapper {
+        min-width: 210px;
+        flex: 1;
+        height: 100px;
+        font-family: "Rubik", sans-serif;
+        pointer-events: none;
+        input[name="words-item-radio"]:checked + .words-item {
+          box-shadow: 2px 2px 0px 0px currentColor;
+        }
+        .words-item {
+          position: relative;
+          background-color: lighten(lightgrey, 11%);
+          cursor: pointer;
+          padding: 1rem 1rem 0 1rem;
+          border-radius: 1rem;
+          flex: 1;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          color: currentColor;
+          pointer-events: all;
+          overflow: clip;
+          .item-word {
+            font-size: 1.4rem;
+            font-weight: 700;
+          }
+          .item-word,
+          .item-translate {
+            pointer-events: none;
+          }
+          .item-status {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            color: $colorActiveBg;
+            background-color: $colorActive;
+            padding: calc($sides-padding/3);
+            width: calc($sides-padding * 2);
+            height: calc($sides-padding * 2);
+            text-align: center;
+            font-family: "Rubik Mono One", sans-serif;
+            border-radius: $sides-padding 0 0 0;
+          }
+        }
+      }
+    }
+  }
+  .pages-container {
+    margin: 0 auto;
+    padding: calc($sides-padding) 0;
+    width: fit-content;
+    display: flex;
+    gap: 5px;
+    .page-button {
+      background-color: lighten(lightgrey, 9%);
+      font-family: "Rubik", sans-serif;
+      color: $colorActive;
+      font-weight: 700;
+      font-size: 1.5rem;
+      height: 2.5rem;
+      width: 2.5rem;
+      flex-shrink: 0;
+      border: unset;
+      border-radius: 50%;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: 0.2s;
+      &:disabled {
+        cursor: auto;
+        pointer-events: none;
+        color: #999;
+        box-shadow: 1px 1px 0px 0px currentColor;
+      }
+      &:hover {
+        box-shadow: 2px 2px 0px 0px currentColor;
+      }
+      &:active {
+        box-shadow: 1px 1px 0px 0px currentColor;
+      }
+    }
+    .slider-buttons-wrapper {
+      position: relative;
+      display: flex;
+      max-width: 200px;
+      overflow: clip;
+      &::after,
+      &::before {
+        position: absolute;
+        content: "";
+        width: 20px;
+        right: 0px;
+        height: 100%;
+        background: linear-gradient(
+          -90deg,
+          rgba(235, 222, 203, 1) 5%,
+          rgba(255, 255, 255, 0) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        z-index: 5;
+        pointer-events: none;
+      }
+      &::before {
+        background: linear-gradient(
+          90deg,
+          rgba(235, 222, 203, 1) 5%,
+          rgba(255, 255, 255, 0) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        right: unset;
+        left: 0;
+      }
+      .slider-buttons {
+        transform: translateX(0px);
+        display: flex;
+        transition: 0.2s;
+        padding-bottom: 5px;
+        gap: 5px;
+      }
+    }
+  }
+}
+
+.card-wrapper {
+  position: relative;
+  .card {
+    top: calc($sides-padding/2);
+    position: sticky;
+    font-family: "Rubik", sans-serif;
+    min-height: 700px;
+    display: flex;
+    flex-direction: column;
+    .games-statictic-wrapper {
+      position: absolute;
+      bottom: 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      justify-self: flex-end;
+      width: 100%;
+      padding: $sides-padding;
+      background-color: $colorActive;
+      opacity: 0.8;
+      color: $colorActiveBg;
+      border-radius: 0 0 $sides-padding $sides-padding;
+      .card-word {
+        width: 100%;
+      }
+    }
+    .card-controls-wrapper {
+      display: flex;
+      padding: $sides-padding;
+      padding-bottom: 0;
+      .difficulty-label {
+        color: lightgrey;
+        border: 1px dashed currentColor;
+        margin: 0 calc($sides-padding/2) 0 0;
+        padding: calc($sides-padding/4);
+        border-radius: $sides-padding;
+        transition: 0.2s;
+        &:hover {
+          color: $colorActive;
+          border: 1px solid currentColor;
+          cursor: pointer;
+        }
+      }
+      input[name="difficulty-radio"]:checked + .difficulty-label {
+        color: $colorActive;
+        border: 1px solid currentColor;
+        box-shadow: 1px 1px 0px 0px currentColor;
+      }
+      input[name="difficulty-radio"]:disabled + .difficulty-label:hover {
+        color: lightgrey;
+        cursor: auto;
+        pointer-events: none;
+      }
+    }
+    .card-content {
+      padding: $sides-padding;
+      padding-bottom: 100px;
+      .card-heading {
+        display: flex;
+        flex-wrap: wrap;
+        row-gap: 0.5rem;
+      }
+      .card-word {
+        font-size: 1.5rem;
+        font-weight: 700;
+        width: 100%;
+      }
+      .card-translate,
+      .card-transcription {
+        font-size: 1.1rem;
+        letter-spacing: -1px;
+        font-weight: 400;
+        width: 100%;
+      }
+      .card-transcription {
+        letter-spacing: 2px;
+        vertical-align: middle;
+        width: fit-content;
+        align-self: flex-end;
+      }
+      .card-buttot-audio {
+        margin: 0 0 0 0.5rem;
+        width: 24px;
+        height: 24px;
+        background-image: url("../../../assets/images/icon-play-audio.svg");
+        background-size: contain;
+        border: unset;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: 0.3s;
+        &:hover {
+          background-color: currentColor;
+        }
+        &.active {
+          animation-name: blinking;
+          animation-duration: 0.65s;
+          animation-iteration-count: infinite;
+          animation-direction: alternate-reverse;
+        }
+        @keyframes blinking {
+          0% {
+            background-color: currentColor;
+          }
+          50% {
+            background-color: currentColor;
+          }
+          100% {
+            background-color: transparent;
+          }
+        }
+      }
+    }
+  }
+}
+
+.games-launcher-wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: calc($sides-padding);
+  .games-launcher-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: calc($sides-padding/2);
+    gap: $sides-padding;
+  }
+  .start-button {
+    width: unset;
+    height: unset;
+    margin: unset;
+    display: block;
+    background-color: unset;
+    border: unset;
+    font-size: unset;
+    padding: calc($sides-padding/2) $sides-padding;
+    border-radius: calc($sides-padding * 2);
+    background-color: lighten(lightgrey, 9%);
+    font-family: "Rubik", sans-serif;
+    color: $colorActive;
+    font-weight: 700;
+    font-size: 1.3rem;
+    height: 2.5rem;
+    transition: 0.2s;
+    &:hover {
+      box-shadow: 2px 2px 0px 0px currentColor;
+    }
+    &:active {
+      box-shadow: 1px 1px 0px 0px currentColor;
+    }
+    &:disabled,
+    &:disabled:hover {
+      color: lighten($colorActive, 40%);
+      box-shadow: unset;
+      cursor: auto;
+    }
+  }
+  .sprint-button {
+    border: unset;
+    padding: calc($sides-padding/2);
+  }
+  .games-info {
+    padding: calc($sides-padding/2);
+    width: 100%;
+    text-align: center;
+    font-family: "Rubik", sans-serif;
+    font-weight: 100;
+  }
+}

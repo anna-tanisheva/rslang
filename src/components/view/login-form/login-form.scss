@@ -1,0 +1,148 @@
+.form-container {
+    position: fixed;
+    z-index: 5;
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    width: 425px;
+    min-height: 250px;
+    padding: 10px;
+    border: 2px solid $main-color;
+    border-radius: 5px;
+    font-family: "Rubik", sans-serif;
+}
+
+.show-form {
+    width: 40px;
+    height: 40px;
+    background-image: url("../../../assets/images/login.png");
+    background-size: cover;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    border-radius: 50%;
+}
+
+.show-form-wrapper {
+    display: flex;
+}
+
+.show-tab {
+    display: block;
+    width: 50%;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    padding: 0.25rem;
+    transform: translateY(1px);
+}
+
+.validation-message {
+    background-color: lighten($main-color, 10%);
+    padding: 0 20px 20px;
+    &>p {
+        margin-bottom: 5px;
+    }
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    background-color: lighten($main-color, 10%);
+    padding: 30px;
+    min-height: inherit;
+    justify-content: space-evenly;
+    label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        white-space: nowrap;
+    }
+    input {
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0 10px;
+        font-family: "Rubik", sans-serif;
+    }
+}
+
+.active-form {
+    background-color: lighten($main-color, 10%);
+}
+
+.close-form-button {
+    position: absolute;
+    height: 25px;
+    width: 25px;
+    border-radius: 50%;
+    top: -15px;
+    right: -15px;
+    border: none;
+    background-color: $main-color;
+    transform: rotate(-45deg);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: 0.3s;
+    &:hover {
+        transform: rotate(-90deg);
+    }
+}
+
+.form-container button {
+    font-family: 'Rubik Mono One', sans-serif;
+    letter-spacing: -1px;
+}
+
+.log-out-wrapper {
+    width: fit-content;
+    transition: 0.5s;
+}
+
+.form-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: 0.5s;
+}
+
+.logout-submit {
+    background-color: unset;
+    border: unset;
+    width: 1.9rem;
+    height: 1.9rem;
+    transition: 0.3s;
+    padding: 0.2rem;
+    padding-left: .25rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+}
+
+.logout-submit:disabled {
+    width: 0;
+    opacity: 0;
+}
+
+.login-submit,
+.registration-submit {
+    padding: 0.1rem;
+    border-radius: 0.5rem;
+}
+
+.show-form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: auto;
+}
+
+.welcome-text {
+    width: fit-content;
+    transition: 0.3s;
+    text-align: center;
+    white-space: nowrap;
+}
