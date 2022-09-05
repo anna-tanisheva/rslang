@@ -24,7 +24,7 @@ import {getActiveViewData} from "./ui";
 import {WordItem} from "../view/textbook/components/word";
 import {GamesLauncher} from "../view/textbook/components/gamesLauncher";
 
-export const BASE_URL = "http://localhost:3000";
+export const BASE_URL = "https://back-end-rs-lang.herokuapp.com";
 const ID = "";
 
 const SIGNIN = `${BASE_URL}/signin`;

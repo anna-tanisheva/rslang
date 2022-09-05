@@ -5,7 +5,7 @@ import {
     ITextbookState,
 } from "../../typings/typings";
 
-export const ENDPOINT = "http://localhost:3000";
+export const ENDPOINT = "https://back-end-rs-lang.herokuapp.com";
 
 export const appState: IAppState = {
     isSignedIn: false,
